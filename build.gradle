@@ -1,0 +1,23 @@
+plugins {
+    id 'java'
+}
+
+group 'dev.alexengrig'
+version '0.1.0-SNAPSHOT'
+
+java {
+    sourceCompatibility(JavaVersion.VERSION_11)
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation "org.junit.jupiter:junit-jupiter-api:${jUnitVersion}"
+    testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:${jUnitVersion}"
+}
+
+test {
+    useJUnitPlatform()
+}
