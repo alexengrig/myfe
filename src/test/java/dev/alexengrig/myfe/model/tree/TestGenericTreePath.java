@@ -16,10 +16,10 @@
 
 package dev.alexengrig.myfe.model.tree;
 
-class TestGenericTreePath
+public class TestGenericTreePath
         extends BaseGenericTreePath<TestModel, TestGenericTreeNode, TestGenericTreePath> {
 
-    TestGenericTreePath(TestGenericTreeNode lastNode) {
+    public TestGenericTreePath(TestGenericTreeNode lastNode) {
         this(createParent(lastNode, TestGenericTreePath::new), lastNode);
     }
 

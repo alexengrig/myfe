@@ -20,7 +20,7 @@ import dev.alexengrig.myfe.model.Model;
 
 import java.util.Objects;
 
-class TestModel implements Model {
+public class TestModel implements Model {
 
     private final Object value;
 

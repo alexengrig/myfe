@@ -16,16 +16,20 @@
 
 package dev.alexengrig.myfe.model.tree;
 
+import dev.alexengrig.myfe.model.ModelUpdater;
+
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.function.UnaryOperator;
 
-class TestGenericTreeNode
-        extends BaseGenericTreeNode<TestModel, TestGenericTreeNode> {
+public class TestGenericTreeNode
+        extends BaseGenericTreeNode<TestModel, TestGenericTreeNode>
+        implements ModelUpdater<TestModel> {
 
     private final TestGenericTreeNode parent;
     private final List<TestGenericTreeNode> children;
-    private final TestModel model;
+    private TestModel model;
 
     TestGenericTreeNode(TestModel model) {
         this(null, model);
@@ -62,7 +66,14 @@ class TestGenericTreeNode
 
     @Override
     public boolean isLeaf() {
-        throw new UnsupportedOperationException();
+        return children.isEmpty();
+    }
+
+    @Override
+    public boolean update(UnaryOperator<TestModel> updater) {
+        TestModel oldModel = this.model;
+        this.model = updater.apply(oldModel);
+        return true;
     }
 
 }
