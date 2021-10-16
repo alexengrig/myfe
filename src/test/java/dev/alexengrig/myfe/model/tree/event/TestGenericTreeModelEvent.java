@@ -33,4 +33,9 @@ public class TestGenericTreeModelEvent
         super(source, path, new int[]{childIndex}, new TestGenericTreeNode[]{child});
     }
 
+    @Override
+    public TestGenericTreePath path() {
+        return super.path();
+    }
+
 }

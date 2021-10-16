@@ -72,8 +72,13 @@ public class TestGenericTreeNode
     @Override
     public boolean update(UnaryOperator<TestModel> updater) {
         TestModel oldModel = this.model;
-        this.model = updater.apply(oldModel);
-        return true;
+        TestModel newModel = updater.apply(oldModel);
+        if (oldModel.equals(newModel)) {
+            return false;
+        } else {
+            this.model = newModel;
+            return true;
+        }
     }
 
 }
