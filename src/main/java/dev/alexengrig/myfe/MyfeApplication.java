@@ -16,26 +16,42 @@
 
 package dev.alexengrig.myfe;
 
+import dev.alexengrig.myfe.controller.directory.DictionaryTreeController;
+import dev.alexengrig.myfe.factory.directory.DefaultFileSystemDirectoryTreeFactory;
+import dev.alexengrig.myfe.model.directory.DirectoryTreeModel;
+import dev.alexengrig.myfe.view.directory.DictionaryTreeView;
+
 import javax.swing.*;
 
 public final class MyfeApplication extends JFrame {
 
     private static final String TITLE = "myfe";
 
+    private DictionaryTreeController treeController;
+
     public MyfeApplication() {
         super(TITLE);
-        configureFrame();
-        configureComponents();
         setVisible(true);
     }
 
-    private void configureFrame() {
+    @Override
+    protected void frameInit() {
+        super.frameInit();
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setLocationRelativeTo(null); // center of screen
+        componentsInit();
     }
 
-    private void configureComponents() {
-        //TODO: add components
+    private void componentsInit() {
+        // Tree //TODO: Get factory from context
+        DefaultFileSystemDirectoryTreeFactory treeFactory = new DefaultFileSystemDirectoryTreeFactory();
+        DirectoryTreeModel treeModel = treeFactory.createModel();
+        DictionaryTreeView treeView = treeFactory.createView(treeModel);
+        this.treeController = treeFactory.createController(treeView);
+        //TODO: Content view (+ Preview view)
+        JPanel contentView = new JPanel();
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, treeView, contentView);
+        add(splitPane);
     }
 
 }
