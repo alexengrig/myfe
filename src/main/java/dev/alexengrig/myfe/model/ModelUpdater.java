@@ -21,10 +21,10 @@ import java.util.function.UnaryOperator;
 @FunctionalInterface
 public interface ModelUpdater<M extends Model> {
 
-    void update(UnaryOperator<M> updater);
+    boolean update(UnaryOperator<M> updater);
 
-    default void update(M model) {
-        update(oldModel -> model);
+    default boolean update(M model) {
+        return update(oldModel -> model);
     }
 
 }
