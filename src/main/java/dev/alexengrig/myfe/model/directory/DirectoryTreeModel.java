@@ -79,7 +79,9 @@ public class DirectoryTreeModel
         }
 
         public void setChildren(List<DirectoryModel> children) {
-            this.children = children.stream().map(Node::new).collect(Collectors.toList());
+            this.children = children.stream()
+                    .map(model -> new Node(this, model))
+                    .collect(Collectors.toList());
             nodeChildrenWereSet(this);
         }
 
@@ -112,7 +114,7 @@ public class DirectoryTreeModel
 
         @Override
         public boolean isLeaf() {
-            return model.isLoaded() && children.isEmpty();
+            return false;
         }
 
     }
