@@ -10,7 +10,7 @@ MYFE (MYFE Youth File Explorer) is a file explorer application.
            v
           VIEW
           ^   \ event
- notify /     \ 
+ notify /      \ 
     MODEL       )
         ^      /
   update \    v
