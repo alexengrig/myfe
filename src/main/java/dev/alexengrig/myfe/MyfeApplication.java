@@ -23,6 +23,7 @@ import dev.alexengrig.myfe.model.directory.DirectoryTreeModel;
 import dev.alexengrig.myfe.view.directory.DirectoryTreeView;
 
 import javax.swing.*;
+import java.awt.*;
 
 public final class MyfeApplication extends JFrame {
 
@@ -32,6 +33,8 @@ public final class MyfeApplication extends JFrame {
 
     public MyfeApplication() {
         super(TITLE);
+        pack();
+        setLocationRelativeTo(null); // center of screen
         setVisible(true);
     }
 
@@ -39,8 +42,13 @@ public final class MyfeApplication extends JFrame {
     protected void frameInit() {
         super.frameInit();
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setLocationRelativeTo(null); // center of screen
+        setPreferredSize(createPreferredSize());
         componentsInit();
+    }
+
+    private Dimension createPreferredSize() {
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        return new Dimension(screenSize.width / 2, screenSize.height / 2);
     }
 
     private void componentsInit() {
