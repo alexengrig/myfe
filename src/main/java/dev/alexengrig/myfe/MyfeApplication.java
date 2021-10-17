@@ -16,10 +16,11 @@
 
 package dev.alexengrig.myfe;
 
-import dev.alexengrig.myfe.controller.directory.DictionaryTreeController;
+import dev.alexengrig.myfe.controller.directory.DirectoryTreeController;
 import dev.alexengrig.myfe.factory.directory.DefaultFileSystemDirectoryTreeFactory;
+import dev.alexengrig.myfe.factory.directory.DirectoryTreeFactory;
 import dev.alexengrig.myfe.model.directory.DirectoryTreeModel;
-import dev.alexengrig.myfe.view.directory.DictionaryTreeView;
+import dev.alexengrig.myfe.view.directory.DirectoryTreeView;
 
 import javax.swing.*;
 
@@ -27,7 +28,7 @@ public final class MyfeApplication extends JFrame {
 
     private static final String TITLE = "myfe";
 
-    private DictionaryTreeController treeController;
+    private DirectoryTreeController treeController;
 
     public MyfeApplication() {
         super(TITLE);
@@ -44,9 +45,9 @@ public final class MyfeApplication extends JFrame {
 
     private void componentsInit() {
         // Tree //TODO: Get factory from context
-        DefaultFileSystemDirectoryTreeFactory treeFactory = new DefaultFileSystemDirectoryTreeFactory();
+        DirectoryTreeFactory treeFactory = new DefaultFileSystemDirectoryTreeFactory();
         DirectoryTreeModel treeModel = treeFactory.createModel();
-        DictionaryTreeView treeView = treeFactory.createView(treeModel);
+        DirectoryTreeView treeView = treeFactory.createView(treeModel);
         this.treeController = treeFactory.createController(treeView);
         //TODO: Content view (+ Preview view)
         JPanel contentView = new JPanel();

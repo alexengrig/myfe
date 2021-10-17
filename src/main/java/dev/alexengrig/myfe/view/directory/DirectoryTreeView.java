@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.controller.directory;
+package dev.alexengrig.myfe.view.directory;
 
-import dev.alexengrig.myfe.view.directory.DictionaryTreeView;
+import dev.alexengrig.myfe.model.directory.DirectoryTreeModel;
 
-import java.nio.file.FileSystems;
+import javax.swing.*;
 
-public class DefaultFileSystemDictionaryTreeController extends DictionaryTreeController {
+public class DirectoryTreeView extends JTree {
 
-    public DefaultFileSystemDictionaryTreeController(DictionaryTreeView view) {
-        super(view, FileSystems.getDefault());
+    public DirectoryTreeView(DirectoryTreeModel model) {
+        super(model);
     }
 
 }

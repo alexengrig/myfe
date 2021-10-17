@@ -17,13 +17,13 @@
 package dev.alexengrig.myfe.factory.directory;
 
 import dev.alexengrig.myfe.model.directory.DirectoryTreeModel;
-import dev.alexengrig.myfe.view.directory.DictionaryTreeView;
+import dev.alexengrig.myfe.view.directory.DirectoryTreeView;
 
 public abstract class BaseDirectoryTreeFactory implements DirectoryTreeFactory {
 
     @Override
-    public DictionaryTreeView createView(DirectoryTreeModel model) {
-        return new DictionaryTreeView(model);
+    public DirectoryTreeView createView(DirectoryTreeModel model) {
+        return new DirectoryTreeView(model);
     }
 
 }

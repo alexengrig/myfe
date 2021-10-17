@@ -18,7 +18,7 @@ package dev.alexengrig.myfe.controller.directory;
 
 import dev.alexengrig.myfe.model.directory.DirectoryModel;
 import dev.alexengrig.myfe.model.directory.DirectoryTreeModel;
-import dev.alexengrig.myfe.view.directory.DictionaryTreeView;
+import dev.alexengrig.myfe.view.directory.DirectoryTreeView;
 
 import javax.swing.*;
 import javax.swing.event.TreeExpansionEvent;
@@ -33,12 +33,12 @@ import java.util.concurrent.ExecutionException;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class DictionaryTreeController {
+public class DirectoryTreeController {
 
-    private final DictionaryTreeView view;
+    private final DirectoryTreeView view;
     private final FileSystem fileSystem;
 
-    public DictionaryTreeController(DictionaryTreeView view, FileSystem fileSystem) {
+    public DirectoryTreeController(DirectoryTreeView view, FileSystem fileSystem) {
         this.view = view;
         this.fileSystem = fileSystem;
         init();

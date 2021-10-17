@@ -16,11 +16,11 @@
 
 package dev.alexengrig.myfe.factory.directory;
 
-import dev.alexengrig.myfe.controller.directory.DefaultFileSystemDictionaryTreeController;
-import dev.alexengrig.myfe.controller.directory.DictionaryTreeController;
+import dev.alexengrig.myfe.controller.directory.DefaultFileSystemDirectoryTreeController;
+import dev.alexengrig.myfe.controller.directory.DirectoryTreeController;
 import dev.alexengrig.myfe.model.directory.DefaultFileSystemDirectoryTreeModel;
 import dev.alexengrig.myfe.model.directory.DirectoryTreeModel;
-import dev.alexengrig.myfe.view.directory.DictionaryTreeView;
+import dev.alexengrig.myfe.view.directory.DirectoryTreeView;
 
 public class DefaultFileSystemDirectoryTreeFactory
         extends BaseDirectoryTreeFactory {
@@ -31,8 +31,8 @@ public class DefaultFileSystemDirectoryTreeFactory
     }
 
     @Override
-    public DictionaryTreeController createController(DictionaryTreeView view) {
-        return new DefaultFileSystemDictionaryTreeController(view);
+    public DirectoryTreeController createController(DirectoryTreeView view) {
+        return new DefaultFileSystemDirectoryTreeController(view);
     }
 
 }

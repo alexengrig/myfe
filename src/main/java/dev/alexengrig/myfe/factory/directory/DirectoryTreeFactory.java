@@ -16,11 +16,11 @@
 
 package dev.alexengrig.myfe.factory.directory;
 
-import dev.alexengrig.myfe.controller.directory.DictionaryTreeController;
+import dev.alexengrig.myfe.controller.directory.DirectoryTreeController;
 import dev.alexengrig.myfe.factory.MVCFactory;
 import dev.alexengrig.myfe.model.directory.DirectoryTreeModel;
-import dev.alexengrig.myfe.view.directory.DictionaryTreeView;
+import dev.alexengrig.myfe.view.directory.DirectoryTreeView;
 
 public interface DirectoryTreeFactory
-        extends MVCFactory<DirectoryTreeModel, DictionaryTreeView, DictionaryTreeController> {
+        extends MVCFactory<DirectoryTreeModel, DirectoryTreeView, DirectoryTreeController> {
 }
