@@ -16,14 +16,13 @@
 
 package dev.alexengrig.myfe.controller.directory;
 
+import dev.alexengrig.myfe.service.directory.DefaultFileSystemDirectoryService;
 import dev.alexengrig.myfe.view.directory.DirectoryTreeView;
-
-import java.nio.file.FileSystems;
 
 public class DefaultFileSystemDirectoryTreeController extends DirectoryTreeController {
 
     public DefaultFileSystemDirectoryTreeController(DirectoryTreeView view) {
-        super(view, FileSystems.getDefault());
+        super(view, new DefaultFileSystemDirectoryService());
     }
 
 }
