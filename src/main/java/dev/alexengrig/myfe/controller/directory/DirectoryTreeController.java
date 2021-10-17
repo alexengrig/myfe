@@ -18,100 +18,77 @@ package dev.alexengrig.myfe.controller.directory;
 
 import dev.alexengrig.myfe.model.directory.DirectoryModel;
 import dev.alexengrig.myfe.model.directory.DirectoryTreeModel;
+import dev.alexengrig.myfe.service.directory.DirectoryService;
+import dev.alexengrig.myfe.util.BackgroundWorker;
 import dev.alexengrig.myfe.view.directory.DirectoryTreeView;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import javax.swing.*;
 import javax.swing.event.TreeExpansionEvent;
 import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.TreePath;
-import java.nio.file.FileSystem;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.List;
+import java.lang.invoke.MethodHandles;
 import java.util.Optional;
-import java.util.concurrent.ExecutionException;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
+import java.util.concurrent.Callable;
+import java.util.function.Consumer;
 
 public class DirectoryTreeController {
 
-    private final DirectoryTreeView view;
-    private final FileSystem fileSystem;
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public DirectoryTreeController(DirectoryTreeView view, FileSystem fileSystem) {
+    private final DirectoryTreeView view;
+    private final DirectoryService service;
+
+    public DirectoryTreeController(DirectoryTreeView view, DirectoryService service) {
         this.view = view;
-        this.fileSystem = fileSystem;
+        this.service = service;
         init();
     }
 
-    protected void init() {
+    private void init() {
         view.addTreeWillExpandListener(new MyTreeWillExpandListener());
     }
 
-    protected class MyTreeWillExpandListener implements TreeWillExpandListener {
+    private <T> void runInBackground(
+            Callable<T> action, Consumer<T> onSuccess, Consumer<Exception> onFailure) {
+        BackgroundWorker.from(action, onSuccess, Exception.class, onFailure).execute();
+    }
+
+    private void loadChildrenDirectories(DirectoryTreeModel.Node node) {
+        DirectoryModel model = node.model();
+        if (model.isLoaded()) {
+            LOGGER.debug("Model already loaded: {}", model);
+            return;
+        }
+        model.setLoaded(true);
+        LOGGER.debug("Start loading subdirectories for: {}", model);
+        runInBackground(
+                () -> service.getSubdirectories(model.getPath()),
+                children -> {
+                    LOGGER.debug("Subdirectories loaded successfully for: {}", model);
+                    node.setChildren(children);
+                },
+                exception -> {
+                    LOGGER.warn("Exception of subdirectories loading for: {}", model, exception);
+                    model.setLoaded(false);
+                });
+    }
+
+    private class MyTreeWillExpandListener implements TreeWillExpandListener {
 
         @Override
         public void treeWillExpand(TreeExpansionEvent event) {
-            Optional<DirectoryTreeModel.Node> optionalNode = Optional.of(event)
+            Optional.of(event)
                     .map(TreeExpansionEvent::getPath)
                     .map(TreePath::getLastPathComponent)
                     .filter(DirectoryTreeModel.Node.class::isInstance)
-                    .map(DirectoryTreeModel.Node.class::cast);
-            if (optionalNode.isEmpty()) {
-                return;
-            }
-            DirectoryTreeModel.Node node = optionalNode.get();
-            DirectoryModel model = node.model();
-            if (model.isLoaded()) {
-                return;
-            }
-            model.setLoaded(true);
-            ChildrenLoader loader = new ChildrenLoader(node, model);
-            loader.execute();
+                    .map(DirectoryTreeModel.Node.class::cast)
+                    .ifPresent(DirectoryTreeController.this::loadChildrenDirectories);
         }
 
         @Override
         public void treeWillCollapse(TreeExpansionEvent event) {
             // do nothing
-        }
-
-    }
-
-    private class ChildrenLoader extends SwingWorker<List<DirectoryModel>, Void> {
-
-        private final DirectoryTreeModel.Node node;
-        private final DirectoryModel model;
-
-        public ChildrenLoader(DirectoryTreeModel.Node node, DirectoryModel model) {
-            this.node = node;
-            this.model = model;
-        }
-
-        @Override
-        protected void done() {
-            try {
-                List<DirectoryModel> models = get();
-                node.setChildren(models);
-            } catch (InterruptedException | ExecutionException e) {
-                model.setLoaded(false);
-                e.printStackTrace();
-            }
-        }
-
-        @Override
-        protected List<DirectoryModel> doInBackground() throws Exception {
-            String path = model.getPath();
-            if (path != null) {
-                Path dir = fileSystem.getPath(path);
-                return Files.list(dir)
-                        .filter(Files::isDirectory)
-                        .map(DirectoryModel::from)
-                        .collect(Collectors.toList());
-            } else {
-                return StreamSupport.stream(fileSystem.getRootDirectories().spliterator(), false)
-                        .map(DirectoryModel::from)
-                        .collect(Collectors.toList());
-            }
         }
 
     }
