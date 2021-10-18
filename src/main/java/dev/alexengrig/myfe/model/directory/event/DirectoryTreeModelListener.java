@@ -14,17 +14,12 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.service.directory;
+package dev.alexengrig.myfe.model.directory.event;
 
-import dev.alexengrig.myfe.model.directory.ContentModel;
-import dev.alexengrig.myfe.model.directory.DirectoryModel;
+import java.util.EventListener;
 
-import java.util.List;
+public interface DirectoryTreeModelListener extends EventListener {
 
-public interface DirectoryService {
-
-    List<DirectoryModel> getSubdirectories(String parentPath);
-
-    List<ContentModel> getContent(String parentPath);
+    void selectDirectory(DirectoryTreeModelEvent event);
 
 }

@@ -16,10 +16,15 @@
 
 package dev.alexengrig.myfe;
 
+import dev.alexengrig.myfe.controller.directory.DirectoryContentController;
 import dev.alexengrig.myfe.controller.directory.DirectoryTreeController;
+import dev.alexengrig.myfe.factory.directory.DefaultFileSystemDirectoryContentFactoryImpl;
 import dev.alexengrig.myfe.factory.directory.DefaultFileSystemDirectoryTreeFactory;
+import dev.alexengrig.myfe.factory.directory.DirectoryContentFactory;
 import dev.alexengrig.myfe.factory.directory.DirectoryTreeFactory;
+import dev.alexengrig.myfe.model.directory.DirectoryContentModel;
 import dev.alexengrig.myfe.model.directory.DirectoryTreeModel;
+import dev.alexengrig.myfe.view.directory.DirectoryContentView;
 import dev.alexengrig.myfe.view.directory.DirectoryTreeView;
 
 import javax.swing.*;
@@ -57,8 +62,12 @@ public final class MyfeApplication extends JFrame {
         DirectoryTreeModel treeModel = treeFactory.createModel();
         DirectoryTreeView treeView = treeFactory.createView(treeModel);
         this.treeController = treeFactory.createController(treeView);
-        //TODO: Content view (+ Preview view)
-        JPanel contentView = new JPanel();
+        // Content
+        DirectoryContentFactory contentFactory = new DefaultFileSystemDirectoryContentFactoryImpl();
+        DirectoryContentModel contentModel = contentFactory.createModel();
+        DirectoryContentView contentView = contentFactory.createView(contentModel);
+        DirectoryContentController contentController = contentFactory.createController(contentView);
+        contentController.subscribeOn(treeView);
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, treeView, contentView);
         add(splitPane);
     }

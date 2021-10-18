@@ -16,6 +16,7 @@
 
 package dev.alexengrig.myfe.service.directory;
 
+import dev.alexengrig.myfe.model.directory.ContentModel;
 import dev.alexengrig.myfe.model.directory.DirectoryModel;
 
 import java.io.IOException;
@@ -50,6 +51,27 @@ public class DefaultFileSystemDirectoryService implements DirectoryService {
                 return stream
                         .filter(Files::isDirectory)
                         .map(DirectoryModel::from)
+                        .collect(Collectors.toList());
+            }
+        }
+    }
+
+    @Override
+    public List<ContentModel> getContent(String parentPath) {
+        if (parentPath != null) {
+            Path directory = fileSystem.getPath(parentPath);
+            try (Stream<Path> stream = Files.list(directory)) {
+                return stream
+                        .map(ContentModel::from)
+                        .collect(Collectors.toList());
+            } catch (IOException e) {
+                throw new RuntimeException("For path: " + parentPath, e); //TODO: Create exception class
+            }
+        } else {
+            Iterable<Path> rootDirectories = fileSystem.getRootDirectories();
+            try (Stream<Path> stream = StreamSupport.stream(rootDirectories.spliterator(), false)) {
+                return stream
+                        .map(ContentModel::from)
                         .collect(Collectors.toList());
             }
         }

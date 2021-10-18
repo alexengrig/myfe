@@ -17,6 +17,7 @@
 package dev.alexengrig.myfe.model.directory;
 
 import dev.alexengrig.myfe.model.ModelUpdater;
+import dev.alexengrig.myfe.model.directory.event.DirectoryTreeModelListener;
 import dev.alexengrig.myfe.model.tree.BaseGenericTreeModel;
 import dev.alexengrig.myfe.model.tree.BaseGenericTreeNode;
 import dev.alexengrig.myfe.model.tree.BaseGenericTreePath;
@@ -24,6 +25,7 @@ import dev.alexengrig.myfe.model.tree.event.BaseGenericTreeModelEvent;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
@@ -34,9 +36,11 @@ public class DirectoryTreeModel
         DirectoryTreeModel.Node, DirectoryTreeModel.Path, DirectoryTreeModel.Event, DirectoryTreeModel> {
 
     private final Node root;
+    private final List<DirectoryTreeModelListener> listeners;
 
     public DirectoryTreeModel(DirectoryModel model) {
         this.root = new Node(model);
+        this.listeners = new LinkedList<>();
     }
 
     @Override
@@ -57,6 +61,14 @@ public class DirectoryTreeModel
     private Event createEventOnSetNodeChildren(Node node) {
         Path path = new Path(node);
         return new Event(this, path);
+    }
+
+    public void addDirectoryTreeModelListener(DirectoryTreeModelListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeDirectoryTreeModelListener(DirectoryTreeModelListener listener) {
+        listeners.remove(listener);
     }
 
     public class Node

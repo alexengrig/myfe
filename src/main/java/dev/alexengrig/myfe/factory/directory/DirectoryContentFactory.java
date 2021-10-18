@@ -14,17 +14,13 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.service.directory;
+package dev.alexengrig.myfe.factory.directory;
 
-import dev.alexengrig.myfe.model.directory.ContentModel;
-import dev.alexengrig.myfe.model.directory.DirectoryModel;
+import dev.alexengrig.myfe.controller.directory.DirectoryContentController;
+import dev.alexengrig.myfe.factory.MVCFactory;
+import dev.alexengrig.myfe.model.directory.DirectoryContentModel;
+import dev.alexengrig.myfe.view.directory.DirectoryContentView;
 
-import java.util.List;
-
-public interface DirectoryService {
-
-    List<DirectoryModel> getSubdirectories(String parentPath);
-
-    List<ContentModel> getContent(String parentPath);
-
+public interface DirectoryContentFactory
+        extends MVCFactory<DirectoryContentModel, DirectoryContentView, DirectoryContentController> {
 }
