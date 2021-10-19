@@ -16,14 +16,42 @@
 
 package dev.alexengrig.myfe.view;
 
+import dev.alexengrig.myfe.model.MyPath;
 import dev.alexengrig.myfe.model.MyPathTableModel;
 
 import javax.swing.*;
+import java.util.function.Consumer;
 
 public class MyPathTable extends JTable {
 
+    //TODO: NPE
+    private Consumer<MyPath> selectPathHandler;
+
     public MyPathTable(MyPathTableModel model) {
         super(model);
+        init();
+    }
+
+    @Override
+    public MyPathTableModel getModel() {
+        return (MyPathTableModel) super.getModel();
+    }
+
+    private void init() {
+        getSelectionModel().addListSelectionListener(e -> {
+            if (getSelectedRowCount() != 1) return;
+            int rowIndex = getSelectedRow();
+            MyPath path = getModel().getPathAt(rowIndex);
+            handleSelectPath(path);
+        });
+    }
+
+    public void onSelectPath(Consumer<MyPath> handler) {
+        this.selectPathHandler = handler;
+    }
+
+    private void handleSelectPath(MyPath path) {
+        selectPathHandler.accept(path);
     }
 
 }

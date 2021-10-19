@@ -23,8 +23,13 @@ import java.util.stream.Collectors;
 
 public class MyPathTableModel extends DefaultTableModel {
 
+    //TODO: NPE
+    private List<? extends MyPath> paths;
+
+    //TODO: Remove wildcard
     public MyPathTableModel(List<? extends MyPath> paths, Object[] columnNames) {
         super(convertToVector(paths), convertToVector(columnNames));
+        this.paths = paths;
     }
 
     private static Vector<Vector<?>> convertToVector(List<? extends MyPath> data) {
@@ -33,8 +38,13 @@ public class MyPathTableModel extends DefaultTableModel {
                 .collect(Collectors.toCollection(Vector::new));
     }
 
+    public MyPath getPathAt(int index) {
+        return paths.get(index);
+    }
+
     public void update(List<? extends MyPath> paths) {
         setDataVector(convertToVector(paths), columnIdentifiers);
+        this.paths = paths;
     }
 
 }

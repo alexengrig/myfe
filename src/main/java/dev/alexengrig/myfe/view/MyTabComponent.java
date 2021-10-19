@@ -19,6 +19,7 @@ package dev.alexengrig.myfe.view;
 import dev.alexengrig.myfe.model.MyDirectory;
 import dev.alexengrig.myfe.model.MyDirectoryTreeModel;
 import dev.alexengrig.myfe.model.MyPath;
+import dev.alexengrig.myfe.model.MyPathDetailsModel;
 import dev.alexengrig.myfe.model.MyPathTableModel;
 import dev.alexengrig.myfe.model.RootDirectoryTreeNode;
 import dev.alexengrig.myfe.service.MyPathService;
@@ -72,7 +73,10 @@ public class MyTabComponent extends JPanel {
             tableModel.update(content);
         });
         // Details
-        MyDetails details = new MyDetails();
+        MyPathDetailsModel detailsModel = new MyPathDetailsModel();
+        MyPathDetails details = new MyPathDetails(detailsModel);
+        table.onSelectPath(detailsModel::setPath);
+        // Preview
         MyPreview preview = new MyPreview();
         MySplitPane info = new MySplitPane.Vertical(new MyScrollPane(details), new MyScrollPane(preview));
         MySplitPane content = new MySplitPane.Horizontal(new MyScrollPane(table), info);

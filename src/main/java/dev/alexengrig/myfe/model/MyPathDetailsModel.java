@@ -14,14 +14,28 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.view;
+package dev.alexengrig.myfe.model;
 
-import javax.swing.*;
+public class MyPathDetailsModel {
 
-public class MyDetails extends JPanel {
+    private MyPath path;
+    private Runnable changePathHandler;
 
-    public MyDetails() {
-        add(new JLabel("created: today, size: 20Mb"));
+    public boolean isEmpty() {
+        return path == null;
+    }
+
+    public MyPath getPath() {
+        return path;
+    }
+
+    public void setPath(MyPath path) {
+        this.path = path;
+        changePathHandler.run(); //TODO: Replace with fire event
+    }
+
+    public void onChangePath(Runnable handler) {
+        this.changePathHandler = handler;
     }
 
 }
