@@ -16,11 +16,13 @@
 
 package dev.alexengrig.myfe.view;
 
-import dev.alexengrig.myfe.model.DirectoryTreeNode;
 import dev.alexengrig.myfe.model.MyDirectory;
 import dev.alexengrig.myfe.model.MyDirectoryTreeModel;
+import dev.alexengrig.myfe.model.MyDirectoryTreeNode;
 import dev.alexengrig.myfe.model.RootDirectoryTreeNode;
-import dev.alexengrig.myfe.util.ThrowableFunction;
+import dev.alexengrig.myfe.service.MyDirectoryTreeBackgroundService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.TreeExpansionEvent;
@@ -30,67 +32,94 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.lang.invoke.MethodHandles;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 public class MyDirectoryTree extends JTree {
 
-    //FIXME: Handlers - NPE
-    private ThrowableFunction<MyDirectory, Iterable<MyDirectory>> loadSubdirectoriesHandler;
-    private Runnable selectRootDirectoryHandler;
-    private Consumer<MyDirectory> selectDirectoryHandler;
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    public MyDirectoryTree(MyDirectoryTreeModel model) {
+    private final MyDirectoryTreeBackgroundService backgroundService;
+
+    private final List<MyDirectoryTreeListener> listeners;
+
+    public MyDirectoryTree(
+            MyDirectoryTreeModel model,
+            MyDirectoryTreeBackgroundService backgroundService) {
         super(model);
+        this.backgroundService = backgroundService;
+        this.listeners = new LinkedList<>();
         init();
     }
 
     private void init() {
-        LoadDirectoriesListener loadDirectoriesListener = new LoadDirectoriesListener();
-        addTreeWillExpandListener(loadDirectoriesListener);
-        SelectDirectoryListener selectDirectoryListener = new SelectDirectoryListener();
-        addMouseListener(selectDirectoryListener);
-        addKeyListener(selectDirectoryListener);
+        LOGGER.debug("Start init");
+        ExpandNodeListener expandNodeListener = new ExpandNodeListener();
+        addTreeWillExpandListener(expandNodeListener);
+        SelectNodeListener selectNodeListener = new SelectNodeListener();
+        addMouseListener(selectNodeListener);
+        addKeyListener(selectNodeListener);
+        LOGGER.debug("Finished init");
     }
 
-    public void onLoadSubdirectories(ThrowableFunction<MyDirectory, Iterable<MyDirectory>> handler) {
-        this.loadSubdirectoriesHandler = handler;
+    @Override
+    public MyDirectoryTreeModel getModel() {
+        return (MyDirectoryTreeModel) super.getModel();
     }
 
-    private void handleLoadDirectories(DirectoryTreeNode node) {
-        node.setLoaded(true);
+    private void handleLoadChildDirectories(MyDirectoryTreeNode node) {
         MyDirectory directory = node.getUserObject();
+        LOGGER.debug("Start loading child directories for: {}", directory);
+        node.setLoaded(true);
         try {
-            Iterable<MyDirectory> subdirectories = loadSubdirectoriesHandler.apply(directory);
-            node.addAll(subdirectories);
-        } catch (Exception e) {
+            backgroundService.loadSubdirectories(directory, children -> {
+                MyDirectoryTreeModel model = getModel();
+                model.addChildrenInto(node, children);
+                LOGGER.debug("Finished loading child directories for: {}; directories: {}", directory, children);
+            });
+        } catch (Exception exception) {
             node.setLoaded(false);
+            LOGGER.warn("Exception of loading child directories for: {}", directory, exception);
         }
     }
 
-    public void onSelectRootDirectory(Runnable handler) {
-        this.selectRootDirectoryHandler = handler;
+    private void handleSelectRoot(RootDirectoryTreeNode root) {
+        fireSelectRoot(new MyDirectoryTreeEvent(root.getUserObject()));
     }
 
-    private void handleSelectRootDirectory(RootDirectoryTreeNode root) {
-        selectRootDirectoryHandler.run();
+    private void handleSelectDirectory(MyDirectoryTreeNode node) {
+        fireSelectDirectory(new MyDirectoryTreeEvent(node.getUserObject()));
     }
 
-    public void onSelectDirectory(Consumer<MyDirectory> handler) {
-        this.selectDirectoryHandler = handler;
+    public void addMyDirectoryTreeListener(MyDirectoryTreeListener listener) {
+        listeners.add(listener);
     }
 
-    private void handleSelectDirectory(DirectoryTreeNode node) {
-        selectDirectoryHandler.accept(node.getUserObject());
+    public void removeMyDirectoryTreeListener(MyDirectoryTreeListener listener) {
+        listeners.remove(listener);
+    }
+
+    private void fireSelectRoot(MyDirectoryTreeEvent event) {
+        for (MyDirectoryTreeListener listener : listeners) {
+            listener.selectRoot(event);
+        }
+    }
+
+    private void fireSelectDirectory(MyDirectoryTreeEvent event) {
+        for (MyDirectoryTreeListener listener : listeners) {
+            listener.selectDirectory(event);
+        }
     }
 
     /**
      * On a tree expands a node.
      *
-     * @see MyDirectoryTree#handleLoadDirectories(DirectoryTreeNode)
+     * @see MyDirectoryTree#handleLoadChildDirectories(MyDirectoryTreeNode)
      */
-    private class LoadDirectoriesListener implements TreeWillExpandListener {
+    private class ExpandNodeListener implements TreeWillExpandListener {
 
         @Override
         public void treeWillExpand(TreeExpansionEvent event) {
@@ -98,10 +127,10 @@ public class MyDirectoryTree extends JTree {
             Optional.ofNullable(event)
                     .map(TreeExpansionEvent::getPath)
                     .map(TreePath::getLastPathComponent)
-                    .filter(DirectoryTreeNode.class::isInstance)
-                    .map(DirectoryTreeNode.class::cast)
-                    .filter(Predicate.not(DirectoryTreeNode::isLoaded))
-                    .ifPresent(MyDirectoryTree.this::handleLoadDirectories);
+                    .filter(MyDirectoryTreeNode.class::isInstance)
+                    .map(MyDirectoryTreeNode.class::cast)
+                    .filter(Predicate.not(MyDirectoryTreeNode::isLoaded))
+                    .ifPresent(MyDirectoryTree.this::handleLoadChildDirectories);
         }
 
         //TODO: Create "do-nothing" interfaces
@@ -115,40 +144,40 @@ public class MyDirectoryTree extends JTree {
     /**
      * On click the left mouse button and press the Enter key on a node.
      *
-     * @see MyDirectoryTree#handleSelectRootDirectory(RootDirectoryTreeNode)
-     * @see MyDirectoryTree#handleSelectDirectory(DirectoryTreeNode)
+     * @see MyDirectoryTree#handleSelectRoot(RootDirectoryTreeNode)
+     * @see MyDirectoryTree#handleSelectDirectory(MyDirectoryTreeNode)
      */
-    private class SelectDirectoryListener implements MouseListener, KeyListener {
+    private class SelectNodeListener implements MouseListener, KeyListener {
 
         @Override
-        public void mouseClicked(MouseEvent e) {
-            if (e.getButton() == MouseEvent.BUTTON1) {
-                TreePath path = getPathForLocation(e.getX(), e.getY());
+        public void mouseClicked(MouseEvent event) {
+            if (event.getButton() == MouseEvent.BUTTON1) {
+                TreePath path = getPathForLocation(event.getX(), event.getY());
                 Optional.ofNullable(path)
                         .map(TreePath::getLastPathComponent)
-                        .filter(DirectoryTreeNode.class::isInstance)
-                        .map(DirectoryTreeNode.class::cast)
+                        .filter(MyDirectoryTreeNode.class::isInstance)
+                        .map(MyDirectoryTreeNode.class::cast)
                         .ifPresentOrElse(MyDirectoryTree.this::handleSelectDirectory, () ->
                                 Optional.ofNullable(path)
                                         .map(TreePath::getLastPathComponent)
                                         .filter(RootDirectoryTreeNode.class::isInstance)
                                         .map(RootDirectoryTreeNode.class::cast)
-                                        .ifPresent(MyDirectoryTree.this::handleSelectRootDirectory));
+                                        .ifPresent(MyDirectoryTree.this::handleSelectRoot));
             }
         }
 
         @Override
-        public void keyPressed(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_ENTER) {
+        public void keyPressed(KeyEvent event) {
+            if (event.getKeyCode() == KeyEvent.VK_ENTER) {
                 Object lastNode = getLastSelectedPathComponent();
                 Optional.ofNullable(lastNode)
-                        .filter(DirectoryTreeNode.class::isInstance)
-                        .map(DirectoryTreeNode.class::cast)
+                        .filter(MyDirectoryTreeNode.class::isInstance)
+                        .map(MyDirectoryTreeNode.class::cast)
                         .ifPresentOrElse(MyDirectoryTree.this::handleSelectDirectory, () ->
                                 Optional.ofNullable(lastNode)
                                         .filter(RootDirectoryTreeNode.class::isInstance)
                                         .map(RootDirectoryTreeNode.class::cast)
-                                        .ifPresent(MyDirectoryTree.this::handleSelectRootDirectory));
+                                        .ifPresent(MyDirectoryTree.this::handleSelectRoot));
             }
         }
 

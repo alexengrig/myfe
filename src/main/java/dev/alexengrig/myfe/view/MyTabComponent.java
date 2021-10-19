@@ -18,75 +18,147 @@ package dev.alexengrig.myfe.view;
 
 import dev.alexengrig.myfe.model.MyDirectory;
 import dev.alexengrig.myfe.model.MyDirectoryTreeModel;
+import dev.alexengrig.myfe.model.MyPath;
 import dev.alexengrig.myfe.model.MyPathModel;
 import dev.alexengrig.myfe.model.MyPathTableModel;
+import dev.alexengrig.myfe.service.MyDirectoryTreeBackgroundService;
 import dev.alexengrig.myfe.service.MyPathService;
 
 import javax.swing.*;
 import java.awt.*;
 import java.util.List;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 
 public class MyTabComponent extends JPanel {
 
     private final MyPathService service;
 
+    private MyDirectoryTreeModel treeModel;
+    private MyPathTableModel tableModel;
+    private MyPathModel pathModel;
+
+    private MyHeader headerView;
+    private MyDirectoryTree treeView;
+    private MyPathTable tableView;
+    private MyPathDetails detailsView;
+    private MyPathPreview previewView;
+    private MyFooter footerView;
+
     public MyTabComponent(MyPathService service) {
         super(new BorderLayout());
         this.service = service;
-        initComponents();
+        init();
+        addComponents();
     }
 
-    private void initComponents() {
-        initHeader();
-        initBody();
-        initFooter();
+    private void init() {
+        initModels();
+        initViews();
+        initListeners();
     }
 
-    private void initHeader() {
-        //TODO: Create header component
-        JPanel top = new JPanel();
-        top.add(new JLabel("<- -> ^     C:\\Users\\admin     refresh"));
-        add(top, BorderLayout.NORTH);
-    }
-
-    private void initBody() {
+    private void initModels() {
         //TODO: Getting root directories is slow - add spinner and background task
-        // Models
         List<MyDirectory> rootDirectories = service.getRootDirectories();
-        MyDirectoryTreeModel treeModel = new MyDirectoryTreeModel(service.getName(), rootDirectories);
-        MyPathTableModel tableModel = new MyPathTableModel(rootDirectories, new Object[]{"Name", "Type"});
-        MyPathModel pathModel = new MyPathModel();
-        // Components
-        MyDirectoryTree tree = new MyDirectoryTree(treeModel);
-        MyPathTable table = new MyPathTable(tableModel);
-        MyPathDetails details = new MyPathDetails(pathModel);
-        MyPathPreview preview = new MyPathPreview(pathModel);
-        // Subscribes
-        //TODO: Run in background
-        tree.onLoadSubdirectories(service::getSubdirectories);
-        //TODO: Run in background
-        tree.onSelectRootDirectory(() -> {
-            tableModel.update(service.getRootDirectories());
-            pathModel.setPath(null);
-        });
-        //TODO: Run in background
-        tree.onSelectDirectory(directory -> {
-            tableModel.update(service.getContent(directory));
-            pathModel.setPath(null);
-        });
-        table.onSelectPath(pathModel::setPath);
-        // Combinations
-        MySplitPane info = new MySplitPane.Vertical(new MyScrollPane(details), new MyScrollPane(preview));
-        MySplitPane content = new MySplitPane.Horizontal(new MyScrollPane(table), info);
-        MySplitPane center = new MySplitPane.Horizontal(new MyScrollPane(tree), content);
-        add(center, BorderLayout.CENTER);
+        treeModel = new MyDirectoryTreeModel(service.getName(), rootDirectories);
+        tableModel = new MyPathTableModel(rootDirectories, new Object[]{"Name", "Type"});
+        pathModel = new MyPathModel();
     }
 
-    private void initFooter() {
-        //TODO: Create footer component
-        JPanel bottom = new JPanel();
-        bottom.add(new JLabel("Number of elements: 123"));
-        add(bottom, BorderLayout.SOUTH);
+    private void initViews() {
+        headerView = new MyHeader();
+        treeView = new MyDirectoryTree(treeModel, new TreeService());
+        tableView = new MyPathTable(tableModel);
+        detailsView = new MyPathDetails(pathModel);
+        previewView = new MyPathPreview(pathModel);
+        footerView = new MyFooter();
+    }
+
+    private void initListeners() {
+        treeView.addMyDirectoryTreeListener(new TreeListener());
+        tableView.addMyPathTableListener(new TableListener());
+    }
+
+    private void addComponents() {
+        add(headerView, BorderLayout.NORTH);
+        MySplitPane info = new MySplitPane.Vertical(new MyScrollPane(detailsView), new MyScrollPane(previewView));
+        MySplitPane content = new MySplitPane.Horizontal(new MyScrollPane(tableView), info);
+        MySplitPane center = new MySplitPane.Horizontal(new MyScrollPane(treeView), content);
+        add(center, BorderLayout.CENTER);
+        add(footerView, BorderLayout.SOUTH);
+    }
+
+    private static class BackgroundWorker<T> extends SwingWorker<T, Void> {
+
+        private final Callable<T> task;
+        private final Consumer<T> handler;
+
+        private BackgroundWorker(Callable<T> task, Consumer<T> handler) {
+            this.task = task;
+            this.handler = handler;
+        }
+
+        public static <T> void execute(Callable<T> task, Consumer<T> handler) {
+            BackgroundWorker<T> worker = new BackgroundWorker<>(task, handler);
+            worker.execute();
+        }
+
+        @Override
+        protected T doInBackground() throws Exception {
+            return task.call();
+        }
+
+        @Override
+        protected void done() {
+            T result;
+            try {
+                result = get();
+            } catch (InterruptedException | ExecutionException e) {
+                throw new RuntimeException(e);
+            }
+            handler.accept(result);
+        }
+
+    }
+
+    private class TreeListener implements MyDirectoryTreeListener {
+
+        @Override
+        public void selectRoot(MyDirectoryTreeEvent event) {
+            //TODO: Spinner to table
+            BackgroundWorker.execute(service::getRootDirectories, tableModel::update);
+            pathModel.setPath(null);
+        }
+
+        @Override
+        public void selectDirectory(MyDirectoryTreeEvent event) {
+            MyDirectory directory = event.getDirectory();
+            //TODO: Spinner to table
+            BackgroundWorker.execute(() -> service.getContent(directory), tableModel::update);
+            pathModel.setPath(null);
+        }
+
+    }
+
+    private class TableListener implements MyPathTableListener {
+
+        @Override
+        public void selectPath(MyPathTableEvent event) {
+            MyPath path = event.getPath();
+            pathModel.setPath(path);
+        }
+
+    }
+
+    private class TreeService implements MyDirectoryTreeBackgroundService {
+
+        @Override
+        public void loadSubdirectories(MyDirectory directory, Consumer<List<MyDirectory>> handler) {
+            BackgroundWorker.execute(() -> service.getSubdirectories(directory), handler);
+        }
+
     }
 
 }

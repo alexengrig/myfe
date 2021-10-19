@@ -17,7 +17,7 @@
 package dev.alexengrig.myfe.model;
 
 import javax.swing.tree.DefaultMutableTreeNode;
-import javax.swing.tree.TreeNode;
+import javax.swing.tree.MutableTreeNode;
 import java.util.List;
 import java.util.Vector;
 
@@ -27,7 +27,14 @@ public class MyTreeNode<T> extends DefaultMutableTreeNode {
         super(userObject, allowsChildren);
     }
 
-    public void addAll(List<? extends TreeNode> nodes) {
+    public void addAll(List<? extends MyTreeNode<?>> nodes) {
+        for (MyTreeNode<?> node : nodes) {
+            MutableTreeNode oldParent = (MutableTreeNode) node.getParent();
+            if (oldParent != null) {
+                oldParent.remove(node);
+            }
+            node.setParent(this);
+        }
         if (children == null) {
             children = new Vector<>();
         }

@@ -20,15 +20,18 @@ import dev.alexengrig.myfe.model.MyPath;
 import dev.alexengrig.myfe.model.MyPathTableModel;
 
 import javax.swing.*;
-import java.util.function.Consumer;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import java.util.LinkedList;
+import java.util.List;
 
 public class MyPathTable extends JTable {
 
-    //TODO: NPE
-    private Consumer<MyPath> selectPathHandler;
+    private final List<MyPathTableListener> listeners;
 
     public MyPathTable(MyPathTableModel model) {
         super(model);
+        this.listeners = new LinkedList<>();
         init();
     }
 
@@ -38,20 +41,42 @@ public class MyPathTable extends JTable {
     }
 
     private void init() {
-        getSelectionModel().addListSelectionListener(e -> {
+        getSelectionModel().addListSelectionListener(new SelectSingleRowListener());
+    }
+
+    private void handleSelectPath(MyPath path) {
+        fireSelectPath(new MyPathTableEvent(path));
+    }
+
+    public void addMyPathTableListener(MyPathTableListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeMyPathTableListener(MyPathTableListener listener) {
+        listeners.remove(listener);
+    }
+
+    private void fireSelectPath(MyPathTableEvent event) {
+        for (MyPathTableListener listener : listeners) {
+            listener.selectPath(event);
+        }
+    }
+
+    /**
+     * On select a single row.
+     *
+     * @see MyPathTable#handleSelectPath(MyPath)
+     */
+    private class SelectSingleRowListener implements ListSelectionListener {
+
+        @Override
+        public void valueChanged(ListSelectionEvent event) {
             if (getSelectedRowCount() != 1) return;
             int rowIndex = getSelectedRow();
             MyPath path = getModel().getPathAt(rowIndex);
             handleSelectPath(path);
-        });
-    }
+        }
 
-    public void onSelectPath(Consumer<MyPath> handler) {
-        this.selectPathHandler = handler;
-    }
-
-    private void handleSelectPath(MyPath path) {
-        selectPathHandler.accept(path);
     }
 
 }

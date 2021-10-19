@@ -19,7 +19,6 @@ package dev.alexengrig.myfe.model;
 import javax.swing.tree.DefaultTreeModel;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class MyDirectoryTreeModel extends DefaultTreeModel {
 
@@ -29,11 +28,11 @@ public class MyDirectoryTreeModel extends DefaultTreeModel {
     }
 
     public void addChildrenInto(MyTreeNode<?> parent, List<MyDirectory> children) {
-        int startIndex = parent.getChildCount();
-        List<MyDirectoryTreeNode> nodes = children.stream().map(MyDirectoryTreeNode::new).collect(Collectors.toList());
+        List<MyDirectoryTreeNode> nodes = children.stream()
+                .map(MyDirectoryTreeNode::new)
+                .collect(Collectors.toList());
         parent.addAll(nodes);
-        int[] indices = IntStream.range(startIndex, startIndex + children.size()).toArray();
-        nodesWereInserted(parent, indices);
+        nodeStructureChanged(parent);
     }
 
     @Override
