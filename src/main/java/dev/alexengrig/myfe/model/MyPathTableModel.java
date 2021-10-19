@@ -21,9 +21,9 @@ import java.util.List;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
-public class MyTableModel extends DefaultTableModel {
+public class MyPathTableModel extends DefaultTableModel {
 
-    public MyTableModel(List<? extends MyPath> paths, Object[] columnNames) {
+    public MyPathTableModel(List<? extends MyPath> paths, Object[] columnNames) {
         super(convertToVector(paths), convertToVector(columnNames));
     }
 

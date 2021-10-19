@@ -16,13 +16,13 @@
 
 package dev.alexengrig.myfe.view;
 
-import dev.alexengrig.myfe.model.MyTableModel;
+import dev.alexengrig.myfe.model.MyPathTableModel;
 
 import javax.swing.*;
 
-public class MyTable extends JTable {
+public class MyPathTable extends JTable {
 
-    public MyTable(MyTableModel model) {
+    public MyPathTable(MyPathTableModel model) {
         super(model);
     }
 

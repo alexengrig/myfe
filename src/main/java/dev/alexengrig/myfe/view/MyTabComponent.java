@@ -19,7 +19,7 @@ package dev.alexengrig.myfe.view;
 import dev.alexengrig.myfe.model.MyDirectory;
 import dev.alexengrig.myfe.model.MyDirectoryTreeModel;
 import dev.alexengrig.myfe.model.MyPath;
-import dev.alexengrig.myfe.model.MyTableModel;
+import dev.alexengrig.myfe.model.MyPathTableModel;
 import dev.alexengrig.myfe.model.RootDirectoryTreeNode;
 import dev.alexengrig.myfe.service.MyPathService;
 
@@ -60,8 +60,8 @@ public class MyTabComponent extends JPanel {
         //TODO: Run in background
         tree.onLoadSubdirectories(service::getSubdirectories);
         // Table
-        MyTableModel tableModel = new MyTableModel(rootDirectories, new Object[]{"Name", "Type"});
-        MyTable table = new MyTable(tableModel);
+        MyPathTableModel tableModel = new MyPathTableModel(rootDirectories, new Object[]{"Name", "Type"});
+        MyPathTable table = new MyPathTable(tableModel);
         tree.onSelectRootDirectory(() -> {
             //TODO: Run in background
             tableModel.update(rootDirectories);
