@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.model;
+package dev.alexengrig.myfe.model.event;
+
+import dev.alexengrig.myfe.model.MyPath;
 
 public class MyPathModelEvent {
 

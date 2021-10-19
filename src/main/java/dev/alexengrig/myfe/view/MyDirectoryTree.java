@@ -21,6 +21,8 @@ import dev.alexengrig.myfe.model.MyDirectoryTreeModel;
 import dev.alexengrig.myfe.model.MyDirectoryTreeNode;
 import dev.alexengrig.myfe.model.RootDirectoryTreeNode;
 import dev.alexengrig.myfe.service.MyDirectoryTreeBackgroundService;
+import dev.alexengrig.myfe.view.event.MyDirectoryTreeEvent;
+import dev.alexengrig.myfe.view.event.MyDirectoryTreeListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

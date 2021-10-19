@@ -23,6 +23,10 @@ import dev.alexengrig.myfe.model.MyPathModel;
 import dev.alexengrig.myfe.model.MyPathTableModel;
 import dev.alexengrig.myfe.service.MyDirectoryTreeBackgroundService;
 import dev.alexengrig.myfe.service.MyPathService;
+import dev.alexengrig.myfe.view.event.MyDirectoryTreeEvent;
+import dev.alexengrig.myfe.view.event.MyDirectoryTreeListener;
+import dev.alexengrig.myfe.view.event.MyPathTableEvent;
+import dev.alexengrig.myfe.view.event.MyPathTableListener;
 
 import javax.swing.*;
 import java.awt.*;

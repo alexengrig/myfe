@@ -47,4 +47,9 @@ public class MyPathTableModel extends DefaultTableModel {
         this.paths = paths;
     }
 
+    @Override
+    public boolean isCellEditable(int row, int column) {
+        return false;
+    }
+
 }

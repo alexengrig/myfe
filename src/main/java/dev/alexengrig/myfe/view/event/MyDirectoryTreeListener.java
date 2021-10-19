@@ -14,20 +14,14 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.view;
+package dev.alexengrig.myfe.view.event;
 
-import dev.alexengrig.myfe.model.MyPath;
+import java.util.EventListener;
 
-public class MyPathTableEvent {
+public interface MyDirectoryTreeListener extends EventListener {
 
-    private final MyPath path;
+    void selectRoot(MyDirectoryTreeEvent event);
 
-    public MyPathTableEvent(MyPath path) {
-        this.path = path;
-    }
-
-    public MyPath getPath() {
-        return path;
-    }
+    void selectDirectory(MyDirectoryTreeEvent event);
 
 }

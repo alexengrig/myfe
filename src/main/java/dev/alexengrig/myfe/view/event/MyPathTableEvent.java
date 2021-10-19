@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.model;
+package dev.alexengrig.myfe.view.event;
 
-import java.util.EventListener;
+import dev.alexengrig.myfe.model.MyPath;
 
-public interface MyPathModelListener extends EventListener {
+public class MyPathTableEvent {
 
-    void changePath(MyPathModelEvent event);
+    private final MyPath path;
+
+    public MyPathTableEvent(MyPath path) {
+        this.path = path;
+    }
+
+    public MyPath getPath() {
+        return path;
+    }
 
 }

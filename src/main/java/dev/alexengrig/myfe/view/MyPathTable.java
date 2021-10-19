@@ -18,6 +18,8 @@ package dev.alexengrig.myfe.view;
 
 import dev.alexengrig.myfe.model.MyPath;
 import dev.alexengrig.myfe.model.MyPathTableModel;
+import dev.alexengrig.myfe.view.event.MyPathTableEvent;
+import dev.alexengrig.myfe.view.event.MyPathTableListener;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;

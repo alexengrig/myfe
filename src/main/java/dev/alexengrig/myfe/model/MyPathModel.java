@@ -16,6 +16,9 @@
 
 package dev.alexengrig.myfe.model;
 
+import dev.alexengrig.myfe.model.event.MyPathModelEvent;
+import dev.alexengrig.myfe.model.event.MyPathModelListener;
+
 import java.util.LinkedList;
 import java.util.List;
 

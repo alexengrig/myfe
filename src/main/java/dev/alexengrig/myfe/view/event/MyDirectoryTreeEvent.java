@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.view;
+package dev.alexengrig.myfe.view.event;
 
 import dev.alexengrig.myfe.model.MyDirectory;
 
