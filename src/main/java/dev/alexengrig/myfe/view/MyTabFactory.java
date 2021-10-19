@@ -16,10 +16,31 @@
 
 package dev.alexengrig.myfe.view;
 
+import dev.alexengrig.myfe.converter.Converter;
+import dev.alexengrig.myfe.converter.Path2MyDirectoryConverter;
+import dev.alexengrig.myfe.converter.Path2MyFileConverter;
+import dev.alexengrig.myfe.converter.Path2MyPathConverter;
+import dev.alexengrig.myfe.model.MyDirectory;
+import dev.alexengrig.myfe.model.MyFile;
+import dev.alexengrig.myfe.model.MyPath;
+import dev.alexengrig.myfe.repository.LocalFileSystemPathRepository;
+import dev.alexengrig.myfe.repository.MyPathRepository;
+import dev.alexengrig.myfe.service.MyPathService;
+import dev.alexengrig.myfe.service.SimplePathService;
+
+import java.nio.file.Path;
+
 public class MyTabFactory {
 
     public MyTab createDefaultTab() {
-        MyTabComponent component = new MyTabComponent();
+        Converter<Path, MyDirectory> directoryConverter = new Path2MyDirectoryConverter();
+        Converter<Path, MyFile> fileConverter = new Path2MyFileConverter();
+        Converter<Path, MyPath> pathConverter = new Path2MyPathConverter(directoryConverter, fileConverter);
+        MyPathRepository repository = new LocalFileSystemPathRepository(directoryConverter, pathConverter);
+        //TODO: Move name
+        MyPathService service = new SimplePathService("This computer", repository);
+        MyTabComponent component = new MyTabComponent(service);
+        //TODO: Move title and tip
         return new MyTab("This computer", "Your computer", component);
     }
 

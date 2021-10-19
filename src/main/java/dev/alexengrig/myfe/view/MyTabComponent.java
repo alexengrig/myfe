@@ -16,13 +16,28 @@
 
 package dev.alexengrig.myfe.view;
 
+import dev.alexengrig.myfe.model.DirectoryTreeNode;
+import dev.alexengrig.myfe.model.MyDirectory;
+import dev.alexengrig.myfe.model.MyTreeModel;
+import dev.alexengrig.myfe.model.RootDirectoryTreeNode;
+import dev.alexengrig.myfe.service.MyPathService;
+
 import javax.swing.*;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeWillExpandListener;
+import javax.swing.tree.TreePath;
 import java.awt.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.function.Predicate;
 
 public class MyTabComponent extends JPanel {
 
-    public MyTabComponent() {
+    private final MyPathService service;
+
+    public MyTabComponent(MyPathService service) {
         super(new BorderLayout());
+        this.service = service;
         initComponents();
     }
 
@@ -40,7 +55,39 @@ public class MyTabComponent extends JPanel {
     }
 
     private void initBody() {
-        MyTree tree = new MyTree();
+        // Tree
+        //TODO: Getting root directories is slow - add spinner and background task
+        RootDirectoryTreeNode treeRootNode = new RootDirectoryTreeNode(service.getName(), service.getRootDirectories());
+        MyTreeModel treeModel = new MyTreeModel(treeRootNode);
+        MyTree tree = new MyTree(treeModel);
+        tree.addTreeWillExpandListener(new TreeWillExpandListener() {
+            @Override
+            public void treeWillExpand(TreeExpansionEvent event) {
+                //TODO: Add benchmark: vs Plain style
+                Optional.of(event)
+                        .map(TreeExpansionEvent::getPath)
+                        .map(TreePath::getLastPathComponent)
+                        .filter(DirectoryTreeNode.class::isInstance)
+                        .map(DirectoryTreeNode.class::cast)
+                        .filter(Predicate.not(DirectoryTreeNode::isLoaded))
+                        .ifPresent(node -> {
+                            node.setLoaded(true);
+                            MyDirectory directory = node.getUserObject();
+                            try {
+                                //TODO: Run in background
+                                List<MyDirectory> subdirectories = service.getSubdirectories(directory);
+                                node.addAll(subdirectories);
+                            } catch (Exception e) {
+                                node.setLoaded(false);
+                            }
+                        });
+            }
+
+            @Override
+            public void treeWillCollapse(TreeExpansionEvent event) {
+            }
+        });
+        // Table
         MyTable table = new MyTable();
         MyDetails details = new MyDetails();
         MyPreview preview = new MyPreview();
