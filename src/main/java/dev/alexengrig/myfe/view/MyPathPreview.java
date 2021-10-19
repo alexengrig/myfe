@@ -21,53 +21,51 @@ import dev.alexengrig.myfe.model.MyPathModel;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.List;
 
-public class MyPathDetails extends JPanel {
+public class MyPathPreview extends JPanel {
 
     private final MyPathModel model;
     private final JPanel contentPane;
 
-    public MyPathDetails(MyPathModel model) {
+    public MyPathPreview(MyPathModel model) {
         this.model = model;
-        this.contentPane = new JPanel(new GridLayout(0, 1));
+        this.contentPane = new JPanel(new BorderLayout());
         init();
     }
 
     private void init() {
-        addDetailsComponents();
-        model.addMyPathModelListener(event -> updateDetailsComponents());
+        addPreviewComponent();
+        model.addMyPathModelListener(event -> updatePreviewComponent());
         add(contentPane);
     }
 
-    private void addDetailsComponents() {
-        List<JComponent> components;
+    private void addPreviewComponent() {
+        JComponent component;
         if (model.isEmpty()) {
-            components = createEmptyComponent();
+            component = createEmptyComponent();
         } else {
-            components = createComponent();
+            component = createComponent();
         }
-        for (JComponent component : components) {
-            contentPane.add(component);
-        }
+        contentPane.add(component);
     }
 
-    private void updateDetailsComponents() {
+    private void updatePreviewComponent() {
         contentPane.removeAll();
-        addDetailsComponents();
+        addPreviewComponent();
         contentPane.revalidate();
     }
 
-    private List<JComponent> createEmptyComponent() {
-        return List.of(new JLabel("Select an element to details"));
+    private JComponent createEmptyComponent() {
+        return new JLabel("Select an element to preview");
     }
 
-    private List<JComponent> createComponent() {
+    private JComponent createComponent() {
         MyPath path = model.getPath();
-        return List.of(
-                new JLabel("Name: " + path.getName()),
-                new JLabel("Type: " + path.getExtension())
-        );
+        if (path.isDirectory()) {
+            return new JLabel("No preview available");
+        }
+        //TODO: Add content
+        return new JLabel("Preview");
     }
 
 }

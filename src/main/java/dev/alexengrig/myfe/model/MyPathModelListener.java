@@ -16,13 +16,10 @@
 
 package dev.alexengrig.myfe.model;
 
-import javax.swing.tree.DefaultTreeModel;
-import java.util.List;
+import java.util.EventListener;
 
-public class MyDirectoryTreeModel extends DefaultTreeModel {
+public interface MyPathModelListener extends EventListener {
 
-    public MyDirectoryTreeModel(String name, List<MyDirectory> rootDirectories) {
-        super(new RootDirectoryTreeNode(name, rootDirectories), true);
-    }
+    void changePath(MyPathModelEvent event);
 
 }

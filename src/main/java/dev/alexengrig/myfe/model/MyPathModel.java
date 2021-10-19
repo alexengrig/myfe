@@ -16,10 +16,14 @@
 
 package dev.alexengrig.myfe.model;
 
-public class MyPathDetailsModel {
+import java.util.LinkedList;
+import java.util.List;
+
+public class MyPathModel {
+
+    private final List<MyPathModelListener> listeners = new LinkedList<>();
 
     private MyPath path;
-    private Runnable changePathHandler;
 
     public boolean isEmpty() {
         return path == null;
@@ -31,11 +35,17 @@ public class MyPathDetailsModel {
 
     public void setPath(MyPath path) {
         this.path = path;
-        changePathHandler.run(); //TODO: Replace with fire event
+        fireChangePath(new MyPathModelEvent(path));
     }
 
-    public void onChangePath(Runnable handler) {
-        this.changePathHandler = handler;
+    public void addMyPathModelListener(MyPathModelListener listener) {
+        listeners.add(listener);
+    }
+
+    private void fireChangePath(MyPathModelEvent event) {
+        for (MyPathModelListener listener : listeners) {
+            listener.changePath(event);
+        }
     }
 
 }

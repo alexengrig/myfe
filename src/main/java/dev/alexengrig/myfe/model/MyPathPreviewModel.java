@@ -14,14 +14,7 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.view;
+package dev.alexengrig.myfe.model;
 
-import javax.swing.*;
-
-public class MyPreview extends JPanel {
-
-    public MyPreview() {
-        add(new JTextArea("Begin.\nThis is text!\nEnd."));
-    }
-
+public class MyPathPreviewModel {
 }

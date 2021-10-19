@@ -16,13 +16,17 @@
 
 package dev.alexengrig.myfe.model;
 
-import javax.swing.tree.DefaultTreeModel;
-import java.util.List;
+import java.util.EventObject;
 
-public class MyDirectoryTreeModel extends DefaultTreeModel {
+public class MyPathModelEvent extends EventObject {
 
-    public MyDirectoryTreeModel(String name, List<MyDirectory> rootDirectories) {
-        super(new RootDirectoryTreeNode(name, rootDirectories), true);
+    public MyPathModelEvent(MyPath path) {
+        super(path);
+    }
+
+    @Override
+    public MyPath getSource() {
+        return (MyPath) super.getSource();
     }
 
 }

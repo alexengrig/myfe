@@ -19,9 +19,8 @@ package dev.alexengrig.myfe.view;
 import dev.alexengrig.myfe.model.MyDirectory;
 import dev.alexengrig.myfe.model.MyDirectoryTreeModel;
 import dev.alexengrig.myfe.model.MyPath;
-import dev.alexengrig.myfe.model.MyPathDetailsModel;
+import dev.alexengrig.myfe.model.MyPathModel;
 import dev.alexengrig.myfe.model.MyPathTableModel;
-import dev.alexengrig.myfe.model.RootDirectoryTreeNode;
 import dev.alexengrig.myfe.service.MyPathService;
 
 import javax.swing.*;
@@ -55,8 +54,7 @@ public class MyTabComponent extends JPanel {
         // Tree
         //TODO: Getting root directories is slow - add spinner and background task
         List<MyDirectory> rootDirectories = service.getRootDirectories();
-        RootDirectoryTreeNode treeRootNode = new RootDirectoryTreeNode(service.getName(), rootDirectories);
-        MyDirectoryTreeModel treeModel = new MyDirectoryTreeModel(treeRootNode);
+        MyDirectoryTreeModel treeModel = new MyDirectoryTreeModel(service.getName(), rootDirectories);
         MyDirectoryTree tree = new MyDirectoryTree(treeModel);
         //TODO: Run in background
         tree.onLoadSubdirectories(service::getSubdirectories);
@@ -73,11 +71,11 @@ public class MyTabComponent extends JPanel {
             tableModel.update(content);
         });
         // Details
-        MyPathDetailsModel detailsModel = new MyPathDetailsModel();
-        MyPathDetails details = new MyPathDetails(detailsModel);
-        table.onSelectPath(detailsModel::setPath);
+        MyPathModel pathModel = new MyPathModel();
+        MyPathDetails details = new MyPathDetails(pathModel);
+        table.onSelectPath(pathModel::setPath);
         // Preview
-        MyPreview preview = new MyPreview();
+        MyPathPreview preview = new MyPathPreview(pathModel);
         MySplitPane info = new MySplitPane.Vertical(new MyScrollPane(details), new MyScrollPane(preview));
         MySplitPane content = new MySplitPane.Horizontal(new MyScrollPane(table), info);
         MySplitPane center = new MySplitPane.Horizontal(new MyScrollPane(tree), content);
