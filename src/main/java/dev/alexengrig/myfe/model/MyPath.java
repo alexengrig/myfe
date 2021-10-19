@@ -42,6 +42,19 @@ public abstract class MyPath {
         return name;
     }
 
+    public String getExtension() {
+        //FIXME: Lazy?
+        if (isDirectory()) {
+            return "<dir>"; //FIXME: dir?
+        }
+        int indexOfDot = name.lastIndexOf('.');
+        if (indexOfDot >= 0) {
+            return name.substring(indexOfDot + 1); //FIXME: Uppercase?
+        } else {
+            return "<unknown>"; //FIXME: unknown?
+        }
+    }
+
     @Override
     public String toString() {
         return path;
