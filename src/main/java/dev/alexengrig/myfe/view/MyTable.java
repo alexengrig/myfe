@@ -16,12 +16,14 @@
 
 package dev.alexengrig.myfe.view;
 
+import dev.alexengrig.myfe.model.MyTableModel;
+
 import javax.swing.*;
 
 public class MyTable extends JTable {
 
-    public MyTable() {
-        super(20, 2);
+    public MyTable(MyTableModel model) {
+        super(model);
     }
 
 }
