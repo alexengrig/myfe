@@ -16,19 +16,15 @@
 
 package dev.alexengrig.myfe.model;
 
-import java.util.List;
-
 public class RootDirectoryTreeNode extends MyTreeNode<String> {
 
-    public RootDirectoryTreeNode(String name, List<MyDirectory> subdirectories) {
-        super(name);
-        addChildren(subdirectories);
+    public RootDirectoryTreeNode(String name) {
+        super(name, true);
     }
 
-    private void addChildren(List<MyDirectory> children) {
-        for (MyDirectory child : children) {
-            add(new DirectoryTreeNode(child));
-        }
+    @Override
+    public boolean isLeaf() {
+        return false;
     }
 
     @Override

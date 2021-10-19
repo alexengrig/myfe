@@ -17,23 +17,27 @@
 package dev.alexengrig.myfe.model;
 
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.TreeNode;
+import java.util.List;
+import java.util.Vector;
 
 public class MyTreeNode<T> extends DefaultMutableTreeNode {
 
-    public MyTreeNode(T userObject) {
-        super(userObject, true);
+    public MyTreeNode(T userObject, boolean allowsChildren) {
+        super(userObject, allowsChildren);
+    }
+
+    public void addAll(List<? extends TreeNode> nodes) {
+        if (children == null) {
+            children = new Vector<>();
+        }
+        children.addAll(nodes);
     }
 
     @Override
     @SuppressWarnings("unchecked")
     public T getUserObject() {
-        //TODO: Add benchmark: vs Without cast
         return (T) super.getUserObject();
-    }
-
-    @Override
-    public boolean isLeaf() {
-        return false;
     }
 
 }
