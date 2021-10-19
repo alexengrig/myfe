@@ -16,17 +16,16 @@
 
 package dev.alexengrig.myfe.model;
 
-import java.util.EventObject;
+public class MyPathModelEvent {
 
-public class MyPathModelEvent extends EventObject {
+    private final MyPath path;
 
     public MyPathModelEvent(MyPath path) {
-        super(path);
+        this.path = path;
     }
 
-    @Override
-    public MyPath getSource() {
-        return (MyPath) super.getSource();
+    public MyPath getPath() {
+        return path;
     }
 
 }
