@@ -18,9 +18,9 @@ package dev.alexengrig.myfe.model;
 
 import javax.swing.tree.DefaultTreeModel;
 
-public class MyTreeModel extends DefaultTreeModel {
+public class MyDirectoryTreeModel extends DefaultTreeModel {
 
-    public MyTreeModel(RootDirectoryTreeNode root) {
+    public MyDirectoryTreeModel(RootDirectoryTreeNode root) {
         super(root, true);
     }
 

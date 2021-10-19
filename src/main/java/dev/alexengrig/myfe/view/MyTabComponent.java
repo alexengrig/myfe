@@ -16,27 +16,16 @@
 
 package dev.alexengrig.myfe.view;
 
-import dev.alexengrig.myfe.model.DirectoryTreeNode;
 import dev.alexengrig.myfe.model.MyDirectory;
+import dev.alexengrig.myfe.model.MyDirectoryTreeModel;
 import dev.alexengrig.myfe.model.MyPath;
 import dev.alexengrig.myfe.model.MyTableModel;
-import dev.alexengrig.myfe.model.MyTreeModel;
 import dev.alexengrig.myfe.model.RootDirectoryTreeNode;
 import dev.alexengrig.myfe.service.MyPathService;
 
 import javax.swing.*;
-import javax.swing.event.TreeExpansionEvent;
-import javax.swing.event.TreeWillExpandListener;
-import javax.swing.tree.TreePath;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Predicate;
 
 public class MyTabComponent extends JPanel {
 
@@ -66,73 +55,21 @@ public class MyTabComponent extends JPanel {
         //TODO: Getting root directories is slow - add spinner and background task
         List<MyDirectory> rootDirectories = service.getRootDirectories();
         RootDirectoryTreeNode treeRootNode = new RootDirectoryTreeNode(service.getName(), rootDirectories);
-        MyTreeModel treeModel = new MyTreeModel(treeRootNode);
-        MyTree tree = new MyTree(treeModel);
-        tree.addTreeWillExpandListener(new TreeWillExpandListener() {
-            @Override
-            public void treeWillExpand(TreeExpansionEvent event) {
-                //TODO: Add benchmark: vs Plain style
-                Optional.ofNullable(event)
-                        .map(TreeExpansionEvent::getPath)
-                        .map(TreePath::getLastPathComponent)
-                        .filter(DirectoryTreeNode.class::isInstance)
-                        .map(DirectoryTreeNode.class::cast)
-                        .filter(Predicate.not(DirectoryTreeNode::isLoaded))
-                        .ifPresent(node -> {
-                            node.setLoaded(true);
-                            MyDirectory directory = node.getUserObject();
-                            try {
-                                //TODO: Run in background
-                                List<MyDirectory> subdirectories = service.getSubdirectories(directory);
-                                node.addAll(subdirectories);
-                            } catch (Exception e) {
-                                node.setLoaded(false);
-                            }
-                        });
-            }
-
-            @Override
-            public void treeWillCollapse(TreeExpansionEvent event) {
-            }
-        });
+        MyDirectoryTreeModel treeModel = new MyDirectoryTreeModel(treeRootNode);
+        MyDirectoryTree tree = new MyDirectoryTree(treeModel);
+        //TODO: Run in background
+        tree.onLoadSubdirectories(service::getSubdirectories);
         // Table
         MyTableModel tableModel = new MyTableModel(rootDirectories, new Object[]{"Name", "Type"});
         MyTable table = new MyTable(tableModel);
-        //TODO: Move listeners with actions
-        Consumer<DirectoryTreeNode> loadContent = node -> {
-            MyDirectory directory = node.getUserObject();
+        tree.onSelectRootDirectory(() -> {
+            //TODO: Run in background
+            tableModel.update(rootDirectories);
+        });
+        tree.onSelectDirectory(directory -> {
             //TODO: Run in background
             List<MyPath> content = service.getContent(directory);
             tableModel.update(content);
-        };
-        Consumer<Object> setRootContent = ignore -> tableModel.update(rootDirectories);
-        tree.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                TreePath path = tree.getPathForLocation(e.getX(), e.getY());
-                Optional.ofNullable(path)
-                        .map(TreePath::getLastPathComponent)
-                        .filter(DirectoryTreeNode.class::isInstance)
-                        .map(DirectoryTreeNode.class::cast)
-                        .ifPresentOrElse(loadContent, () -> Optional.ofNullable(path)
-                                .map(TreePath::getLastPathComponent)
-                                .filter(RootDirectoryTreeNode.class::isInstance)
-                                .ifPresent(setRootContent));
-            }
-        });
-        tree.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
-                    Object lastNode = tree.getLastSelectedPathComponent();
-                    Optional.ofNullable(lastNode)
-                            .filter(DirectoryTreeNode.class::isInstance)
-                            .map(DirectoryTreeNode.class::cast)
-                            .ifPresentOrElse(loadContent, () -> Optional.ofNullable(lastNode)
-                                    .filter(RootDirectoryTreeNode.class::isInstance)
-                                    .ifPresent(setRootContent));
-                }
-            }
         });
         // Details
         MyDetails details = new MyDetails();
