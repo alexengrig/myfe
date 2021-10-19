@@ -14,16 +14,26 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.view;
+package dev.alexengrig.myfe.model;
 
-import dev.alexengrig.myfe.model.MyTreeModel;
+import javax.swing.tree.DefaultMutableTreeNode;
 
-import javax.swing.*;
+public class MyTreeNode<T> extends DefaultMutableTreeNode {
 
-public class MyTree extends JTree {
+    public MyTreeNode(T userObject) {
+        super(userObject, true);
+    }
 
-    public MyTree(MyTreeModel model) {
-        super(model);
+    @Override
+    @SuppressWarnings("unchecked")
+    public T getUserObject() {
+        //TODO: Add benchmark: vs Without cast
+        return (T) super.getUserObject();
+    }
+
+    @Override
+    public boolean isLeaf() {
+        return false;
     }
 
 }

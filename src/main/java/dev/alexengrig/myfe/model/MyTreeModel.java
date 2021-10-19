@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.view;
+package dev.alexengrig.myfe.model;
 
-import dev.alexengrig.myfe.model.MyTreeModel;
+import javax.swing.tree.DefaultTreeModel;
 
-import javax.swing.*;
+public class MyTreeModel extends DefaultTreeModel {
 
-public class MyTree extends JTree {
-
-    public MyTree(MyTreeModel model) {
-        super(model);
+    public MyTreeModel(RootDirectoryTreeNode root) {
+        super(root, true);
     }
 
 }

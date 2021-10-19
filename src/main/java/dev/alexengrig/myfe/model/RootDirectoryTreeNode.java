@@ -14,16 +14,26 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.view;
+package dev.alexengrig.myfe.model;
 
-import dev.alexengrig.myfe.model.MyTreeModel;
+import java.util.List;
 
-import javax.swing.*;
+public class RootDirectoryTreeNode extends MyTreeNode<String> {
 
-public class MyTree extends JTree {
+    public RootDirectoryTreeNode(String name, List<MyDirectory> subdirectories) {
+        super(name);
+        addChildren(subdirectories);
+    }
 
-    public MyTree(MyTreeModel model) {
-        super(model);
+    private void addChildren(List<MyDirectory> children) {
+        for (MyDirectory child : children) {
+            add(new DirectoryTreeNode(child));
+        }
+    }
+
+    @Override
+    public String toString() {
+        return getUserObject();
     }
 
 }
