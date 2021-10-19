@@ -18,11 +18,27 @@ package dev.alexengrig.myfe.model;
 
 import javax.swing.tree.DefaultTreeModel;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class MyDirectoryTreeModel extends DefaultTreeModel {
 
-    public MyDirectoryTreeModel(String name, List<MyDirectory> rootDirectories) {
-        super(new RootDirectoryTreeNode(name, rootDirectories), true);
+    public MyDirectoryTreeModel(String rootName, List<MyDirectory> rootDirectories) {
+        super(new RootDirectoryTreeNode(rootName), true);
+        addChildrenInto(getRoot(), rootDirectories);
+    }
+
+    public void addChildrenInto(MyTreeNode<?> parent, List<MyDirectory> children) {
+        int startIndex = parent.getChildCount();
+        List<MyDirectoryTreeNode> nodes = children.stream().map(MyDirectoryTreeNode::new).collect(Collectors.toList());
+        parent.addAll(nodes);
+        int[] indices = IntStream.range(startIndex, startIndex + children.size()).toArray();
+        nodesWereInserted(parent, indices);
+    }
+
+    @Override
+    public RootDirectoryTreeNode getRoot() {
+        return (RootDirectoryTreeNode) super.getRoot();
     }
 
 }
