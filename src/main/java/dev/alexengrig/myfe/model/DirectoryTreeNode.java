@@ -16,14 +16,17 @@
 
 package dev.alexengrig.myfe.model;
 
+import javax.swing.tree.DefaultMutableTreeNode;
+import java.util.List;
 import java.util.Objects;
+import java.util.Vector;
 
-public class DirectoryTreeNode extends MyTreeNode<MyDirectory> {
+public class DirectoryTreeNode extends DefaultMutableTreeNode {
 
     private boolean loaded;
 
     public DirectoryTreeNode(MyDirectory directory) {
-        super(Objects.requireNonNull(directory, "The directory must not be null"));
+        super(Objects.requireNonNull(directory, "The directory must not be null"), true);
     }
 
     public boolean isLoaded() {
@@ -34,10 +37,21 @@ public class DirectoryTreeNode extends MyTreeNode<MyDirectory> {
         this.loaded = loaded;
     }
 
-    public void addAll(Iterable<MyDirectory> subdirectories) {
-        for (MyDirectory subdirectory : subdirectories) {
-            add(new DirectoryTreeNode(subdirectory));
+    public void addAll(List<DirectoryTreeNode> nodes) {
+        if (children == null) {
+            children = new Vector<>();
         }
+        children.addAll(nodes);
+    }
+
+    @Override
+    public MyDirectory getUserObject() {
+        return (MyDirectory) super.getUserObject();
+    }
+
+    @Override
+    public boolean isLeaf() {
+        return false;
     }
 
     @Override
