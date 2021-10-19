@@ -18,7 +18,6 @@ package dev.alexengrig.myfe.view;
 
 import dev.alexengrig.myfe.model.MyDirectory;
 import dev.alexengrig.myfe.model.MyDirectoryTreeModel;
-import dev.alexengrig.myfe.model.MyPath;
 import dev.alexengrig.myfe.model.MyPathModel;
 import dev.alexengrig.myfe.model.MyPathTableModel;
 import dev.alexengrig.myfe.service.MyPathService;
@@ -51,31 +50,32 @@ public class MyTabComponent extends JPanel {
     }
 
     private void initBody() {
-        // Tree
         //TODO: Getting root directories is slow - add spinner and background task
+        // Models
         List<MyDirectory> rootDirectories = service.getRootDirectories();
         MyDirectoryTreeModel treeModel = new MyDirectoryTreeModel(service.getName(), rootDirectories);
+        MyPathTableModel tableModel = new MyPathTableModel(rootDirectories, new Object[]{"Name", "Type"});
+        MyPathModel pathModel = new MyPathModel();
+        // Components
         MyDirectoryTree tree = new MyDirectoryTree(treeModel);
+        MyPathTable table = new MyPathTable(tableModel);
+        MyPathDetails details = new MyPathDetails(pathModel);
+        MyPathPreview preview = new MyPathPreview(pathModel);
+        // Subscribes
         //TODO: Run in background
         tree.onLoadSubdirectories(service::getSubdirectories);
-        // Table
-        MyPathTableModel tableModel = new MyPathTableModel(rootDirectories, new Object[]{"Name", "Type"});
-        MyPathTable table = new MyPathTable(tableModel);
+        //TODO: Run in background
         tree.onSelectRootDirectory(() -> {
-            //TODO: Run in background
-            tableModel.update(rootDirectories);
+            tableModel.update(service.getRootDirectories());
+            pathModel.setPath(null);
         });
+        //TODO: Run in background
         tree.onSelectDirectory(directory -> {
-            //TODO: Run in background
-            List<MyPath> content = service.getContent(directory);
-            tableModel.update(content);
+            tableModel.update(service.getContent(directory));
+            pathModel.setPath(null);
         });
-        // Details
-        MyPathModel pathModel = new MyPathModel();
-        MyPathDetails details = new MyPathDetails(pathModel);
         table.onSelectPath(pathModel::setPath);
-        // Preview
-        MyPathPreview preview = new MyPathPreview(pathModel);
+        // Combinations
         MySplitPane info = new MySplitPane.Vertical(new MyScrollPane(details), new MyScrollPane(preview));
         MySplitPane content = new MySplitPane.Horizontal(new MyScrollPane(table), info);
         MySplitPane center = new MySplitPane.Horizontal(new MyScrollPane(tree), content);
