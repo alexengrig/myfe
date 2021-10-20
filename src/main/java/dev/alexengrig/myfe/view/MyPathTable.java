@@ -48,9 +48,11 @@ public class MyPathTable extends JTable {
 
     private void init() {
         getSelectionModel().addListSelectionListener(new SelectPathListener());
-        GoToPathListener doubleClickRowGoToPathListener = new GoToPathListener();
-        addMouseListener(doubleClickRowGoToPathListener);
-        addKeyListener(doubleClickRowGoToPathListener);
+        GoToPathListener goToPathListener = new GoToPathListener();
+        addMouseListener(goToPathListener);
+        addKeyListener(goToPathListener);
+        addKeyListener(new GoBackListener());
+
     }
 
     private void handleSelectPath(MyPath path) {
@@ -59,6 +61,10 @@ public class MyPathTable extends JTable {
 
     private void handleGoToPath(MyPath path) {
         fireDoubleClickOnPath(new MyPathTableEvent(path));
+    }
+
+    private void handleGoBack() {
+        fireGoBack(new MyPathTableEvent());
     }
 
     public void addMyPathTableListener(MyPathTableListener listener) {
@@ -78,6 +84,12 @@ public class MyPathTable extends JTable {
     private void fireDoubleClickOnPath(MyPathTableEvent event) {
         for (MyPathTableListener listener : listeners) {
             listener.doubleClickOnPath(event);
+        }
+    }
+
+    private void fireGoBack(MyPathTableEvent event) {
+        for (MyPathTableListener listener : listeners) {
+            listener.goBack(event);
         }
     }
 
@@ -122,6 +134,22 @@ public class MyPathTable extends JTable {
                 MyPathTableModel model = getModel();
                 MyPath path = model.getPathAt(rowIndex);
                 handleGoToPath(path);
+            }
+        }
+
+    }
+
+    /**
+     * On press the Backspace key.
+     *
+     * @see MyPathTable#handleGoBack
+     */
+    private class GoBackListener implements DoNothingKeyListener {
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+                handleGoBack();
             }
         }
 

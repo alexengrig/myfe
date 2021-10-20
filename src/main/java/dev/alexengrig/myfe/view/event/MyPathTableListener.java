@@ -24,4 +24,6 @@ public interface MyPathTableListener extends EventListener {
 
     void doubleClickOnPath(MyPathTableEvent event);
 
+    void goBack(MyPathTableEvent event);
+
 }

@@ -22,6 +22,10 @@ public class MyPathTableEvent {
 
     private final MyPath path;
 
+    public MyPathTableEvent() {
+        this(null);
+    }
+
     public MyPathTableEvent(MyPath path) {
         this.path = path;
     }

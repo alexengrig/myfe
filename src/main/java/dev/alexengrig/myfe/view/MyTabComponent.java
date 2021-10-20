@@ -30,6 +30,8 @@ import dev.alexengrig.myfe.view.event.MyPathTableListener;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.Deque;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
@@ -38,6 +40,10 @@ import java.util.function.Consumer;
 public class MyTabComponent extends JPanel {
 
     private final MyPathService service;
+    /**
+     * Current directory on the top; {@code null} - the root.
+     */
+    private final Deque<MyDirectory> directoryStack;
 
     private MyDirectoryTreeModel treeModel;
     private MyPathTableModel tableModel;
@@ -53,6 +59,7 @@ public class MyTabComponent extends JPanel {
     public MyTabComponent(MyPathService service) {
         super(new BorderLayout());
         this.service = service;
+        this.directoryStack = new LinkedList<>();
         init();
         addComponents();
     }
@@ -94,16 +101,28 @@ public class MyTabComponent extends JPanel {
         add(footerView, BorderLayout.SOUTH);
     }
 
-    private void handleSelectRoot(String rootName) {
+    private void handleSelectRoot() {
         //TODO: Spinner to table
         BackgroundWorker.execute(service::getRootDirectories, tableModel::update);
         pathModel.setPath(null);
+        directoryStack.push(null);
     }
 
     private void handleSelectDirectory(MyDirectory directory) {
         //TODO: Spinner to table
         BackgroundWorker.execute(() -> service.getContent(directory), tableModel::update);
         pathModel.setPath(null);
+        directoryStack.push(directory);
+    }
+
+    private void handleGoToPreviousDirectory() {
+        MyDirectory currentDirectory = directoryStack.poll();
+        MyDirectory previousDirectory = directoryStack.poll();
+        if (previousDirectory == null) {
+            handleSelectRoot();
+        } else {
+            handleSelectDirectory(previousDirectory);
+        }
     }
 
     private static class BackgroundWorker<T> extends SwingWorker<T, Void> {
@@ -143,8 +162,7 @@ public class MyTabComponent extends JPanel {
 
         @Override
         public void selectRoot(MyDirectoryTreeEvent event) {
-            String rootName = event.getRootName();
-            handleSelectRoot(rootName);
+            handleSelectRoot();
         }
 
         @Override
@@ -169,6 +187,11 @@ public class MyTabComponent extends JPanel {
             if (path.isDirectory()) {
                 handleSelectDirectory(path.asDirectory());
             }
+        }
+
+        @Override
+        public void goBack(MyPathTableEvent event) {
+            handleGoToPreviousDirectory();
         }
 
     }
