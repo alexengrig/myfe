@@ -17,6 +17,7 @@
 package dev.alexengrig.myfe.util;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -62,20 +63,18 @@ public final class PathUtil {
     }
 
     public static List<Path> getSubdirectories(Path path) {
-        requireDirectory(requireNonNullPath(path));
-        try (Stream<Path> stream = Files.list(path)) {
+        try (Stream<Path> stream = Files.list(requireDirectory(path))) {
             return stream.filter(PathUtil::doIsDirectory).collect(Collectors.toList());
         } catch (IOException e) {
-            throw new IllegalArgumentException("For path: " + path, e);
+            throw new UncheckedIOException("Exception of getting subdirectories for path: " + path, e);
         }
     }
 
     public static List<Path> getChildren(Path path) {
-        requireDirectory(requireNonNullPath(path));
-        try (Stream<Path> stream = Files.list(path)) {
+        try (Stream<Path> stream = Files.list(requireDirectory(path))) {
             return stream.collect(Collectors.toList());
         } catch (IOException e) {
-            throw new IllegalArgumentException("For path: " + path, e);
+            throw new UncheckedIOException("Exception of getting children for path: " + path, e);
         }
     }
 
@@ -83,10 +82,11 @@ public final class PathUtil {
         return requireNonNull(path, "The path must not be null");
     }
 
-    private static void requireDirectory(Path path) {
-        if (doNonDirectory(path)) {
+    private static Path requireDirectory(Path path) {
+        if (doNonDirectory(requireNonNullPath(path))) {
             throw new IllegalArgumentException("The path isn't directory: " + path);
         }
+        return path;
     }
 
 }
