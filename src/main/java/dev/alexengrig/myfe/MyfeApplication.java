@@ -16,16 +16,9 @@
 
 package dev.alexengrig.myfe;
 
-import dev.alexengrig.myfe.controller.directory.DirectoryContentController;
-import dev.alexengrig.myfe.controller.directory.DirectoryTreeController;
-import dev.alexengrig.myfe.factory.directory.DefaultFileSystemDirectoryContentFactoryImpl;
-import dev.alexengrig.myfe.factory.directory.DefaultFileSystemDirectoryTreeFactory;
-import dev.alexengrig.myfe.factory.directory.DirectoryContentFactory;
-import dev.alexengrig.myfe.factory.directory.DirectoryTreeFactory;
-import dev.alexengrig.myfe.model.directory.DirectoryContentModel;
-import dev.alexengrig.myfe.model.directory.DirectoryTreeModel;
-import dev.alexengrig.myfe.view.directory.DirectoryContentView;
-import dev.alexengrig.myfe.view.directory.DirectoryTreeView;
+import dev.alexengrig.myfe.view.MyTab;
+import dev.alexengrig.myfe.view.MyTabFactory;
+import dev.alexengrig.myfe.view.MyTabbedPane;
 
 import javax.swing.*;
 import java.awt.*;
@@ -34,42 +27,36 @@ public final class MyfeApplication extends JFrame {
 
     private static final String TITLE = "myfe";
 
-    private DirectoryTreeController treeController;
+    private final MyTabFactory tabFactory = new MyTabFactory();
 
     public MyfeApplication() {
         super(TITLE);
+        init();
         pack();
         setLocationRelativeTo(null); // center of screen
         setVisible(true);
     }
 
-    @Override
-    protected void frameInit() {
-        super.frameInit();
+    private void init() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
-        setPreferredSize(createPreferredSize());
+        setPreferredSize(createFramePreferredSize());
         componentsInit();
     }
 
-    private Dimension createPreferredSize() {
+    private Dimension createFramePreferredSize() {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         return new Dimension(screenSize.width / 2, screenSize.height / 2);
     }
 
     private void componentsInit() {
-        // Tree //TODO: Get factory from context
-        DirectoryTreeFactory treeFactory = new DefaultFileSystemDirectoryTreeFactory();
-        DirectoryTreeModel treeModel = treeFactory.createModel();
-        DirectoryTreeView treeView = treeFactory.createView(treeModel);
-        this.treeController = treeFactory.createController(treeView);
-        // Content
-        DirectoryContentFactory contentFactory = new DefaultFileSystemDirectoryContentFactoryImpl();
-        DirectoryContentModel contentModel = contentFactory.createModel();
-        DirectoryContentView contentView = contentFactory.createView(contentModel);
-        DirectoryContentController contentController = contentFactory.createController(contentView);
-        contentController.subscribeOn(treeView);
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, treeView, contentView);
-        add(splitPane);
+        //TODO: Add menu
+        tabbedPaneInit();
+    }
+
+    private void tabbedPaneInit() {
+        MyTab defaultTab = tabFactory.createDefaultTab();
+        MyTabbedPane pane = new MyTabbedPane(defaultTab);
+        add(pane);
     }
 
 }
