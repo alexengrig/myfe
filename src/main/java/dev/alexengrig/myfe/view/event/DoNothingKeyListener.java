@@ -16,12 +16,21 @@
 
 package dev.alexengrig.myfe.view.event;
 
-import java.util.EventListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
-public interface MyPathTableListener extends EventListener {
+public interface DoNothingKeyListener extends KeyListener {
 
-    void selectPath(MyPathTableEvent event);
+    @Override
+    default void keyTyped(KeyEvent e) {
+    }
 
-    void doubleClickOnPath(MyPathTableEvent event);
+    @Override
+    default void keyPressed(KeyEvent e) {
+    }
+
+    @Override
+    default void keyReleased(KeyEvent e) {
+    }
 
 }

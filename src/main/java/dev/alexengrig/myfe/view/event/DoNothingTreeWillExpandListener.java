@@ -16,12 +16,20 @@
 
 package dev.alexengrig.myfe.view.event;
 
-import java.util.EventListener;
+import javax.swing.event.TreeExpansionEvent;
+import javax.swing.event.TreeWillExpandListener;
+import javax.swing.tree.ExpandVetoException;
 
-public interface MyPathTableListener extends EventListener {
+public interface DoNothingTreeWillExpandListener extends TreeWillExpandListener {
 
-    void selectPath(MyPathTableEvent event);
+    @Override
+    @SuppressWarnings("RedundantThrows")
+    default void treeWillExpand(TreeExpansionEvent event) throws ExpandVetoException {
+    }
 
-    void doubleClickOnPath(MyPathTableEvent event);
+    @Override
+    @SuppressWarnings("RedundantThrows")
+    default void treeWillCollapse(TreeExpansionEvent event) throws ExpandVetoException {
+    }
 
 }

@@ -18,12 +18,16 @@ package dev.alexengrig.myfe.view;
 
 import dev.alexengrig.myfe.model.MyPath;
 import dev.alexengrig.myfe.model.MyPathTableModel;
+import dev.alexengrig.myfe.view.event.DoNothingKeyListener;
+import dev.alexengrig.myfe.view.event.DoNothingMouseListener;
 import dev.alexengrig.myfe.view.event.MyPathTableEvent;
 import dev.alexengrig.myfe.view.event.MyPathTableListener;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -43,11 +47,18 @@ public class MyPathTable extends JTable {
     }
 
     private void init() {
-        getSelectionModel().addListSelectionListener(new SelectSingleRowListener());
+        getSelectionModel().addListSelectionListener(new SelectPathListener());
+        GoToPathListener doubleClickRowGoToPathListener = new GoToPathListener();
+        addMouseListener(doubleClickRowGoToPathListener);
+        addKeyListener(doubleClickRowGoToPathListener);
     }
 
     private void handleSelectPath(MyPath path) {
         fireSelectPath(new MyPathTableEvent(path));
+    }
+
+    private void handleGoToPath(MyPath path) {
+        fireDoubleClickOnPath(new MyPathTableEvent(path));
     }
 
     public void addMyPathTableListener(MyPathTableListener listener) {
@@ -64,12 +75,18 @@ public class MyPathTable extends JTable {
         }
     }
 
+    private void fireDoubleClickOnPath(MyPathTableEvent event) {
+        for (MyPathTableListener listener : listeners) {
+            listener.doubleClickOnPath(event);
+        }
+    }
+
     /**
      * On select a single row.
      *
      * @see MyPathTable#handleSelectPath(MyPath)
      */
-    private class SelectSingleRowListener implements ListSelectionListener {
+    private class SelectPathListener implements ListSelectionListener {
 
         @Override
         public void valueChanged(ListSelectionEvent event) {
@@ -77,6 +94,35 @@ public class MyPathTable extends JTable {
             int rowIndex = getSelectedRow();
             MyPath path = getModel().getPathAt(rowIndex);
             handleSelectPath(path);
+        }
+
+    }
+
+    /**
+     * On double-click the left mouse button and press the Enter key on a row.
+     *
+     * @see MyPathTable#handleGoToPath(MyPath)
+     */
+    private class GoToPathListener implements DoNothingMouseListener, DoNothingKeyListener {
+
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() > 1 && getSelectedRowCount() == 1) {
+                int rowIndex = MyPathTable.this.rowAtPoint(e.getPoint());
+                MyPathTableModel model = getModel();
+                MyPath path = model.getPathAt(rowIndex);
+                handleGoToPath(path);
+            }
+        }
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_ENTER && getSelectedRowCount() == 1) {
+                int rowIndex = getSelectedRow();
+                MyPathTableModel model = getModel();
+                MyPath path = model.getPathAt(rowIndex);
+                handleGoToPath(path);
+            }
         }
 
     }

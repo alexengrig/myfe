@@ -30,8 +30,16 @@ public abstract class MyPath {
 
     public abstract boolean isDirectory();
 
+    public MyDirectory asDirectory() {
+        return (MyDirectory) this;
+    }
+
     public boolean isFile() {
         return !isDirectory();
+    }
+
+    public MyFile asFile() {
+        return (MyFile) this;
     }
 
     public String getPath() {

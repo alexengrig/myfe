@@ -21,6 +21,9 @@ import dev.alexengrig.myfe.model.MyDirectoryTreeModel;
 import dev.alexengrig.myfe.model.MyDirectoryTreeNode;
 import dev.alexengrig.myfe.model.RootDirectoryTreeNode;
 import dev.alexengrig.myfe.service.MyDirectoryTreeBackgroundService;
+import dev.alexengrig.myfe.view.event.DoNothingKeyListener;
+import dev.alexengrig.myfe.view.event.DoNothingMouseListener;
+import dev.alexengrig.myfe.view.event.DoNothingTreeWillExpandListener;
 import dev.alexengrig.myfe.view.event.MyDirectoryTreeEvent;
 import dev.alexengrig.myfe.view.event.MyDirectoryTreeListener;
 import org.slf4j.Logger;
@@ -28,12 +31,9 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.TreeExpansionEvent;
-import javax.swing.event.TreeWillExpandListener;
 import javax.swing.tree.TreePath;
 import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.lang.invoke.MethodHandles;
 import java.util.LinkedList;
 import java.util.List;
@@ -59,8 +59,8 @@ public class MyDirectoryTree extends JTree {
 
     private void init() {
         LOGGER.debug("Start init");
-        ExpandNodeListener expandNodeListener = new ExpandNodeListener();
-        addTreeWillExpandListener(expandNodeListener);
+        LoadChildDirectoriesListener loadChildDirectoriesListener = new LoadChildDirectoriesListener();
+        addTreeWillExpandListener(loadChildDirectoriesListener);
         SelectNodeListener selectNodeListener = new SelectNodeListener();
         addMouseListener(selectNodeListener);
         addKeyListener(selectNodeListener);
@@ -88,11 +88,11 @@ public class MyDirectoryTree extends JTree {
         }
     }
 
-    private void handleSelectRoot(RootDirectoryTreeNode root) {
+    private void handleSelectRootNode(RootDirectoryTreeNode root) {
         fireSelectRoot(new MyDirectoryTreeEvent(root.getUserObject()));
     }
 
-    private void handleSelectDirectory(MyDirectoryTreeNode node) {
+    private void handleSelectDirectoryNode(MyDirectoryTreeNode node) {
         fireSelectDirectory(new MyDirectoryTreeEvent(node.getUserObject()));
     }
 
@@ -121,7 +121,7 @@ public class MyDirectoryTree extends JTree {
      *
      * @see MyDirectoryTree#handleLoadChildDirectories(MyDirectoryTreeNode)
      */
-    private class ExpandNodeListener implements TreeWillExpandListener {
+    private class LoadChildDirectoriesListener implements DoNothingTreeWillExpandListener {
 
         @Override
         public void treeWillExpand(TreeExpansionEvent event) {
@@ -135,21 +135,15 @@ public class MyDirectoryTree extends JTree {
                     .ifPresent(MyDirectoryTree.this::handleLoadChildDirectories);
         }
 
-        //TODO: Create "do-nothing" interfaces
-
-        @Override
-        public void treeWillCollapse(TreeExpansionEvent event) {
-        }
-
     }
 
     /**
      * On click the left mouse button and press the Enter key on a node.
      *
-     * @see MyDirectoryTree#handleSelectRoot(RootDirectoryTreeNode)
-     * @see MyDirectoryTree#handleSelectDirectory(MyDirectoryTreeNode)
+     * @see MyDirectoryTree#handleSelectRootNode(RootDirectoryTreeNode)
+     * @see MyDirectoryTree#handleSelectDirectoryNode(MyDirectoryTreeNode)
      */
-    private class SelectNodeListener implements MouseListener, KeyListener {
+    private class SelectNodeListener implements DoNothingMouseListener, DoNothingKeyListener {
 
         @Override
         public void mouseClicked(MouseEvent event) {
@@ -159,12 +153,12 @@ public class MyDirectoryTree extends JTree {
                         .map(TreePath::getLastPathComponent)
                         .filter(MyDirectoryTreeNode.class::isInstance)
                         .map(MyDirectoryTreeNode.class::cast)
-                        .ifPresentOrElse(MyDirectoryTree.this::handleSelectDirectory, () ->
+                        .ifPresentOrElse(MyDirectoryTree.this::handleSelectDirectoryNode, () ->
                                 Optional.ofNullable(path)
                                         .map(TreePath::getLastPathComponent)
                                         .filter(RootDirectoryTreeNode.class::isInstance)
                                         .map(RootDirectoryTreeNode.class::cast)
-                                        .ifPresent(MyDirectoryTree.this::handleSelectRoot));
+                                        .ifPresent(MyDirectoryTree.this::handleSelectRootNode));
             }
         }
 
@@ -175,38 +169,12 @@ public class MyDirectoryTree extends JTree {
                 Optional.ofNullable(lastNode)
                         .filter(MyDirectoryTreeNode.class::isInstance)
                         .map(MyDirectoryTreeNode.class::cast)
-                        .ifPresentOrElse(MyDirectoryTree.this::handleSelectDirectory, () ->
+                        .ifPresentOrElse(MyDirectoryTree.this::handleSelectDirectoryNode, () ->
                                 Optional.ofNullable(lastNode)
                                         .filter(RootDirectoryTreeNode.class::isInstance)
                                         .map(RootDirectoryTreeNode.class::cast)
-                                        .ifPresent(MyDirectoryTree.this::handleSelectRoot));
+                                        .ifPresent(MyDirectoryTree.this::handleSelectRootNode));
             }
-        }
-
-        //TODO: Create "do-nothing" interfaces
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-        }
-
-        @Override
-        public void mouseEntered(MouseEvent e) {
-        }
-
-        @Override
-        public void mouseExited(MouseEvent e) {
-        }
-
-        @Override
-        public void keyTyped(KeyEvent e) {
-        }
-
-        @Override
-        public void keyReleased(KeyEvent e) {
         }
 
     }

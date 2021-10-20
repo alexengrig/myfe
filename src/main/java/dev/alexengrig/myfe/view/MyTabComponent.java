@@ -94,6 +94,18 @@ public class MyTabComponent extends JPanel {
         add(footerView, BorderLayout.SOUTH);
     }
 
+    private void handleSelectRoot(String rootName) {
+        //TODO: Spinner to table
+        BackgroundWorker.execute(service::getRootDirectories, tableModel::update);
+        pathModel.setPath(null);
+    }
+
+    private void handleSelectDirectory(MyDirectory directory) {
+        //TODO: Spinner to table
+        BackgroundWorker.execute(() -> service.getContent(directory), tableModel::update);
+        pathModel.setPath(null);
+    }
+
     private static class BackgroundWorker<T> extends SwingWorker<T, Void> {
 
         private final Callable<T> task;
@@ -131,17 +143,14 @@ public class MyTabComponent extends JPanel {
 
         @Override
         public void selectRoot(MyDirectoryTreeEvent event) {
-            //TODO: Spinner to table
-            BackgroundWorker.execute(service::getRootDirectories, tableModel::update);
-            pathModel.setPath(null);
+            String rootName = event.getRootName();
+            handleSelectRoot(rootName);
         }
 
         @Override
         public void selectDirectory(MyDirectoryTreeEvent event) {
             MyDirectory directory = event.getDirectory();
-            //TODO: Spinner to table
-            BackgroundWorker.execute(() -> service.getContent(directory), tableModel::update);
-            pathModel.setPath(null);
+            handleSelectDirectory(directory);
         }
 
     }
@@ -152,6 +161,14 @@ public class MyTabComponent extends JPanel {
         public void selectPath(MyPathTableEvent event) {
             MyPath path = event.getPath();
             pathModel.setPath(path);
+        }
+
+        @Override
+        public void doubleClickOnPath(MyPathTableEvent event) {
+            MyPath path = event.getPath();
+            if (path.isDirectory()) {
+                handleSelectDirectory(path.asDirectory());
+            }
         }
 
     }
