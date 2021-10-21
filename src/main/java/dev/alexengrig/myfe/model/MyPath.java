@@ -16,12 +16,16 @@
 
 package dev.alexengrig.myfe.model;
 
+import dev.alexengrig.myfe.util.MyPathUtil;
+
 import java.util.Objects;
 
 public abstract class MyPath {
 
     private final String path;
     private final String name;
+
+    private transient String extension;
 
     protected MyPath(String path, String name) {
         this.path = Objects.requireNonNull(path, "The path must not be null");
@@ -51,16 +55,10 @@ public abstract class MyPath {
     }
 
     public String getExtension() {
-        //FIXME: Lazy?
-        if (isDirectory()) {
-            return "<dir>"; //FIXME: dir?
+        if (extension == null) {
+            extension = MyPathUtil.getExtension(this);
         }
-        int indexOfDot = name.lastIndexOf('.');
-        if (indexOfDot >= 0) {
-            return name.substring(indexOfDot + 1); //FIXME: Uppercase?
-        } else {
-            return "<unknown>"; //FIXME: unknown?
-        }
+        return extension;
     }
 
     @Override
