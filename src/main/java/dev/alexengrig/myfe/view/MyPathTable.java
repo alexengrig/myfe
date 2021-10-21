@@ -26,6 +26,7 @@ import dev.alexengrig.myfe.view.event.MyPathTableListener;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.JTableHeader;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.LinkedList;
@@ -41,18 +42,26 @@ public class MyPathTable extends JTable {
         init();
     }
 
-    @Override
-    public MyPathTableModel getModel() {
-        return (MyPathTableModel) super.getModel();
+    private void init() {
+        initListeners();
     }
 
-    private void init() {
+    private void initListeners() {
         getSelectionModel().addListSelectionListener(new SelectPathListener());
         GoToPathListener goToPathListener = new GoToPathListener();
         addMouseListener(goToPathListener);
         addKeyListener(goToPathListener);
         addKeyListener(new GoBackListener());
+    }
 
+    @Override
+    protected JTableHeader createDefaultTableHeader() {
+        return new MyPathTableHeader(columnModel);
+    }
+
+    @Override
+    public MyPathTableModel getModel() {
+        return (MyPathTableModel) super.getModel();
     }
 
     private void handleSelectPath(MyPath path) {
