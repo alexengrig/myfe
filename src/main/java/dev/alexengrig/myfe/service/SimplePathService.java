@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Alexengrig Dev.
+ * Copyright 2020-2021 Alexengrig Dev.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,13 +17,20 @@
 package dev.alexengrig.myfe.service;
 
 import dev.alexengrig.myfe.model.MyDirectory;
+import dev.alexengrig.myfe.model.MyFile;
 import dev.alexengrig.myfe.model.MyPath;
 import dev.alexengrig.myfe.repository.MyPathRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.lang.invoke.MethodHandles;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 public class SimplePathService implements MyPathService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final String name;
     private final MyPathRepository repository;
@@ -49,12 +56,21 @@ public class SimplePathService implements MyPathService {
     }
 
     @Override
-    public List<MyPath> getContent(MyDirectory directory) {
+    public List<MyPath> getDirectoryContent(MyDirectory directory) {
         return repository.getChildren(requireNonNullDirectory(directory).getPath()); //TODO: Sort
+    }
+
+    @Override
+    public Stream<String> readByLineFileContent(MyFile file) {
+        return repository.readByLine(requireNonNullFile(file).getPath());
     }
 
     private MyDirectory requireNonNullDirectory(MyDirectory directory) {
         return Objects.requireNonNull(directory, "The directory must not be null");
+    }
+
+    private MyFile requireNonNullFile(MyFile file) {
+        return Objects.requireNonNull(file, "The file must not be null");
     }
 
 }

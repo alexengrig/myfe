@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Alexengrig Dev.
+ * Copyright 2020-2021 Alexengrig Dev.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,6 +20,7 @@ import dev.alexengrig.myfe.model.MyDirectory;
 import dev.alexengrig.myfe.model.MyPath;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 public interface MyPathRepository {
 
@@ -28,5 +29,7 @@ public interface MyPathRepository {
     List<MyPath> getChildren(String directoryPath);
 
     List<MyDirectory> getSubdirectories(String directoryPath);
+
+    Stream<String> readByLine(String filePath);
 
 }

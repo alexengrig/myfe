@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Alexengrig Dev.
+ * Copyright 2020-2021 Alexengrig Dev.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,11 +18,15 @@ package dev.alexengrig.myfe.view;
 
 import dev.alexengrig.myfe.model.MyDirectory;
 import dev.alexengrig.myfe.model.MyDirectoryTreeModel;
+import dev.alexengrig.myfe.model.MyFile;
 import dev.alexengrig.myfe.model.MyPath;
 import dev.alexengrig.myfe.model.MyPathModel;
 import dev.alexengrig.myfe.model.MyPathTableModel;
 import dev.alexengrig.myfe.service.MyDirectoryTreeBackgroundService;
+import dev.alexengrig.myfe.service.MyPathPreviewBackgroundService;
 import dev.alexengrig.myfe.service.MyPathService;
+import dev.alexengrig.myfe.util.BackgroundExecutor;
+import dev.alexengrig.myfe.util.BackgroundStreamer;
 import dev.alexengrig.myfe.view.event.MyDirectoryTreeEvent;
 import dev.alexengrig.myfe.view.event.MyDirectoryTreeListener;
 import dev.alexengrig.myfe.view.event.MyPathTableEvent;
@@ -33,9 +37,8 @@ import java.awt.*;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 public class MyTabComponent extends JPanel {
 
@@ -83,7 +86,7 @@ public class MyTabComponent extends JPanel {
         treeView = new MyDirectoryTree(treeModel, new TreeService());
         tableView = new MyPathTable(tableModel);
         detailsView = new MyPathDetails(pathModel);
-        previewView = new MyPathPreview(pathModel);
+        previewView = new MyPathPreview(pathModel, new PreviewService());
         footerView = new MyFooter();
     }
 
@@ -103,14 +106,14 @@ public class MyTabComponent extends JPanel {
 
     private void handleSelectRoot() {
         //TODO: Spinner to table
-        BackgroundWorker.execute(service::getRootDirectories, tableModel::update);
+        BackgroundExecutor.execute(service::getRootDirectories, tableModel::update);
         pathModel.setPath(null);
         directoryStack.push(null);
     }
 
     private void handleSelectDirectory(MyDirectory directory) {
         //TODO: Spinner to table
-        BackgroundWorker.execute(() -> service.getContent(directory), tableModel::update);
+        BackgroundExecutor.execute(() -> service.getDirectoryContent(directory), tableModel::update);
         pathModel.setPath(null);
         directoryStack.push(directory);
     }
@@ -123,39 +126,6 @@ public class MyTabComponent extends JPanel {
         } else {
             handleSelectDirectory(previousDirectory);
         }
-    }
-
-    private static class BackgroundWorker<T> extends SwingWorker<T, Void> {
-
-        private final Callable<T> task;
-        private final Consumer<T> handler;
-
-        private BackgroundWorker(Callable<T> task, Consumer<T> handler) {
-            this.task = task;
-            this.handler = handler;
-        }
-
-        public static <T> void execute(Callable<T> task, Consumer<T> handler) {
-            BackgroundWorker<T> worker = new BackgroundWorker<>(task, handler);
-            worker.execute();
-        }
-
-        @Override
-        protected T doInBackground() throws Exception {
-            return task.call();
-        }
-
-        @Override
-        protected void done() {
-            T result;
-            try {
-                result = get();
-            } catch (InterruptedException | ExecutionException e) {
-                throw new RuntimeException(e);
-            }
-            handler.accept(result);
-        }
-
     }
 
     private class TreeListener implements MyDirectoryTreeListener {
@@ -200,7 +170,16 @@ public class MyTabComponent extends JPanel {
 
         @Override
         public void loadSubdirectories(MyDirectory directory, Consumer<List<MyDirectory>> handler) {
-            BackgroundWorker.execute(() -> service.getSubdirectories(directory), handler);
+            BackgroundExecutor.execute(() -> service.getSubdirectories(directory), handler);
+        }
+
+    }
+
+    private class PreviewService implements MyPathPreviewBackgroundService {
+
+        @Override
+        public void loadTextPreview(MyFile file, Consumer<Stream<String>> handler) {
+            BackgroundStreamer.stream(() -> service.readByLineFileContent(file), handler);
         }
 
     }

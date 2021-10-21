@@ -1,5 +1,5 @@
 /*
- * Copyright 2021 Alexengrig Dev.
+ * Copyright 2020-2021 Alexengrig Dev.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,9 +17,11 @@
 package dev.alexengrig.myfe.service;
 
 import dev.alexengrig.myfe.model.MyDirectory;
+import dev.alexengrig.myfe.model.MyFile;
 import dev.alexengrig.myfe.model.MyPath;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 public interface MyPathService {
 
@@ -30,6 +32,8 @@ public interface MyPathService {
 
     List<MyDirectory> getSubdirectories(MyDirectory directory);
 
-    List<MyPath> getContent(MyDirectory directory);
+    List<MyPath> getDirectoryContent(MyDirectory directory);
+
+    Stream<String> readByLineFileContent(MyFile file);
 
 }
