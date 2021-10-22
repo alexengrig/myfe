@@ -41,9 +41,9 @@ public class MyPathFilter extends JPanel {
 
     private void init() {
         add(new JLabel("Filter type: "), BorderLayout.WEST);
-        TypeComboBoxModel typeComboBoxModel = new TypeComboBoxModel(filterModel.getTypes());
-        filterModel.addMyPathFilterModelListener(event -> typeComboBoxModel.setTypes(event.getTypes()));
-        add(new JComboBox<>(typeComboBoxModel)); //TODO: Add clear button
+        TypeComboBoxModel typeComboBoxModel = new TypeComboBoxModel();
+        filterModel.addMyPathFilterModelListener(event -> typeComboBoxModel.reset());
+        add(new JComboBox<>(typeComboBoxModel));
     }
 
     public void addMyPathFilterListener(MyPathFilterListener listener) {
@@ -62,14 +62,11 @@ public class MyPathFilter extends JPanel {
 
     private class TypeComboBoxModel implements ComboBoxModel<String> {
 
+        private static final String DEFAULT_ITEM = "All";
+
         private final List<ListDataListener> listeners = new LinkedList<>();
 
-        private List<String> types;
-        private String selected;
-
-        public TypeComboBoxModel(List<String> types) {
-            this.types = types;
-        }
+        private String selected = DEFAULT_ITEM;
 
         @Override
         public Object getSelectedItem() {
@@ -78,18 +75,20 @@ public class MyPathFilter extends JPanel {
 
         @Override
         public void setSelectedItem(Object anItem) {
-            selected = anItem == null ? null : anItem.toString();
-            fireFilterType(MyPathFilterEvent.type(selected));
+            selected = anItem.toString();
+            @SuppressWarnings("StringEquality")
+            String payload = selected == DEFAULT_ITEM ? null : selected;
+            fireFilterType(MyPathFilterEvent.type(payload));
         }
 
         @Override
         public int getSize() {
-            return types.size();
+            return 1 + filterModel.getTypes().size();
         }
 
         @Override
         public String getElementAt(int index) {
-            return types.get(index);
+            return index == 0 ? DEFAULT_ITEM : filterModel.getTypes().get(index - 1);
         }
 
         @Override
@@ -108,9 +107,8 @@ public class MyPathFilter extends JPanel {
             }
         }
 
-        public void setTypes(List<String> types) {
-            this.selected = null;
-            this.types = types;
+        public void reset() {
+            this.selected = DEFAULT_ITEM;
             fireContentsChanged(new ListDataEvent(this, ListDataEvent.CONTENTS_CHANGED, -1, -1));
         }
 
