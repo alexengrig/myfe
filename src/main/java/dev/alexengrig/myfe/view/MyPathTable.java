@@ -26,7 +26,6 @@ import dev.alexengrig.myfe.view.event.MyPathTableListener;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.table.JTableHeader;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.LinkedList;
@@ -43,6 +42,7 @@ public class MyPathTable extends JTable {
     }
 
     private void init() {
+        getTableHeader().setReorderingAllowed(false);
         initListeners();
     }
 
@@ -52,11 +52,6 @@ public class MyPathTable extends JTable {
         addMouseListener(goToPathListener);
         addKeyListener(goToPathListener);
         addKeyListener(new GoBackListener());
-    }
-
-    @Override
-    protected JTableHeader createDefaultTableHeader() {
-        return new MyPathTableHeader(columnModel);
     }
 
     @Override
