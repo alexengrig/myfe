@@ -41,20 +41,20 @@ public class MyTabFactory {
 
     public MyTab createDefaultTab() {
         MyPathRepository repository = new LocalFileSystemPathRepository(directoryConverter, pathConverter);
-        //TODO: Move name
-        MyPathService service = new SimplePathService("This computer", repository);
+        return createTab("This computer", "Your computer", "This computer", repository);
+    }
+
+    private MyTab createTab(String title, String tip, String name, MyPathRepository repository) {
+        MyPathService service = new SimplePathService(name, repository);
         MyTabComponent component = new MyTabComponent(service);
-        //TODO: Move title and tip
-        return new MyTab("This computer", "Your computer", component);
+        return new MyTab(title, tip, component);
     }
 
     public MyTab createArchiveTab(Path path) {
-        URI uri = path.toUri();
-        URI jarUri = URI.create("jar:" + uri);
         String archiveName = PathUtil.getName(path);
-        URIFileSystemPathRepository repository = new URIFileSystemPathRepository(jarUri, directoryConverter, pathConverter);
-        MyPathService service = new SimplePathService(archiveName, repository);
-        return new MyTab("Archive: " + archiveName, PathUtil.getAbsolutePath(path), new MyTabComponent(service));
+        URI uri = URI.create("jar:" + path.toUri());
+        MyPathRepository repository = new URIFileSystemPathRepository(uri, directoryConverter, pathConverter);
+        return createTab("Archive: " + archiveName, PathUtil.getAbsolutePath(path), archiveName, repository);
     }
 
 }

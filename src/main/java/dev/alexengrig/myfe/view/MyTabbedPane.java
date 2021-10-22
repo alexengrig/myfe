@@ -30,25 +30,20 @@ public class MyTabbedPane extends JTabbedPane {
         String title = tab.title();
         super.addTab(title, tab.icon(), tab.component(), tab.tip());
         int index = super.getTabCount() - 1;
-        super.setTabComponentAt(index, new MyTabComponent(title));
+        super.setTabComponentAt(index, new MyTabComponent(tab));
     }
 
     private class MyTabComponent extends JPanel {
 
-        private final String title;
-
-        private MyTabComponent(String title) {
-            this.title = title;
-            init();
-        }
-
-        private void init() {
+        private MyTabComponent(MyTab tab) {
+            String title = tab.title();
             add(new JLabel(title));
             JButton button = new JButton(new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     int index = MyTabbedPane.super.indexOfTab(title);
                     MyTabbedPane.super.removeTabAt(index);
+                    tab.component().destroy();
                 }
             });
             button.setText("x"); //TODO: Make it beautiful

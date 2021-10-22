@@ -172,6 +172,10 @@ public class MyTabComponent extends JPanel {
         }
     }
 
+    public void destroy() {
+        service.destroy();
+    }
+
     private class TreeListener implements MyDirectoryTreeListener {
 
         @Override
