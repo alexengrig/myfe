@@ -27,8 +27,7 @@ public interface MyPathService {
 
     void destroy();
 
-    //FIXME: Name?
-    String getName();
+    String getRootName();
 
     List<MyDirectory> getRootDirectories();
 

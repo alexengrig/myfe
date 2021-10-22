@@ -39,15 +39,15 @@ public class MyTabFactory {
     private final Converter<Path, MyFile> fileConverter = new Path2MyFileConverter();
     private final Converter<Path, MyPath> pathConverter = new Path2MyPathConverter(directoryConverter, fileConverter);
 
-    public MyTab createDefaultTab() {
-        MyPathRepository repository = new LocalFileSystemPathRepository(directoryConverter, pathConverter);
-        return createTab("This computer", "Your computer", "This computer", repository);
-    }
-
     private MyTab createTab(String title, String tip, String name, MyPathRepository repository) {
         MyPathService service = new SimplePathService(name, repository);
         MyTabComponent component = new MyTabComponent(service);
         return new MyTab(title, tip, component);
+    }
+
+    public MyTab createDefaultTab() {
+        MyPathRepository repository = new LocalFileSystemPathRepository(directoryConverter, pathConverter);
+        return createTab("This computer", "Your computer", "This computer", repository);
     }
 
     public MyTab createArchiveTab(Path path) {

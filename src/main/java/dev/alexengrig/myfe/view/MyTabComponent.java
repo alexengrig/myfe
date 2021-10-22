@@ -86,7 +86,7 @@ public class MyTabComponent extends JPanel {
     private void initModels() {
         //TODO: Getting root directories is slow - add spinner and background task
         List<MyDirectory> rootDirectories = service.getRootDirectories();
-        treeModel = new MyDirectoryTreeModel(service.getName(), rootDirectories);
+        treeModel = new MyDirectoryTreeModel(service.getRootName(), rootDirectories);
         tableModel = new MyPathTableModel(rootDirectories);
         filterModel = new MyPathFilterModel(rootDirectories);
         pathModel = new MyPathModel();

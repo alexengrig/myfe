@@ -32,11 +32,11 @@ public class SimplePathService implements MyPathService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final String name;
+    private final String rootName;
     private final MyPathRepository repository;
 
-    public SimplePathService(String name, MyPathRepository repository) {
-        this.name = name;
+    public SimplePathService(String rootName, MyPathRepository repository) {
+        this.rootName = rootName;
         this.repository = repository;
     }
 
@@ -50,8 +50,8 @@ public class SimplePathService implements MyPathService {
     }
 
     @Override
-    public String getName() {
-        return name;
+    public String getRootName() {
+        return rootName;
     }
 
     @Override
