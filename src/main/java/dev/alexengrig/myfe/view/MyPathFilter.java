@@ -43,7 +43,7 @@ public class MyPathFilter extends JPanel {
         add(new JLabel("Filter type: "), BorderLayout.WEST);
         TypeComboBoxModel typeComboBoxModel = new TypeComboBoxModel(filterModel.getTypes());
         filterModel.addMyPathFilterModelListener(event -> typeComboBoxModel.setTypes(event.getTypes()));
-        add(new JComboBox<>(typeComboBoxModel));
+        add(new JComboBox<>(typeComboBoxModel)); //TODO: Add clear button
     }
 
     public void addMyPathFilterListener(MyPathFilterListener listener) {
@@ -78,7 +78,7 @@ public class MyPathFilter extends JPanel {
 
         @Override
         public void setSelectedItem(Object anItem) {
-            selected = anItem.toString();
+            selected = anItem == null ? null : anItem.toString();
             fireFilterType(MyPathFilterEvent.type(selected));
         }
 

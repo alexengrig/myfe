@@ -26,6 +26,7 @@ import dev.alexengrig.myfe.view.event.MyPathTableListener;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.TableRowSorter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.LinkedList;
@@ -43,7 +44,24 @@ public class MyPathTable extends JTable {
 
     private void init() {
         getTableHeader().setReorderingAllowed(false);
+        initSorter();
         initListeners();
+    }
+
+    private void initSorter() {
+        TableRowSorter<MyPathTableModel> sorter = new TableRowSorter<>(getModel());
+        sorter.setRowFilter(new RowFilter<>() {
+            @Override
+            public boolean include(Entry<? extends MyPathTableModel, ? extends Integer> entry) {
+                String filteredType = getModel().getFilteredType();
+                if (filteredType == null) {
+                    return true;
+                }
+                String type = entry.getStringValue(1);
+                return filteredType.equals(type);
+            }
+        });
+        setRowSorter(sorter);
     }
 
     private void initListeners() {
@@ -57,6 +75,12 @@ public class MyPathTable extends JTable {
     @Override
     public MyPathTableModel getModel() {
         return (MyPathTableModel) super.getModel();
+    }
+
+    private MyPath getSelectedPath() {
+        int rowIndex = getSelectedRow();
+        int pathIndex = getRowSorter().convertRowIndexToModel(rowIndex);
+        return getModel().getPathAt(pathIndex);
     }
 
     private void handleSelectPath(MyPath path) {
@@ -106,10 +130,10 @@ public class MyPathTable extends JTable {
 
         @Override
         public void valueChanged(ListSelectionEvent event) {
-            if (getSelectedRowCount() != 1) return;
-            int rowIndex = getSelectedRow();
-            MyPath path = getModel().getPathAt(rowIndex);
-            handleSelectPath(path);
+            if (getSelectedRowCount() == 1) {
+                MyPath path = getSelectedPath();
+                handleSelectPath(path);
+            }
         }
 
     }
@@ -124,9 +148,7 @@ public class MyPathTable extends JTable {
         @Override
         public void mouseClicked(MouseEvent e) {
             if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() > 1 && getSelectedRowCount() == 1) {
-                int rowIndex = MyPathTable.this.rowAtPoint(e.getPoint());
-                MyPathTableModel model = getModel();
-                MyPath path = model.getPathAt(rowIndex);
+                MyPath path = getSelectedPath();
                 handleGoToPath(path);
             }
         }
@@ -134,9 +156,7 @@ public class MyPathTable extends JTable {
         @Override
         public void keyPressed(KeyEvent e) {
             if (e.getKeyCode() == KeyEvent.VK_ENTER && getSelectedRowCount() == 1) {
-                int rowIndex = getSelectedRow();
-                MyPathTableModel model = getModel();
-                MyPath path = model.getPathAt(rowIndex);
+                MyPath path = getSelectedPath();
                 handleGoToPath(path);
             }
         }
@@ -152,6 +172,7 @@ public class MyPathTable extends JTable {
 
         @Override
         public void keyPressed(KeyEvent e) {
+            //TODO: As global
             if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
                 handleGoBack();
             }

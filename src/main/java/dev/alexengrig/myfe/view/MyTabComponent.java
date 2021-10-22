@@ -146,7 +146,7 @@ public class MyTabComponent extends JPanel {
     }
 
     private void handleFilterType(String type) {
-        //TODO: Filter table by type
+        tableModel.setFilteredType(type);
     }
 
     private class TreeListener implements MyDirectoryTreeListener {

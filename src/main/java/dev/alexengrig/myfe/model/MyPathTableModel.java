@@ -24,6 +24,7 @@ import java.util.stream.Collectors;
 public class MyPathTableModel extends DefaultTableModel {
 
     private List<? extends MyPath> paths;
+    private String filteredType;
 
     public MyPathTableModel(List<? extends MyPath> paths) {
         super(convertToVector(paths), convertToVector(new Object[]{"Name", "Type"}));
@@ -41,8 +42,18 @@ public class MyPathTableModel extends DefaultTableModel {
     }
 
     public void setPaths(List<? extends MyPath> paths) {
-        setDataVector(convertToVector(paths), columnIdentifiers);
         this.paths = paths;
+        this.filteredType = null;
+        setDataVector(convertToVector(paths), columnIdentifiers);
+    }
+
+    public String getFilteredType() {
+        return filteredType;
+    }
+
+    public void setFilteredType(String filteredType) {
+        this.filteredType = filteredType;
+        fireTableStructureChanged();
     }
 
     @Override
