@@ -14,28 +14,12 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.service;
+package dev.alexengrig.myfe.view.event;
 
-import dev.alexengrig.myfe.model.MyDirectory;
-import dev.alexengrig.myfe.model.MyFile;
-import dev.alexengrig.myfe.model.MyPath;
+import java.util.EventListener;
 
-import java.util.List;
-import java.util.stream.Stream;
+public interface MyTabComponentListener extends EventListener {
 
-public interface MyPathService {
-
-    void destroy();
-
-    //FIXME: Name?
-    String getName();
-
-    List<MyDirectory> getRootDirectories();
-
-    List<MyDirectory> getSubdirectories(MyDirectory directory);
-
-    List<MyPath> getDirectoryContent(MyDirectory directory);
-
-    Stream<String> readByLineFileContent(MyFile file);
+    void openArchive(MyTabComponentEvent event);
 
 }

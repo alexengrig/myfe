@@ -41,6 +41,15 @@ public class SimplePathService implements MyPathService {
     }
 
     @Override
+    public void destroy() {
+        try {
+            repository.close();
+        } catch (Exception e) {
+            throw new RuntimeException("Exception of destroying", e);
+        }
+    }
+
+    @Override
     public String getName() {
         return name;
     }

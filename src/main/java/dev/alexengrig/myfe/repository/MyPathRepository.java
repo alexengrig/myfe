@@ -22,7 +22,7 @@ import dev.alexengrig.myfe.model.MyPath;
 import java.util.List;
 import java.util.stream.Stream;
 
-public interface MyPathRepository {
+public interface MyPathRepository extends AutoCloseable {
 
     List<MyDirectory> getRootDirectories();
 

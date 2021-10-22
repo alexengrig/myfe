@@ -29,6 +29,7 @@ public class MyPathUtil {
 
     private static final Set<String> IMAGE_FILE_EXTENSIONS = Set.of("JPEG", "JPG", "GIF", "XBM");
     private static final Set<String> TEXT_FILE_EXTENSIONS = Set.of("TXT", "LOG");
+    private static final Set<String> ARCHIVE_FILE_EXTENSIONS = Set.of("JAR", "ZIP");
 
     private MyPathUtil() throws IllegalAccessException {
         throw new IllegalAccessException("This is utility class");
@@ -54,6 +55,10 @@ public class MyPathUtil {
 
     public static boolean isText(MyFile file) {
         return TEXT_FILE_EXTENSIONS.contains(requireNonNullFile(file).getExtension());
+    }
+
+    public static boolean isArchive(MyFile file) {
+        return ARCHIVE_FILE_EXTENSIONS.contains(requireNonNullFile(file).getExtension());
     }
 
     private static MyPath requireNonNullPath(MyPath path) {

@@ -28,12 +28,15 @@ import dev.alexengrig.myfe.service.MyPathPreviewBackgroundService;
 import dev.alexengrig.myfe.service.MyPathService;
 import dev.alexengrig.myfe.util.BackgroundExecutor;
 import dev.alexengrig.myfe.util.BackgroundStreamer;
+import dev.alexengrig.myfe.util.MyPathUtil;
 import dev.alexengrig.myfe.view.event.MyDirectoryTreeEvent;
 import dev.alexengrig.myfe.view.event.MyDirectoryTreeListener;
 import dev.alexengrig.myfe.view.event.MyPathFilterEvent;
 import dev.alexengrig.myfe.view.event.MyPathFilterListener;
 import dev.alexengrig.myfe.view.event.MyPathTableEvent;
 import dev.alexengrig.myfe.view.event.MyPathTableListener;
+import dev.alexengrig.myfe.view.event.MyTabComponentEvent;
+import dev.alexengrig.myfe.view.event.MyTabComponentListener;
 
 import javax.swing.*;
 import java.awt.*;
@@ -44,6 +47,8 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public class MyTabComponent extends JPanel {
+
+    private final List<MyTabComponentListener> listeners = new LinkedList<>();
 
     private final MyPathService service;
     /**
@@ -149,6 +154,24 @@ public class MyTabComponent extends JPanel {
         tableModel.setFilteredType(type);
     }
 
+    private void handleOpenArchive(MyFile file) {
+        fireOpenArchive(new MyTabComponentEvent(file));
+    }
+
+    public void addMyTabComponentListener(MyTabComponentListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeMyTabComponentListener(MyTabComponentListener listener) {
+        listeners.remove(listener);
+    }
+
+    private void fireOpenArchive(MyTabComponentEvent event) {
+        for (MyTabComponentListener listener : listeners) {
+            listener.openArchive(event);
+        }
+    }
+
     private class TreeListener implements MyDirectoryTreeListener {
 
         @Override
@@ -177,6 +200,8 @@ public class MyTabComponent extends JPanel {
             MyPath path = event.getPath();
             if (path.isDirectory()) {
                 handleSelectDirectory(path.asDirectory());
+            } else if (MyPathUtil.isArchive(path.asFile())) {
+                handleOpenArchive(path.asFile());
             }
         }
 

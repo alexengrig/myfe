@@ -25,23 +25,36 @@ import dev.alexengrig.myfe.model.MyFile;
 import dev.alexengrig.myfe.model.MyPath;
 import dev.alexengrig.myfe.repository.LocalFileSystemPathRepository;
 import dev.alexengrig.myfe.repository.MyPathRepository;
+import dev.alexengrig.myfe.repository.URIFileSystemPathRepository;
 import dev.alexengrig.myfe.service.MyPathService;
 import dev.alexengrig.myfe.service.SimplePathService;
+import dev.alexengrig.myfe.util.PathUtil;
 
+import java.net.URI;
 import java.nio.file.Path;
 
 public class MyTabFactory {
 
+    private final Converter<Path, MyDirectory> directoryConverter = new Path2MyDirectoryConverter();
+    private final Converter<Path, MyFile> fileConverter = new Path2MyFileConverter();
+    private final Converter<Path, MyPath> pathConverter = new Path2MyPathConverter(directoryConverter, fileConverter);
+
     public MyTab createDefaultTab() {
-        Converter<Path, MyDirectory> directoryConverter = new Path2MyDirectoryConverter();
-        Converter<Path, MyFile> fileConverter = new Path2MyFileConverter();
-        Converter<Path, MyPath> pathConverter = new Path2MyPathConverter(directoryConverter, fileConverter);
         MyPathRepository repository = new LocalFileSystemPathRepository(directoryConverter, pathConverter);
         //TODO: Move name
         MyPathService service = new SimplePathService("This computer", repository);
         MyTabComponent component = new MyTabComponent(service);
         //TODO: Move title and tip
         return new MyTab("This computer", "Your computer", component);
+    }
+
+    public MyTab createArchiveTab(Path path) {
+        URI uri = path.toUri();
+        URI jarUri = URI.create("jar:" + uri);
+        String archiveName = PathUtil.getName(path);
+        URIFileSystemPathRepository repository = new URIFileSystemPathRepository(jarUri, directoryConverter, pathConverter);
+        MyPathService service = new SimplePathService(archiveName, repository);
+        return new MyTab("Archive: " + archiveName, PathUtil.getAbsolutePath(path), new MyTabComponent(service));
     }
 
 }

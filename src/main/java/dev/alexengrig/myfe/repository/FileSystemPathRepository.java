@@ -54,6 +54,11 @@ public class FileSystemPathRepository implements MyPathRepository {
     }
 
     @Override
+    public void close() throws Exception {
+        fileSystem.close();
+    }
+
+    @Override
     public List<MyDirectory> getRootDirectories() {
         Iterable<Path> directories = fileSystem.getRootDirectories();
         return StreamSupport.stream(directories.spliterator(), false)
