@@ -16,6 +16,7 @@
 
 package dev.alexengrig.myfe;
 
+import dev.alexengrig.myfe.config.FTPConnectionConfig;
 import dev.alexengrig.myfe.view.MyTab;
 import dev.alexengrig.myfe.view.MyTabFactory;
 import dev.alexengrig.myfe.view.MyTabbedPane;
@@ -76,6 +77,11 @@ public final class MyfeApplication extends JFrame {
         tabbedPane.addMyTab(archiveTab);
     }
 
+    private void handleConnectToFTPServer(FTPConnectionConfig connectionConfig) {
+        MyTab ftpTab = tabFactory.createFTPTab(connectionConfig);
+        tabbedPane.addMyTab(ftpTab);
+    }
+
     private class MyMenuBar extends JMenuBar {
 
         public MyMenuBar() {
@@ -85,9 +91,18 @@ public final class MyfeApplication extends JFrame {
 
         private JMenu createFileMenu() {
             JMenu menu = new JMenu("File");
+            JMenuItem openArchiveMenuItem = createOpenArchiveMenuItem();
+            menu.add(openArchiveMenuItem);
+            JMenuItem connectToFTPServerMenuItem = createConnectToFTPServerMenuItem();
+            menu.add(connectToFTPServerMenuItem);
+            return menu;
+        }
+
+        private JMenuItem createOpenArchiveMenuItem() {
             JMenuItem openArchiveMenuItem = new JMenuItem(new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    //TODO: Create new view of chooser
                     JFileChooser chooser = new JFileChooser();
                     chooser.setDialogTitle("Open archive");
                     chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
@@ -112,8 +127,61 @@ public final class MyfeApplication extends JFrame {
             });
             openArchiveMenuItem.setMnemonic('O');
             openArchiveMenuItem.setText("Open archive...");
-            menu.add(openArchiveMenuItem);
-            return menu;
+            return openArchiveMenuItem;
+        }
+
+        private JMenuItem createConnectToFTPServerMenuItem() {
+            JMenuItem connectToFTPServerMenuItem = new JMenuItem(new AbstractAction() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    //TODO: Create new view of dialog
+                    JDialog dialog = new JDialog(MyfeApplication.this, "Connect to FTP server", true);
+                    dialog.setLocationRelativeTo(MyfeApplication.this);
+                    dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+                    JPanel content = new JPanel(new GridLayout(0, 2));
+                    // host
+                    content.add(new JLabel("Host:"));
+                    JTextField hostField = new JTextField();
+                    content.add(hostField);
+                    // port
+                    content.add(new JLabel("Port:"));
+                    JTextField portField = new JTextField();
+                    content.add(portField);
+                    // username
+                    content.add(new JLabel("Username:"));
+                    JTextField usernameField = new JTextField();
+                    content.add(usernameField);
+                    // password
+                    content.add(new JLabel("Password:"));
+                    JPasswordField passwordField = new JPasswordField();
+                    content.add(passwordField);
+                    // button
+                    JButton button = new JButton(new AbstractAction() {
+                        @Override
+                        public void actionPerformed(ActionEvent e) {
+                            FTPConnectionConfig ftpConnectionConfig = FTPConnectionConfig.user(
+                                    hostField.getText(),
+                                    Integer.parseInt(portField.getText()),
+                                    usernameField.getText(),
+                                    passwordField.getPassword()
+                            );
+                            dialog.setVisible(false);
+                            //TODO: Add spinner
+                            handleConnectToFTPServer(ftpConnectionConfig);
+                            dialog.dispose();
+                        }
+                    });
+                    button.setText("Connect");
+                    content.add(button);
+                    // dialog
+                    dialog.getContentPane().add(content);
+                    dialog.pack();
+                    dialog.setVisible(true);
+                }
+            });
+            connectToFTPServerMenuItem.setMnemonic('C');
+            connectToFTPServerMenuItem.setText("Connect to FTP server...");
+            return connectToFTPServerMenuItem;
         }
 
     }
