@@ -16,6 +16,7 @@
 
 package dev.alexengrig.myfe.view;
 
+import dev.alexengrig.myfe.config.FTPConnectionConfig;
 import dev.alexengrig.myfe.converter.Converter;
 import dev.alexengrig.myfe.converter.Path2MyDirectoryConverter;
 import dev.alexengrig.myfe.converter.Path2MyFileConverter;
@@ -23,6 +24,7 @@ import dev.alexengrig.myfe.converter.Path2MyPathConverter;
 import dev.alexengrig.myfe.model.MyDirectory;
 import dev.alexengrig.myfe.model.MyFile;
 import dev.alexengrig.myfe.model.MyPath;
+import dev.alexengrig.myfe.repository.FTPPathRepository;
 import dev.alexengrig.myfe.repository.LocalFileSystemPathRepository;
 import dev.alexengrig.myfe.repository.MyPathRepository;
 import dev.alexengrig.myfe.repository.URIFileSystemPathRepository;
@@ -52,9 +54,17 @@ public class MyTabFactory {
 
     public MyTab createArchiveTab(Path path) {
         String archiveName = PathUtil.getName(path);
+        String title = "Archive: " + archiveName;
         URI uri = URI.create("jar:" + path.toUri());
         MyPathRepository repository = new URIFileSystemPathRepository(uri, directoryConverter, pathConverter);
-        return createTab("Archive: " + archiveName, PathUtil.getAbsolutePath(path), archiveName, repository);
+        return createTab(title, PathUtil.getAbsolutePath(path), archiveName, repository);
+    }
+
+    public MyTab createFTPTab(FTPConnectionConfig connectionConfig) {
+        String title = "FTP: " + connectionConfig.getHost();
+        String tip = connectionConfig.getHost() + ":" + connectionConfig.getPort();
+        MyPathRepository repository = new FTPPathRepository(connectionConfig);
+        return createTab(title, tip, connectionConfig.getHost(), repository);
     }
 
 }
