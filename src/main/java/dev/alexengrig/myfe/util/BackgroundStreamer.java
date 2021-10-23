@@ -20,6 +20,7 @@ import javax.swing.*;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -48,6 +49,18 @@ public class BackgroundStreamer<T> extends SwingWorker<T, T> {
     @Override
     protected final void process(List<T> chunks) {
         chunksHandler.accept(chunks.stream());
+    }
+
+    @Override
+    protected void done() {
+        try {
+            get();
+            //TODO: Fix exceptions
+        } catch (InterruptedException e) {
+            throw new RuntimeException(e);
+        } catch (ExecutionException e) {
+            throw new RuntimeException(e.getCause());
+        }
     }
 
 }
