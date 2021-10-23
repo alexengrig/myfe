@@ -32,6 +32,18 @@ public abstract class MyPath {
         this.name = Objects.requireNonNull(name, "The name must not be null");
     }
 
+    public static MyPath of(String path, String name, boolean isDirectory) {
+        return isDirectory ? directory(path, name) : file(path, name);
+    }
+
+    public static MyFile file(String path, String name) {
+        return new MyFile(path, name);
+    }
+
+    public static MyDirectory directory(String path, String name) {
+        return new MyDirectory(path, name);
+    }
+
     public abstract boolean isDirectory();
 
     public MyDirectory asDirectory() {
@@ -64,6 +76,19 @@ public abstract class MyPath {
     @Override
     public String toString() {
         return path;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        MyPath myPath = (MyPath) o;
+        return path.equals(myPath.path);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(path);
     }
 
 }
