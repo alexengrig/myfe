@@ -14,25 +14,10 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.view;
+package dev.alexengrig.myfe.model;
 
-import dev.alexengrig.myfe.model.MyFooterModel;
+public class MyFooterModel {
 
-import javax.swing.*;
-import java.awt.*;
-
-public class MyFooter extends JPanel {
-
-    private final MyFooterModel model;
-
-    public MyFooter(MyFooterModel model) {
-        super(new BorderLayout());
-        this.model = model;
-        init();
-    }
-
-    private void init() {
-        add(new JLabel("Number of elements: 123"), BorderLayout.WEST);
-    }
+    private Integer numberOfElements;
 
 }

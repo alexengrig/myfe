@@ -19,6 +19,7 @@ package dev.alexengrig.myfe.view;
 import dev.alexengrig.myfe.model.MyDirectory;
 import dev.alexengrig.myfe.model.MyDirectoryTreeModel;
 import dev.alexengrig.myfe.model.MyFile;
+import dev.alexengrig.myfe.model.MyFooterModel;
 import dev.alexengrig.myfe.model.MyPath;
 import dev.alexengrig.myfe.model.MyPathFilterModel;
 import dev.alexengrig.myfe.model.MyPathModel;
@@ -60,6 +61,7 @@ public class MyTabComponent extends JPanel {
     private MyPathTableModel tableModel;
     private MyPathFilterModel filterModel;
     private MyPathModel pathModel;
+    private MyFooterModel footerModel;
 
     private MyHeader headerView;
     private MyDirectoryTree treeView;
@@ -90,6 +92,7 @@ public class MyTabComponent extends JPanel {
         tableModel = new MyPathTableModel(rootDirectories);
         filterModel = new MyPathFilterModel(rootDirectories);
         pathModel = new MyPathModel();
+        footerModel = new MyFooterModel();
     }
 
     private void initViews() {
@@ -99,7 +102,7 @@ public class MyTabComponent extends JPanel {
         filterView = new MyPathFilter(filterModel);
         detailsView = new MyPathDetails(pathModel);
         previewView = new MyPathPreview(pathModel, new PreviewService());
-        footerView = new MyFooter();
+        footerView = new MyFooter(footerModel);
     }
 
     private void initListeners() {
@@ -138,6 +141,10 @@ public class MyTabComponent extends JPanel {
         });
         pathModel.setPath(null);
         directoryStack.push(directory);
+    }
+
+    private void handleSelectPath(MyPath path) {
+        pathModel.setPath(path);
     }
 
     private void handleGoToPreviousDirectory() {
@@ -196,7 +203,7 @@ public class MyTabComponent extends JPanel {
         @Override
         public void selectPath(MyPathTableEvent event) {
             MyPath path = event.getPath();
-            pathModel.setPath(path);
+            handleSelectPath(path);
         }
 
         @Override
