@@ -31,6 +31,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 public class MyPathTable extends JTable {
 
@@ -128,10 +129,17 @@ public class MyPathTable extends JTable {
      */
     private class SelectPathListener implements ListSelectionListener {
 
+        private transient MyPath previousPath;
+
         @Override
         public void valueChanged(ListSelectionEvent event) {
             if (getSelectedRowCount() == 1) {
                 MyPath path = getSelectedPath();
+                //FIXME: Don't load same path
+                if (Objects.equals(previousPath, path)) {
+                    return;
+                }
+                previousPath = path;
                 handleSelectPath(path);
             }
         }
