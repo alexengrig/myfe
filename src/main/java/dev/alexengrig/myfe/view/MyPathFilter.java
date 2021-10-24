@@ -19,15 +19,20 @@ package dev.alexengrig.myfe.view;
 import dev.alexengrig.myfe.model.MyPathFilterModel;
 import dev.alexengrig.myfe.view.event.MyPathFilterEvent;
 import dev.alexengrig.myfe.view.event.MyPathFilterListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.ListDataEvent;
 import javax.swing.event.ListDataListener;
 import java.awt.*;
+import java.lang.invoke.MethodHandles;
 import java.util.LinkedList;
 import java.util.List;
 
 public class MyPathFilter extends JPanel {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final List<MyPathFilterListener> listeners = new LinkedList<>();
 
@@ -55,6 +60,7 @@ public class MyPathFilter extends JPanel {
     }
 
     private void fireFilterType(MyPathFilterEvent event) {
+        LOGGER.debug("Fire filter type: {}", event);
         for (MyPathFilterListener listener : listeners) {
             listener.filterType(event);
         }

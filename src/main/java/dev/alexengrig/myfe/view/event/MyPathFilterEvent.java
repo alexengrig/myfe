@@ -32,4 +32,11 @@ public class MyPathFilterEvent {
         return type;
     }
 
+    @Override
+    public String toString() {
+        return "MyPathFilterEvent{" +
+                "type='" + type + '\'' +
+                '}';
+    }
+
 }
