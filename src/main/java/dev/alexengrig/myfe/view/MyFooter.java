@@ -17,22 +17,66 @@
 package dev.alexengrig.myfe.view;
 
 import dev.alexengrig.myfe.model.MyFooterModel;
+import dev.alexengrig.myfe.model.event.MyFooterModelEvent;
+import dev.alexengrig.myfe.model.event.MyFooterModelListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.lang.invoke.MethodHandles;
 
 public class MyFooter extends JPanel {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private final MyFooterModel model;
+    private final JPanel contentPane;
 
     public MyFooter(MyFooterModel model) {
         super(new BorderLayout());
         this.model = model;
+        this.contentPane = new JPanel(new BorderLayout());
         init();
     }
 
     private void init() {
-        add(new JLabel("Number of elements: 123"), BorderLayout.WEST);
+        add(contentPane);
+        model.addMyFooterModelListener(new ModelListener());
+        handleChangeNumberOfElements(model.getNumberOfElements());
+    }
+
+    private void addCounterComponent() {
+        int numberOfElements = model.getNumberOfElements();
+        contentPane.add(new JLabel(createCounterText(numberOfElements)), BorderLayout.WEST);
+    }
+
+    private String createCounterText(int count) {
+        if (count == 1) {
+            return "1 element";
+        } else {
+            return count + " elements";
+        }
+    }
+
+    private void handleChangeNumberOfElements(Integer numberOfElements) {
+        LOGGER.debug("Handle change number of elements: {}", numberOfElements);
+        contentPane.removeAll();
+        if (numberOfElements != null) {
+            addCounterComponent();
+        }
+        contentPane.revalidate();
+        contentPane.repaint();
+    }
+
+    private class ModelListener implements MyFooterModelListener {
+
+        @Override
+        public void changeNumberOfElements(MyFooterModelEvent event) {
+            Integer numberOfElements = event.getNumberOfElements();
+            handleChangeNumberOfElements(numberOfElements);
+        }
+
     }
 
 }
