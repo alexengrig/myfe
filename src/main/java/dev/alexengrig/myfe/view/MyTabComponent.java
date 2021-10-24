@@ -38,9 +38,12 @@ import dev.alexengrig.myfe.view.event.MyPathTableEvent;
 import dev.alexengrig.myfe.view.event.MyPathTableListener;
 import dev.alexengrig.myfe.view.event.MyTabComponentEvent;
 import dev.alexengrig.myfe.view.event.MyTabComponentListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.lang.invoke.MethodHandles;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,6 +51,8 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 public class MyTabComponent extends JPanel {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final List<MyTabComponentListener> listeners = new LinkedList<>();
 
@@ -80,22 +85,27 @@ public class MyTabComponent extends JPanel {
     }
 
     private void init() {
+        LOGGER.debug("Start initializing");
         initModels();
         initViews();
         initListeners();
+        LOGGER.debug("Finished initializing");
     }
 
     private void initModels() {
+        LOGGER.debug("Start initializing models");
         //TODO: Getting root directories is slow - add spinner and background task
         List<MyDirectory> rootDirectories = service.getRootDirectories();
         treeModel = new MyDirectoryTreeModel(service.getRootName(), rootDirectories);
         tableModel = new MyPathTableModel(rootDirectories);
         filterModel = new MyPathFilterModel(rootDirectories);
         pathModel = new MyPathModel();
-        footerModel = new MyFooterModel();
+        footerModel = new MyFooterModel(rootDirectories.size());
+        LOGGER.debug("Finished initializing models");
     }
 
     private void initViews() {
+        LOGGER.debug("Start initializing views");
         headerView = new MyHeader();
         treeView = new MyDirectoryTree(treeModel, new TreeService());
         tableView = new MyPathTable(tableModel);
@@ -103,15 +113,19 @@ public class MyTabComponent extends JPanel {
         detailsView = new MyPathDetails(pathModel);
         previewView = new MyPathPreview(pathModel, new PreviewService());
         footerView = new MyFooter(footerModel);
+        LOGGER.debug("Finished initializing views");
     }
 
     private void initListeners() {
+        LOGGER.debug("Start initializing listeners");
         treeView.addMyDirectoryTreeListener(new TreeListener());
         tableView.addMyPathTableListener(new TableListener());
         filterView.addMyPathFilterListener(new FilterListener());
+        LOGGER.debug("Finished initializing listeners");
     }
 
     private void addComponents() {
+        LOGGER.debug("Start adding components");
         add(headerView, BorderLayout.NORTH);
         MySplitPane info = new MySplitPane.Vertical(new MyScrollPane(detailsView), new MyScrollPane(previewView));
         JPanel filteredTable = new JPanel(new BorderLayout());
@@ -121,9 +135,11 @@ public class MyTabComponent extends JPanel {
         MySplitPane center = new MySplitPane.Horizontal(new MyScrollPane(treeView), content);
         add(center, BorderLayout.CENTER);
         add(footerView, BorderLayout.SOUTH);
+        LOGGER.debug("Finished adding components");
     }
 
     private void handleSelectRoot() {
+        LOGGER.debug("Handle select root");
         //TODO: Spinner to table
         BackgroundExecutor.execute(service::getRootDirectories, paths -> {
             tableModel.setPaths(paths);
@@ -134,6 +150,7 @@ public class MyTabComponent extends JPanel {
     }
 
     private void handleSelectDirectory(MyDirectory directory) {
+        LOGGER.debug("Handle select directory: {}", directory);
         //TODO: Spinner to table
         BackgroundExecutor.execute(() -> service.getDirectoryContent(directory), paths -> {
             tableModel.setPaths(paths);
@@ -144,12 +161,14 @@ public class MyTabComponent extends JPanel {
     }
 
     private void handleSelectPath(MyPath path) {
+        LOGGER.debug("Handle select path: {}", path);
         pathModel.setPath(path);
     }
 
     private void handleGoToPreviousDirectory() {
         MyDirectory currentDirectory = directoryStack.poll();
         MyDirectory previousDirectory = directoryStack.poll();
+        LOGGER.debug("Handle go to previous directory: {}", previousDirectory);
         if (previousDirectory == null) {
             handleSelectRoot();
         } else {
@@ -158,11 +177,13 @@ public class MyTabComponent extends JPanel {
     }
 
     private void handleFilterType(String type) {
+        LOGGER.debug("Handle filter type: {}", type);
         tableModel.setFilteredType(type);
     }
 
-    private void handleOpenArchive(MyFile file) {
-        fireOpenArchive(new MyTabComponentEvent(file));
+    private void handleChangeNumberOfElements(Integer numberOfElements) {
+        LOGGER.debug("Handle change number of elements: {}", numberOfElements);
+        footerModel.setNumberOfElements(numberOfElements);
     }
 
     public void addMyTabComponentListener(MyTabComponentListener listener) {
@@ -174,15 +195,24 @@ public class MyTabComponent extends JPanel {
     }
 
     private void fireOpenArchive(MyTabComponentEvent event) {
+        LOGGER.debug("Fire open archive: {}", event);
         for (MyTabComponentListener listener : listeners) {
             listener.openArchive(event);
         }
     }
 
     public void destroy() {
+        LOGGER.debug("Start destroying");
         service.destroy();
+        LOGGER.debug("Finished destroying");
     }
 
+    /**
+     * Events from Tree.
+     *
+     * @see MyTabComponent#handleSelectRoot()
+     * @see MyTabComponent#handleSelectDirectory(MyDirectory)
+     */
     private class TreeListener implements MyDirectoryTreeListener {
 
         @Override
@@ -198,6 +228,15 @@ public class MyTabComponent extends JPanel {
 
     }
 
+    /**
+     * Events from table.
+     *
+     * @see MyTabComponent#handleSelectPath(MyPath)
+     * @see MyTabComponent#handleSelectDirectory(MyDirectory)
+     * @see MyTabComponent#handleGoToPreviousDirectory()
+     * @see MyTabComponent#handleChangeNumberOfElements(Integer)
+     * @see MyTabComponent#fireOpenArchive(MyTabComponentEvent)
+     */
     private class TableListener implements MyPathTableListener {
 
         @Override
@@ -212,7 +251,7 @@ public class MyTabComponent extends JPanel {
             if (path.isDirectory()) {
                 handleSelectDirectory(path.asDirectory());
             } else if (MyPathUtil.isArchive(path.asFile())) {
-                handleOpenArchive(path.asFile());
+                fireOpenArchive(new MyTabComponentEvent(path.asFile()));
             }
         }
 
@@ -221,8 +260,18 @@ public class MyTabComponent extends JPanel {
             handleGoToPreviousDirectory();
         }
 
+        @Override
+        public void changeRowCount(MyPathTableEvent event) {
+            handleChangeNumberOfElements(event.getRowCount());
+        }
+
     }
 
+    /**
+     * Events from table filter.
+     *
+     * @see MyTabComponent#handleFilterType(String)
+     */
     private class FilterListener implements MyPathFilterListener {
 
         @Override
@@ -233,6 +282,9 @@ public class MyTabComponent extends JPanel {
 
     }
 
+    /**
+     * Service for tree.
+     */
     private class TreeService implements MyDirectoryTreeBackgroundService {
 
         @Override
@@ -242,10 +294,14 @@ public class MyTabComponent extends JPanel {
 
     }
 
+    /**
+     * Service for preview.
+     */
     private class PreviewService implements MyPathPreviewBackgroundService {
 
         @Override
         public void loadTextPreview(MyFile file, Consumer<Stream<String>> handler) {
+            //TODO: Cancel previous task
             BackgroundStreamer.stream(() -> service.readByLineFileContent(file), handler);
         }
 
