@@ -22,24 +22,30 @@ import dev.alexengrig.myfe.view.event.DoNothingKeyListener;
 import dev.alexengrig.myfe.view.event.DoNothingMouseListener;
 import dev.alexengrig.myfe.view.event.MyPathTableEvent;
 import dev.alexengrig.myfe.view.event.MyPathTableListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.RowSorterEvent;
+import javax.swing.event.RowSorterListener;
 import javax.swing.table.TableRowSorter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
+import java.lang.invoke.MethodHandles;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
 public class MyPathTable extends JTable {
 
-    private final List<MyPathTableListener> listeners;
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+    private final List<MyPathTableListener> listeners = new LinkedList<>();
 
     public MyPathTable(MyPathTableModel model) {
         super(model);
-        this.listeners = new LinkedList<>();
         init();
     }
 
@@ -71,6 +77,7 @@ public class MyPathTable extends JTable {
         addMouseListener(goToPathListener);
         addKeyListener(goToPathListener);
         addKeyListener(new GoBackListener());
+        getRowSorter().addRowSorterListener(new RowCountListener());
     }
 
     @Override
@@ -84,18 +91,6 @@ public class MyPathTable extends JTable {
         return getModel().getPathAt(pathIndex);
     }
 
-    private void handleSelectPath(MyPath path) {
-        fireSelectPath(new MyPathTableEvent(path));
-    }
-
-    private void handleGoToPath(MyPath path) {
-        fireDoubleClickOnPath(new MyPathTableEvent(path));
-    }
-
-    private void handleGoBack() {
-        fireGoBack(new MyPathTableEvent());
-    }
-
     public void addMyPathTableListener(MyPathTableListener listener) {
         listeners.add(listener);
     }
@@ -105,27 +100,37 @@ public class MyPathTable extends JTable {
     }
 
     private void fireSelectPath(MyPathTableEvent event) {
+        LOGGER.debug("Fire select path: {}", event);
         for (MyPathTableListener listener : listeners) {
             listener.selectPath(event);
         }
     }
 
     private void fireDoubleClickOnPath(MyPathTableEvent event) {
+        LOGGER.debug("Fire double click on path: {}", event);
         for (MyPathTableListener listener : listeners) {
             listener.doubleClickOnPath(event);
         }
     }
 
     private void fireGoBack(MyPathTableEvent event) {
+        LOGGER.debug("Fire go back: {}", event);
         for (MyPathTableListener listener : listeners) {
             listener.goBack(event);
+        }
+    }
+
+    private void fireChangeRowCount(MyPathTableEvent event) {
+        LOGGER.debug("Fire change row count: {}", event);
+        for (MyPathTableListener listener : listeners) {
+            listener.changeRowCount(event);
         }
     }
 
     /**
      * On select a single row.
      *
-     * @see MyPathTable#handleSelectPath(MyPath)
+     * @see MyPathTable#fireSelectPath(MyPathTableEvent)
      */
     private class SelectPathListener implements ListSelectionListener {
 
@@ -135,12 +140,12 @@ public class MyPathTable extends JTable {
         public void valueChanged(ListSelectionEvent event) {
             if (getSelectedRowCount() == 1) {
                 MyPath path = getSelectedPath();
-                //FIXME: Don't load same path
+                //FIXME: Don't handle same path
                 if (Objects.equals(previousPath, path)) {
                     return;
                 }
                 previousPath = path;
-                handleSelectPath(path);
+                fireSelectPath(new MyPathTableEvent(path));
             }
         }
 
@@ -149,7 +154,7 @@ public class MyPathTable extends JTable {
     /**
      * On double-click the left mouse button and press the Enter key on a row.
      *
-     * @see MyPathTable#handleGoToPath(MyPath)
+     * @see MyPathTable#fireDoubleClickOnPath(MyPathTableEvent)
      */
     private class GoToPathListener implements DoNothingMouseListener, DoNothingKeyListener {
 
@@ -157,7 +162,7 @@ public class MyPathTable extends JTable {
         public void mouseClicked(MouseEvent e) {
             if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() > 1 && getSelectedRowCount() == 1) {
                 MyPath path = getSelectedPath();
-                handleGoToPath(path);
+                fireDoubleClickOnPath(new MyPathTableEvent(path));
             }
         }
 
@@ -165,7 +170,7 @@ public class MyPathTable extends JTable {
         public void keyPressed(KeyEvent e) {
             if (e.getKeyCode() == KeyEvent.VK_ENTER && getSelectedRowCount() == 1) {
                 MyPath path = getSelectedPath();
-                handleGoToPath(path);
+                fireDoubleClickOnPath(new MyPathTableEvent(path));
             }
         }
 
@@ -174,15 +179,32 @@ public class MyPathTable extends JTable {
     /**
      * On press the Backspace key.
      *
-     * @see MyPathTable#handleGoBack
+     * @see MyPathTable#fireGoBack(MyPathTableEvent)
      */
     private class GoBackListener implements DoNothingKeyListener {
 
         @Override
         public void keyPressed(KeyEvent e) {
-            //TODO: As global
+            //TODO: As global for tab
             if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
-                handleGoBack();
+                fireGoBack(new MyPathTableEvent());
+            }
+        }
+
+    }
+
+    /**
+     * On change number of rows.
+     *
+     * @see MyPathTable#fireChangeRowCount(MyPathTableEvent)
+     */
+    private class RowCountListener implements RowSorterListener {
+
+        @Override
+        public void sorterChanged(RowSorterEvent e) {
+            int currentCount = getRowSorter().getViewRowCount();
+            if (currentCount == 0 || currentCount != e.getPreviousRowCount()) {
+                fireChangeRowCount(new MyPathTableEvent(currentCount));
             }
         }
 
