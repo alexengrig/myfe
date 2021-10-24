@@ -21,17 +21,39 @@ import dev.alexengrig.myfe.model.MyPath;
 public class MyPathTableEvent {
 
     private final MyPath path;
+    private final Integer rowCount;
+
+    public MyPathTableEvent(MyPath path, Integer rowCount) {
+        this.path = path;
+        this.rowCount = rowCount;
+    }
 
     public MyPathTableEvent() {
-        this(null);
+        this(null, null);
     }
 
     public MyPathTableEvent(MyPath path) {
-        this.path = path;
+        this(path, null);
+    }
+
+    public MyPathTableEvent(Integer rowCount) {
+        this(null, rowCount);
     }
 
     public MyPath getPath() {
         return path;
+    }
+
+    public Integer getRowCount() {
+        return rowCount;
+    }
+
+    @Override
+    public String toString() {
+        return "MyPathTableEvent{" +
+                "path=" + path +
+                ", rowCount=" + rowCount +
+                '}';
     }
 
 }

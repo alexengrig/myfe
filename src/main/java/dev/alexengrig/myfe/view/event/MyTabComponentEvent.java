@@ -30,4 +30,11 @@ public class MyTabComponentEvent {
         return file;
     }
 
+    @Override
+    public String toString() {
+        return "MyTabComponentEvent{" +
+                "file=" + file +
+                '}';
+    }
+
 }

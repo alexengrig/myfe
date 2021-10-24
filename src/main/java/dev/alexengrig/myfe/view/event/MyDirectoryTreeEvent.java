@@ -44,4 +44,12 @@ public class MyDirectoryTreeEvent {
         return rootName;
     }
 
+    @Override
+    public String toString() {
+        return "MyDirectoryTreeEvent{" +
+                "directory=" + directory +
+                ", rootName='" + rootName + '\'' +
+                '}';
+    }
+
 }
