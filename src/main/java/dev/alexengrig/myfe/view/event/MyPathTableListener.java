@@ -26,4 +26,6 @@ public interface MyPathTableListener extends EventListener {
 
     void goBack(MyPathTableEvent event);
 
+    void changeRowCount(MyPathTableEvent event);
+
 }
