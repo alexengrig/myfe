@@ -16,8 +16,52 @@
 
 package dev.alexengrig.myfe.model;
 
+import dev.alexengrig.myfe.model.event.MyFooterModelEvent;
+import dev.alexengrig.myfe.model.event.MyFooterModelListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.lang.invoke.MethodHandles;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+
 public class MyFooterModel {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+    private final List<MyFooterModelListener> listeners = new LinkedList<>();
+
     private Integer numberOfElements;
+
+    public MyFooterModel(Integer numberOfElements) {
+        this.numberOfElements = numberOfElements;
+    }
+
+    public Integer getNumberOfElements() {
+        return numberOfElements;
+    }
+
+    public void setNumberOfElements(Integer numberOfElements) {
+        if (!Objects.equals(this.numberOfElements, numberOfElements)) {
+            this.numberOfElements = numberOfElements;
+            fireChangeNumberOfElements(new MyFooterModelEvent(numberOfElements));
+        }
+    }
+
+    public void addMyFooterModelListener(MyFooterModelListener listener) {
+        listeners.add(listener);
+    }
+
+    public void removeMyFooterModelListener(MyFooterModelListener listener) {
+        listeners.remove(listener);
+    }
+
+    private void fireChangeNumberOfElements(MyFooterModelEvent event) {
+        LOGGER.debug("Fire change number of elements: {}", event);
+        for (MyFooterModelListener listener : listeners) {
+            listener.changeNumberOfElements(event);
+        }
+    }
 
 }
