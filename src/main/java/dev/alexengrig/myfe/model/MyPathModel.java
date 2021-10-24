@@ -18,11 +18,16 @@ package dev.alexengrig.myfe.model;
 
 import dev.alexengrig.myfe.model.event.MyPathModelEvent;
 import dev.alexengrig.myfe.model.event.MyPathModelListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.lang.invoke.MethodHandles;
 import java.util.LinkedList;
 import java.util.List;
 
 public class MyPathModel {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final List<MyPathModelListener> listeners = new LinkedList<>();
 
@@ -46,6 +51,7 @@ public class MyPathModel {
     }
 
     private void fireChangePath(MyPathModelEvent event) {
+        LOGGER.debug("Fire change path: {}", event);
         for (MyPathModelListener listener : listeners) {
             listener.changePath(event);
         }

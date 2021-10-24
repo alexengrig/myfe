@@ -30,4 +30,11 @@ public class MyPathModelEvent {
         return path;
     }
 
+    @Override
+    public String toString() {
+        return "MyPathModelEvent{" +
+                "path=" + path +
+                '}';
+    }
+
 }

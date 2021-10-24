@@ -18,12 +18,17 @@ package dev.alexengrig.myfe.model;
 
 import dev.alexengrig.myfe.model.event.MyPathFilterModelEvent;
 import dev.alexengrig.myfe.model.event.MyPathFilterModelListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.lang.invoke.MethodHandles;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class MyPathFilterModel {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final List<MyPathFilterModelListener> listeners = new LinkedList<>();
 
@@ -61,6 +66,7 @@ public class MyPathFilterModel {
     }
 
     private void fireChangeTypes(MyPathFilterModelEvent event) {
+        LOGGER.debug("Fire change types: {}", event);
         for (MyPathFilterModelListener listener : listeners) {
             listener.changeTypes(event);
         }

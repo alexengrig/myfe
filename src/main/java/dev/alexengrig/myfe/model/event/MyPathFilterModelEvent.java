@@ -30,4 +30,11 @@ public class MyPathFilterModelEvent {
         return types;
     }
 
+    @Override
+    public String toString() {
+        return "MyPathFilterModelEvent{" +
+                "types=" + types +
+                '}';
+    }
+
 }
