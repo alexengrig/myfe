@@ -16,8 +16,8 @@
 
 package dev.alexengrig.myfe.util;
 
-import dev.alexengrig.myfe.exception.BackgroundWorkerInterruptedException;
-import dev.alexengrig.myfe.exception.BackgroundWorkerUnexpectedException;
+import dev.alexengrig.myfe.exception.ExecutionBackgroundTaskException;
+import dev.alexengrig.myfe.exception.InterruptedBackgroundTaskException;
 
 import javax.swing.*;
 import java.lang.reflect.ParameterizedType;
@@ -112,11 +112,11 @@ public class BackgroundWorker<T, V, X extends Throwable>
                 exceptionHandler.accept(expected); // don't catch handler's unchecked exceptions
                 return;
             } else {
-                throw new BackgroundWorkerUnexpectedException(exception);
+                throw new ExecutionBackgroundTaskException(exception);
             }
         } catch (InterruptedException ignore) {
             Thread.currentThread().interrupt();
-            throw new BackgroundWorkerInterruptedException();
+            throw new InterruptedBackgroundTaskException();
         }
         resultHandler.accept(result); // don't catch handler's unchecked exceptions
     }

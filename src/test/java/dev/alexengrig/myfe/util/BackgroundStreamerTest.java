@@ -42,7 +42,7 @@ class BackgroundStreamerTest {
         AtomicInteger valueHolder = new AtomicInteger();
         WaitingBackgroundStreamer<Integer> streamer = new WaitingBackgroundStreamer<>(
                 () -> IntStream.rangeClosed(1, 1_000).boxed().onClose(() -> closeHolder.set(true)),
-                valueHolder::set);
+                integers -> integers.forEach(valueHolder::set));
         streamer.executeAndWait();
         assertTrue(closeHolder.get(), "Stream isn't closed");
         assertEquals(1_000, valueHolder.get(), "Max value");
@@ -75,7 +75,7 @@ class BackgroundStreamerTest {
         AtomicInteger valueHolder = new AtomicInteger();
         WaitingBackgroundStreamer<Integer> streamer = new WaitingBackgroundStreamer<>(
                 () -> IntStream.range(1, Integer.MAX_VALUE).boxed().onClose(() -> closeHolder.set(true)),
-                valueHolder::set);
+                integers -> integers.forEach(valueHolder::set));
         new Thread(() -> {
             try {
                 Thread.sleep(1_000L);
@@ -93,7 +93,7 @@ class BackgroundStreamerTest {
         private final CountDownLatch onDone = new CountDownLatch(1);
         private final AtomicReference<Exception> exceptionHolder = new AtomicReference<>();
 
-        protected WaitingBackgroundStreamer(Callable<Stream<T>> backgroundTask, Consumer<T> chunksHandler) {
+        protected WaitingBackgroundStreamer(Callable<Stream<T>> backgroundTask, Consumer<Stream<T>> chunksHandler) {
             super(backgroundTask, chunksHandler);
         }
 
