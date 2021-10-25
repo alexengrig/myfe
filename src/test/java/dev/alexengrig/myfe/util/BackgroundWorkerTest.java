@@ -16,8 +16,8 @@
 
 package dev.alexengrig.myfe.util;
 
-import dev.alexengrig.myfe.exception.BackgroundWorkerInterruptedException;
-import dev.alexengrig.myfe.exception.BackgroundWorkerUnexpectedException;
+import dev.alexengrig.myfe.exception.ExecutionBackgroundTaskException;
+import dev.alexengrig.myfe.exception.InterruptedBackgroundTaskException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
@@ -89,8 +89,8 @@ class BackgroundWorkerTest {
                 resultHolder::set,
                 exceptionHolder::set);
         // Run and wait
-        BackgroundWorkerUnexpectedException exception = assertThrows(
-                BackgroundWorkerUnexpectedException.class, worker::executeAndWait);
+        ExecutionBackgroundTaskException exception = assertThrows(
+                ExecutionBackgroundTaskException.class, worker::executeAndWait);
         // Check
         assertNull(resultHolder.get(), "Result");
         assertNull(exceptionHolder.get(), "Exception");
@@ -156,7 +156,7 @@ class BackgroundWorkerTest {
         WaitingBackgroundWorker worker = new WaitingBackgroundWorker(() -> {
             throw new InterruptedException();
         }, Objects::hash, Objects::hash);
-        assertThrows(BackgroundWorkerInterruptedException.class, worker::executeAndWait);
+        assertThrows(InterruptedBackgroundTaskException.class, worker::executeAndWait);
     }
 
     static class TestRuntimeException
