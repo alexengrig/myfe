@@ -17,14 +17,14 @@
 package dev.alexengrig.myfe.exception;
 
 /**
- * When {@link dev.alexengrig.myfe.util.BackgroundWorker} is interrupted.
+ * {@link InterruptedException} in background tasks.
  */
-public class BackgroundWorkerInterruptedException extends RuntimeException {
+public class InterruptedBackgroundTaskException extends RuntimeException {
 
-    public BackgroundWorkerInterruptedException() {
+    public InterruptedBackgroundTaskException() {
     }
 
-    public BackgroundWorkerInterruptedException(String message) {
+    public InterruptedBackgroundTaskException(String message) {
         super(message);
     }
 

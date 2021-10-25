@@ -17,16 +17,17 @@
 package dev.alexengrig.myfe.exception;
 
 /**
- * When {@link dev.alexengrig.myfe.util.BackgroundWorker} doesn't expect an exception.
+ * {@link java.util.concurrent.ExecutionException} in background tasks.
+ *
  * <p>Use {@link Throwable#getCause()} to get an unexpected message.
  */
-public class BackgroundWorkerUnexpectedException extends RuntimeException {
+public class ExecutionBackgroundTaskException extends RuntimeException {
 
-    public BackgroundWorkerUnexpectedException(Throwable cause) {
+    public ExecutionBackgroundTaskException(Throwable cause) {
         super(cause);
     }
 
-    public BackgroundWorkerUnexpectedException(String message, Throwable cause) {
+    public ExecutionBackgroundTaskException(String message, Throwable cause) {
         super(message, cause);
     }
 
