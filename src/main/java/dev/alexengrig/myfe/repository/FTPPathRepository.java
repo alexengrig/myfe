@@ -104,6 +104,7 @@ public class FTPPathRepository implements MyPathRepository {
     }
 
     private FTPClient getPreparedClient() {
+        //TODO: Add semaphore
         FTPClient client = clientHolder.get();
         prepareClient(client);
         return client;
@@ -182,7 +183,7 @@ public class FTPPathRepository implements MyPathRepository {
     }
 
     @Override
-    public Stream<String> readByLine(String filePath) {
+    public Stream<String> readInBatches(String filePath) {
         FTPClient client = getPreparedClient();
         try {
             LOGGER.debug("Start reading by line: {}:{}{}", config.getHost(), config.getPort(), filePath);

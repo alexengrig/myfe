@@ -30,6 +30,6 @@ public interface MyPathRepository extends AutoCloseable {
 
     List<MyDirectory> getSubdirectories(String directoryPath);
 
-    Stream<String> readByLine(String filePath);
+    Stream<String> readInBatches(String filePath);
 
 }
