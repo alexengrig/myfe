@@ -56,22 +56,22 @@ public class SimplePathService implements MyPathService {
 
     @Override
     public List<MyDirectory> getRootDirectories() {
-        return repository.getRootDirectories(); //TODO: Sort
+        return repository.getRootDirectories();
     }
 
     @Override
     public List<MyDirectory> getSubdirectories(MyDirectory directory) {
-        return repository.getSubdirectories(requireNonNullDirectory(directory).getPath()); //TODO: Sort
+        return repository.getSubdirectories(requireNonNullDirectory(directory).getPath());
     }
 
     @Override
     public List<MyPath> getDirectoryContent(MyDirectory directory) {
-        return repository.getChildren(requireNonNullDirectory(directory).getPath()); //TODO: Sort
+        return repository.getChildren(requireNonNullDirectory(directory).getPath());
     }
 
     @Override
-    public Stream<String> readByLineFileContent(MyFile file) {
-        return repository.readByLine(requireNonNullFile(file).getPath());
+    public Stream<String> readFileContentInBatches(MyFile file) {
+        return repository.readInBatches(requireNonNullFile(file).getPath());
     }
 
     private MyDirectory requireNonNullDirectory(MyDirectory directory) {

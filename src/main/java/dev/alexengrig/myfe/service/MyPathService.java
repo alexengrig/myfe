@@ -35,6 +35,6 @@ public interface MyPathService {
 
     List<MyPath> getDirectoryContent(MyDirectory directory);
 
-    Stream<String> readByLineFileContent(MyFile file);
+    Stream<String> readFileContentInBatches(MyFile file);
 
 }
