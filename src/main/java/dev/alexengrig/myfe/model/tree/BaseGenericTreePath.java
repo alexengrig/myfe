@@ -33,6 +33,7 @@ import java.util.function.BiFunction;
  * @param <N>    the type of {@link GenericTreeNode}
  * @param <SELF> the type of {@link BaseGenericTreePath}
  */
+@Deprecated
 public abstract class BaseGenericTreePath<
         M extends Model,
         N extends GenericTreeNode<M, N>,

@@ -28,6 +28,7 @@ import javax.swing.tree.TreePath;
  * @param <N> the type of {@link GenericTreeNode}
  * @param <P> the type of {@link BaseGenericTreePath}
  */
+@Deprecated
 public interface GenericTreeModel<
         M extends Model,
         N extends GenericTreeNode<M, N>,

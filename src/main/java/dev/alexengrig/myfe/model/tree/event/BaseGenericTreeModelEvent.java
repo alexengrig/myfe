@@ -34,6 +34,7 @@ import java.util.List;
  * @param <P>  the type of {@link BaseGenericTreePath}
  * @param <TM> the type of {@link GenericTreeModel}
  */
+@Deprecated
 public class BaseGenericTreeModelEvent<
         M extends Model,
         N extends GenericTreeNode<M, N>,

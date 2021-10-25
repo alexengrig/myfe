@@ -31,6 +31,7 @@ import java.util.stream.Stream;
  * @param <M>    the type of {@link Model}
  * @param <SELF> the type of {@link GenericTreeNode}
  */
+@Deprecated
 public interface GenericTreeNode<
         M extends Model,
         SELF extends GenericTreeNode<M, SELF>>

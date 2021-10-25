@@ -31,6 +31,7 @@ import java.util.List;
  * @param <E>    the type of {@link BaseGenericTreeModelEvent}
  * @param <SELF> the type of {@link GenericTreeModel}
  */
+@Deprecated
 public abstract class BaseGenericTreeModel<
         M extends Model,
         N extends GenericTreeNode<M, N> & ModelUpdater<M>,

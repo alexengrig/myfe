@@ -23,6 +23,7 @@ import java.util.Objects;
 /**
  * Base implementation {@link GenericTreeNode}.
  */
+@Deprecated
 public abstract class BaseGenericTreeNode<
         M extends Model,
         SELF extends GenericTreeNode<M, SELF>>
