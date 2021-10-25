@@ -16,6 +16,7 @@
 
 plugins {
     id 'java'
+    id "me.champeau.jmh" version "0.6.6"
 }
 
 group 'dev.alexengrig'
@@ -40,6 +41,9 @@ dependencies {
 
     testImplementation "org.mockito:mockito-core:${mockitoVersion}"
     testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
+
+    jmh "org.openjdk.jmh:jmh-core:${jmhVersion}"
+    jmh "org.openjdk.jmh:jmh-generator-annprocess:${jmhVersion}"
 }
 
 test {
