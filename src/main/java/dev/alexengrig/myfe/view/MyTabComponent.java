@@ -48,7 +48,7 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 public class MyTabComponent extends JPanel {
 
@@ -299,10 +299,17 @@ public class MyTabComponent extends JPanel {
      */
     private class PreviewService implements MyPathPreviewBackgroundService {
 
+        private BackgroundStreamer.Task<String> previousTask;
+
         @Override
-        public void loadTextPreview(MyFile file, Consumer<Stream<String>> handler) {
-            //TODO: Cancel previous task
-            BackgroundStreamer.stream(() -> service.readByLineFileContent(file), handler);
+        public void loadTextPreview(MyFile file, Consumer<String> handler) {
+            // cancel previous task if need
+            if (previousTask != null && !previousTask.isDone() && !previousTask.cancel()) {
+                LOGGER.warn("Failed to cancel previous task");
+            }
+            previousTask = BackgroundStreamer.stream(
+                    () -> service.readFileContentInBatches(file),
+                    strings -> handler.accept(strings.collect(Collectors.joining())));
         }
 
     }

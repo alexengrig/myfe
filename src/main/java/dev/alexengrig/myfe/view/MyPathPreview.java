@@ -19,13 +19,20 @@ package dev.alexengrig.myfe.view;
 import dev.alexengrig.myfe.model.MyFile;
 import dev.alexengrig.myfe.model.MyPath;
 import dev.alexengrig.myfe.model.MyPathModel;
+import dev.alexengrig.myfe.model.event.MyPathModelEvent;
+import dev.alexengrig.myfe.model.event.MyPathModelListener;
 import dev.alexengrig.myfe.service.MyPathPreviewBackgroundService;
 import dev.alexengrig.myfe.util.MyPathUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.lang.invoke.MethodHandles;
 
 public class MyPathPreview extends JPanel {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final MyPathModel model;
     private final MyPathPreviewBackgroundService backgroundService;
@@ -38,27 +45,27 @@ public class MyPathPreview extends JPanel {
     }
 
     private void init() {
-        addPreviewComponent();
-        model.addMyPathModelListener(event -> updatePreviewComponent());
+        addPreviewComponent(model.getPath());
+        model.addMyPathModelListener(new ModelListener());
     }
 
-    private void updatePreviewComponent() {
+    private void handleChangePath(MyPath path) {
+        LOGGER.debug("Handle change path: {}", path);
         removeAll();
-        addPreviewComponent();
-        revalidate();
+        addPreviewComponent(path);
+        revalidate(); //FIXME: It's slow
         repaint();
     }
 
-    private void addPreviewComponent() {
-        JComponent component = createPreviewComponent();
+    private void addPreviewComponent(MyPath path) {
+        JComponent component = createPreviewComponent(path);
         add(component);
     }
 
-    private JComponent createPreviewComponent() {
-        if (model.isEmpty()) {
+    private JComponent createPreviewComponent(MyPath path) {
+        if (path == null) {
             return createEmptyPreviewComponent();
         } else {
-            MyPath path = model.getPath();
             if (path.isFile()) {
                 if (MyPathUtil.isImage(path.asFile())) {
                     return createImagePreviewComponent(path.asFile());
@@ -86,6 +93,20 @@ public class MyPathPreview extends JPanel {
         MyText component = new MyText();
         backgroundService.loadTextPreview(file, component::append);
         return component;
+    }
+
+    /**
+     * Events from model.
+     *
+     * @see MyPathPreview#handleChangePath(MyPath)
+     */
+    private class ModelListener implements MyPathModelListener {
+
+        @Override
+        public void changePath(MyPathModelEvent event) {
+            handleChangePath(event.getPath());
+        }
+
     }
 
 }
