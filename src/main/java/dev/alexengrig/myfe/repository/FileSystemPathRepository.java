@@ -28,7 +28,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.lang.invoke.MethodHandles;
 import java.nio.ByteBuffer;
-import java.nio.channels.ByteChannel;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
@@ -53,11 +53,6 @@ import static java.util.Spliterator.ORDERED;
 public class FileSystemPathRepository implements MyPathRepository {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
-    private static final int ONE_MB = 1_048_576;
-    private static final int MAX_NUMBER_OF_MBs = 1;
-    private static final int BATCH_SIZE = 65_536;
-    private static final int MAX_NUMBER_OF_BATCHES = ONE_MB * MAX_NUMBER_OF_MBs / BATCH_SIZE;
 
     private final FileSystem fileSystem;
     private final Converter<Path, MyDirectory> directoryConverter;
@@ -108,22 +103,42 @@ public class FileSystemPathRepository implements MyPathRepository {
     }
 
     @Override
-    public Stream<String> readInBatches(String filePath) {
-        try {
-            LOGGER.debug("Start reading in batches: {}", filePath);
-            Path path = fileSystem.getPath(requireNonNullPath(filePath));
-            SeekableByteChannel channel = Files.newByteChannel(path);
-            int batchSize = BATCH_SIZE;
+    public String readBatch(String filePath, int batchSize) {
+        LOGGER.debug("Start reading a batch: {} - {} bytes", filePath, batchSize);
+        Path path = fileSystem.getPath(requireNonNullPath(filePath));
+        try (SeekableByteChannel channel = Files.newByteChannel(path)) {
             if (batchSize > channel.size()) {
                 batchSize = (int) channel.size();
             }
             ByteBuffer buffer = ByteBuffer.allocate(batchSize);
-            Iterator<String> iterator = new ChannelIterator(channel, buffer);
+            int count = channel.read(buffer);
+            if (count != -1) {
+                return StandardCharsets.UTF_8.decode(buffer.flip()).toString();
+            }
+            return "";
+        } catch (IOException e) {
+            LOGGER.error("Exception of reading a batch: {} - {} bytes", filePath, batchSize, e);
+            throw new UncheckedIOException("Exception of reading a batch: " +
+                                           filePath + " - " + batchSize + " bytes", e);
+        }
+    }
+
+    @Override
+    public Stream<String> readInBatches(String filePath, int batchSize, int numberOfBatches) {
+        try {
+            LOGGER.debug("Start reading in batches: {}", filePath);
+            Path path = fileSystem.getPath(requireNonNullPath(filePath));
+            SeekableByteChannel channel = Files.newByteChannel(path);
+            if (batchSize > channel.size()) {
+                batchSize = (int) channel.size();
+            }
+            ByteBuffer buffer = ByteBuffer.allocate(batchSize);
+            Iterator<String> iterator = new ChannelIterator(channel, buffer, numberOfBatches);
             Spliterator<String> spliterator = Spliterators.spliteratorUnknownSize(iterator, ORDERED | NONNULL);
             Stream<String> batchStream = StreamSupport.stream(spliterator, false).onClose(() -> {
                 try {
                     channel.close();
-                    LOGGER.debug("Close channel for: {}", filePath);
+                    LOGGER.debug("Closed channel for: {}", filePath);
                 } catch (IOException e) {
                     LOGGER.error("Exception of closing channel of: {}", filePath, e);
                     throw new UncheckedIOException("Exception of closing channel of: " + filePath, e);
@@ -141,23 +156,29 @@ public class FileSystemPathRepository implements MyPathRepository {
         return requireNonNull(path, "The path must not be null");
     }
 
+    /**
+     * {@link ReadableByteChannel} as {@link Iterator}.
+     */
+    //FIXME: Move class
     private static class ChannelIterator implements Iterator<String> {
 
-        private final ByteChannel channel;
+        private final ReadableByteChannel channel;
         private final ByteBuffer buffer;
+        private final int maxNumberOfBatches;
 
         int numberOfBatches = 0;
         String nextBatch = null;
 
-        public ChannelIterator(ByteChannel channel, ByteBuffer buffer) {
+        public ChannelIterator(ReadableByteChannel channel, ByteBuffer buffer, int maxNumberOfBatches) {
             this.channel = channel;
             this.buffer = buffer;
+            this.maxNumberOfBatches = maxNumberOfBatches;
         }
 
         private String readBatch() {
             try {
                 int count = channel.read(buffer);
-                if (count != -1 && numberOfBatches++ < MAX_NUMBER_OF_BATCHES) {
+                if (count != -1 && numberOfBatches++ < maxNumberOfBatches) {
                     return StandardCharsets.UTF_8.decode(buffer.flip()).toString();
                 }
                 return null;
