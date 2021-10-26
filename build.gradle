@@ -17,6 +17,7 @@
 plugins {
     id 'java'
     id "me.champeau.jmh" version "0.6.6"
+    id "io.github.reyerizo.gradle.jcstress" version "0.8.11"
 }
 
 group 'dev.alexengrig'
@@ -41,6 +42,8 @@ dependencies {
 
     testImplementation "org.mockito:mockito-core:${mockitoVersion}"
     testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
+
+    testImplementation "org.openjdk.jcstress:jcstress-core:${jcstressVersion}"
 
     jmh "org.openjdk.jmh:jmh-core:${jmhVersion}"
     jmh "org.openjdk.jmh:jmh-generator-annprocess:${jmhVersion}"
