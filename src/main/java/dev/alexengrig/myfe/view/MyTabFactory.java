@@ -43,8 +43,7 @@ public class MyTabFactory {
 
     private MyTab createTab(String title, String tip, String name, MyPathRepository repository) {
         MyPathService service = new SimplePathService(name, repository);
-        MyTabComponent component = new MyTabComponent(service);
-        return new MyTab(title, tip, component);
+        return new MyTab(service, title, tip);
     }
 
     public MyTab createDefaultTab() {

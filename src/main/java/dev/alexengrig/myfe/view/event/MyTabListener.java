@@ -16,25 +16,10 @@
 
 package dev.alexengrig.myfe.view.event;
 
-import dev.alexengrig.myfe.model.MyFile;
+import java.util.EventListener;
 
-public class MyTabComponentEvent {
+public interface MyTabListener extends EventListener {
 
-    private final MyFile file;
-
-    public MyTabComponentEvent(MyFile file) {
-        this.file = file;
-    }
-
-    public MyFile getFile() {
-        return file;
-    }
-
-    @Override
-    public String toString() {
-        return "MyTabComponentEvent{" +
-                "file=" + file +
-                '}';
-    }
+    void openArchive(MyTabEvent event);
 
 }

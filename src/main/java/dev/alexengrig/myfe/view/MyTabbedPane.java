@@ -21,14 +21,16 @@ import java.awt.event.ActionEvent;
 
 public class MyTabbedPane extends JTabbedPane {
 
-    public MyTabbedPane(MyTab defaultTab) {
+    public MyTabbedPane() {
         super(TOP, SCROLL_TAB_LAYOUT);
-        insertTab(defaultTab.title(), defaultTab.icon(), defaultTab.component(), defaultTab.tip(), 0);
+    }
+
+    public void setDefaultMyTab(MyTab defaultTab) {
+        insertTab(defaultTab.title(), null, defaultTab, defaultTab.tip(), 0);
     }
 
     public void addMyTab(MyTab tab) {
-        String title = tab.title();
-        super.addTab(title, tab.icon(), tab.component(), tab.tip());
+        super.addTab(tab.title(), null, tab, tab.tip());
         int index = super.getTabCount() - 1;
         super.setTabComponentAt(index, new MyTabComponent(tab));
     }
@@ -43,7 +45,7 @@ public class MyTabbedPane extends JTabbedPane {
                 public void actionPerformed(ActionEvent e) {
                     int index = MyTabbedPane.super.indexOfTab(title);
                     MyTabbedPane.super.removeTabAt(index);
-                    tab.component().destroy();
+                    tab.destroy();
                 }
             });
             button.setText("x"); //TODO: Make it beautiful

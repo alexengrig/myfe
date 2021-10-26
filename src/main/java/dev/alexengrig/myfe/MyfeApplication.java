@@ -33,9 +33,8 @@ public final class MyfeApplication extends JFrame {
 
     private static final String TITLE = "myfe";
 
+    private final MyTabbedPane tabbedPane = new MyTabbedPane();
     private final MyTabFactory tabFactory = new MyTabFactory();
-
-    private MyTabbedPane tabbedPane;
 
     public MyfeApplication() {
         super(TITLE);
@@ -67,8 +66,8 @@ public final class MyfeApplication extends JFrame {
 
     private void tabbedPaneInit() {
         MyTab defaultTab = tabFactory.createDefaultTab();
-        defaultTab.component().addMyTabComponentListener(event -> handleOpenArchive(Paths.get(event.getFile().getPath())));
-        tabbedPane = new MyTabbedPane(defaultTab);
+        defaultTab.addMyTabListener(event -> handleOpenArchive(Paths.get(event.getFile().getPath())));
+        tabbedPane.setDefaultMyTab(defaultTab);
         add(tabbedPane);
     }
 
