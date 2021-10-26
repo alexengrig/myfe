@@ -28,8 +28,10 @@ import dev.alexengrig.myfe.repository.FTPPathRepository;
 import dev.alexengrig.myfe.repository.LocalFileSystemPathRepository;
 import dev.alexengrig.myfe.repository.MyPathRepository;
 import dev.alexengrig.myfe.repository.URIFileSystemPathRepository;
+import dev.alexengrig.myfe.service.BackgroundExecutorService;
 import dev.alexengrig.myfe.service.MyPathService;
 import dev.alexengrig.myfe.service.SimplePathService;
+import dev.alexengrig.myfe.util.BackgroundExecutor;
 import dev.alexengrig.myfe.util.PathUtil;
 
 import java.net.URI;
@@ -41,9 +43,11 @@ public class MyTabFactory {
     private final Converter<Path, MyFile> fileConverter = new Path2MyFileConverter();
     private final Converter<Path, MyPath> pathConverter = new Path2MyPathConverter(directoryConverter, fileConverter);
 
+    private final BackgroundExecutorService backgroundExecutorService = BackgroundExecutor::execute;
+
     private MyTab createTab(String title, String tip, String name, MyPathRepository repository) {
         MyPathService service = new SimplePathService(name, repository);
-        return new MyTab(service, title, tip);
+        return new MyTab(service, backgroundExecutorService, title, tip);
     }
 
     public MyTab createDefaultTab() {

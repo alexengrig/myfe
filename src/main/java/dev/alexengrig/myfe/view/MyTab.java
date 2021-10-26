@@ -24,11 +24,12 @@ import dev.alexengrig.myfe.model.MyPath;
 import dev.alexengrig.myfe.model.MyPathFilterModel;
 import dev.alexengrig.myfe.model.MyPathModel;
 import dev.alexengrig.myfe.model.MyPathTableModel;
+import dev.alexengrig.myfe.service.BackgroundExecutorService;
 import dev.alexengrig.myfe.service.MyDirectoryTreeBackgroundService;
 import dev.alexengrig.myfe.service.MyPathPreviewBackgroundService;
 import dev.alexengrig.myfe.service.MyPathService;
 import dev.alexengrig.myfe.util.BackgroundExecutor;
-import dev.alexengrig.myfe.util.BackgroundStreamer;
+import dev.alexengrig.myfe.util.BackgroundTask;
 import dev.alexengrig.myfe.util.MyPathUtil;
 import dev.alexengrig.myfe.view.event.MyDirectoryTreeEvent;
 import dev.alexengrig.myfe.view.event.MyDirectoryTreeListener;
@@ -48,7 +49,6 @@ import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class MyTab extends JPanel {
 
@@ -57,6 +57,7 @@ public class MyTab extends JPanel {
     private final List<MyTabListener> listeners = new LinkedList<>();
 
     private final MyPathService service;
+    private final BackgroundExecutorService backgroundExecutor;
     private final String title;
     private final String tip;
     /**
@@ -78,9 +79,10 @@ public class MyTab extends JPanel {
     private MyFooter footerView;
     private MyPathFilter filterView;
 
-    public MyTab(MyPathService service, String title, String tip) {
+    public MyTab(MyPathService service, BackgroundExecutorService backgroundExecutor, String title, String tip) {
         super(new BorderLayout());
         this.service = service;
+        this.backgroundExecutor = backgroundExecutor;
         this.title = title;
         this.tip = tip;
         this.directoryStack = new LinkedList<>();
@@ -311,17 +313,21 @@ public class MyTab extends JPanel {
      */
     private class PreviewService implements MyPathPreviewBackgroundService {
 
-        private BackgroundStreamer.Task<String> previousTask;
+        private BackgroundTask previousTask;
 
         @Override
         public void loadTextPreview(MyFile file, Consumer<String> handler) {
-            // cancel previous task if need
-            if (previousTask != null && !previousTask.isDone() && !previousTask.cancel()) {
+            cancelPreviousTaskIfNeed();
+            previousTask = backgroundExecutor.execute(() -> service.getFileContentPreview(file), handler);
+        }
+
+        private void cancelPreviousTaskIfNeed() {
+            if (previousTask == null || previousTask.isDone()) {
+                return;
+            }
+            if (!previousTask.cancel() && !previousTask.isDone()) {
                 LOGGER.warn("Failed to cancel previous task");
             }
-            previousTask = BackgroundStreamer.stream(
-                    () -> service.readFileContentInBatches(file),
-                    strings -> handler.accept(strings.collect(Collectors.joining())));
         }
 
     }
