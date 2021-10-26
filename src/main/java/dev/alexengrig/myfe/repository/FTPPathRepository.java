@@ -30,6 +30,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.lang.invoke.MethodHandles;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
@@ -81,13 +83,13 @@ public class FTPPathRepository implements MyPathRepository {
                 LOGGER.warn("Could not login to \"{}:{}\" as user: {}",
                         config.getHost(), config.getPort(), config.getUsername());
                 throw new IllegalArgumentException("Could not login to \"" +
-                        config.getHost() + ":" + config.getPort() +
-                        "\" as user: " + config.getUsername());
+                                                   config.getHost() + ":" + config.getPort() +
+                                                   "\" as user: " + config.getUsername());
             }
         } catch (IOException e) {
             LOGGER.error("Exception of preparing FTP client for: {}:{}", config.getHost(), config.getPort());
             throw new UncheckedIOException("Exception of preparing FTP client for: " +
-                    config.getHost() + ":" + config.getPort(), e);
+                                           config.getHost() + ":" + config.getPort(), e);
         }
     }
 
@@ -99,7 +101,7 @@ public class FTPPathRepository implements MyPathRepository {
         } catch (IOException e) {
             LOGGER.error("Exception of completing FTP client for: {}:{}", config.getHost(), config.getPort(), e);
             throw new UncheckedIOException("Exception of completing FTP client for: " +
-                    config.getHost() + ":" + config.getPort(), e);
+                                           config.getHost() + ":" + config.getPort(), e);
         }
     }
 
@@ -131,7 +133,7 @@ public class FTPPathRepository implements MyPathRepository {
         } catch (IOException e) {
             LOGGER.debug("Exception of getting root directories \"{}:{}\"", config.getHost(), config.getPort(), e);
             throw new UncheckedIOException("Exception of getting root directories \"" +
-                    config.getHost() + ":" + config.getPort() + "\"", e);
+                                           config.getHost() + ":" + config.getPort() + "\"", e);
         } finally {
             completeClient(client);
         }
@@ -153,7 +155,7 @@ public class FTPPathRepository implements MyPathRepository {
         } catch (IOException e) {
             LOGGER.error("Exception of getting children for: {}:{}{}", config.getHost(), config.getPort(), directoryPath);
             throw new UncheckedIOException("Exception of getting children for: " +
-                    config.getHost() + ":" + config.getPort() + directoryPath, e);
+                                           config.getHost() + ":" + config.getPort() + directoryPath, e);
         } finally {
             completeClient(client);
         }
@@ -176,14 +178,40 @@ public class FTPPathRepository implements MyPathRepository {
         } catch (IOException e) {
             LOGGER.debug("Exception of getting subdirectories for: {}:{}{}", config.getHost(), config.getPort(), directoryPath, e);
             throw new UncheckedIOException("Exception of getting subdirectories for: " +
-                    config.getHost() + ":" + config.getPort() + directoryPath, e);
+                                           config.getHost() + ":" + config.getPort() + directoryPath, e);
         } finally {
             completeClient(client);
         }
     }
 
     @Override
-    public Stream<String> readInBatches(String filePath) {
+    public String readBatch(String filePath, int batchSize) {
+        LOGGER.debug("Start reading a batch: {}:{}{} - {} bytes",
+                config.getHost(), config.getPort(), filePath, batchSize);
+        FTPClient client = getPreparedClient();
+        try (InputStream inputStream = client.retrieveFileStream(filePath)) {
+            byte[] buffer = new byte[batchSize];
+            int count = inputStream.read(buffer);
+            if (count != -1) {
+                return StandardCharsets.UTF_8.decode(ByteBuffer.wrap(buffer, 0, count)).toString();
+            }
+            return "";
+        } catch (IOException e) {
+            LOGGER.error("Exception of reading a batch: {}:{}{} - {} bytes",
+                    config.getHost(), config.getPort(), filePath, batchSize, e);
+            throw new RuntimeException("Exception of reading a batch: "
+                                       + config.getHost() + ":" + config.getPort() + filePath +
+                                       " - " + batchSize + " bytes", e);
+        } finally {
+//            if (!client.completePendingCommand()) {
+//             FIXME: handle
+//            }
+            completeClient(client);
+        }
+    }
+
+    @Override
+    public Stream<String> readInBatches(String filePath, int batchSize, int numberOfBatches) {
         FTPClient client = getPreparedClient();
         try {
             LOGGER.debug("Start reading by line: {}:{}{}", config.getHost(), config.getPort(), filePath);
