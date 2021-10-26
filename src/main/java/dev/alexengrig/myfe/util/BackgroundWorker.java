@@ -34,8 +34,7 @@ import java.util.function.Consumer;
  *
  * @param <X> the type of expected exception
  */
-public class BackgroundWorker<T, V, X extends Throwable>
-        extends SwingWorker<T, V> {
+public class BackgroundWorker<T, V, X extends Throwable> extends SwingWorker<T, V> {
 
     /**
      * Index of {@code X}.
@@ -80,6 +79,10 @@ public class BackgroundWorker<T, V, X extends Throwable>
 
     @Override
     protected final T doInBackground() throws Exception {
+        return callBackgroundTask();
+    }
+
+    protected T callBackgroundTask() throws Exception {
         return backgroundTask.call();
     }
 

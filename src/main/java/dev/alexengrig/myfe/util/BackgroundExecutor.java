@@ -31,9 +31,10 @@ public class BackgroundExecutor<T> extends SwingWorker<T, T> {
         this.doneHandler = doneHandler;
     }
 
-    public static <T> void execute(Callable<T> task, Consumer<T> handler) {
+    public static <T> BackgroundTask execute(Callable<T> task, Consumer<T> handler) {
         BackgroundExecutor<T> worker = new BackgroundExecutor<>(task, handler);
         worker.execute();
+        return BackgroundTask.of(worker);
     }
 
     @Override

@@ -28,11 +28,28 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
+/**
+ * {@link SwingWorker}-based implementation,
+ * passes values from a background task to a chunks' handler,
+ * from a background thread to the Event Dispatch Thread;
+ * uses {@link Stream} that closes at the end.
+ *
+ * @param <T> the type of result
+ */
 public class BackgroundStreamer<T> extends SwingWorker<T, T> {
 
+    /**
+     * Run in a background thread.
+     */
     private final Callable<Stream<T>> backgroundTask;
+    /**
+     * Run in the Event Dispatch Thread.
+     */
     private final Consumer<Stream<T>> chunksHandler;
 
+    /**
+     * @implNote See FutureTaskHappensBefore_JCStressTest.
+     */
     private Stream<T> stream;
 
     protected BackgroundStreamer(Callable<Stream<T>> backgroundTask, Consumer<Stream<T>> chunksHandler) {
@@ -40,20 +57,27 @@ public class BackgroundStreamer<T> extends SwingWorker<T, T> {
         this.chunksHandler = Objects.requireNonNull(chunksHandler, "The chunks handler must not be null");
     }
 
-    public static <T> Task<T> stream(Callable<Stream<T>> backgroundTask, Consumer<Stream<T>> chunkHandler) {
+    /**
+     * Create a background task of streaming.
+     *
+     * @param backgroundTask result stream supplier
+     * @param chunkHandler   result handler
+     * @return the background task
+     */
+    public static <T> Task stream(Callable<Stream<T>> backgroundTask, Consumer<Stream<T>> chunkHandler) {
         final BackgroundStreamer<T> worker = new BackgroundStreamer<>(backgroundTask, chunkHandler);
         worker.execute();
-        return new Task<>(worker);
+        return new Task(worker);
     }
 
-    public boolean cancelStreaming() {
+    protected boolean cancelStreaming() {
         return cancel(true);
     }
 
     @Override
     protected final T doInBackground() throws Exception {
-        stream = backgroundTask.call();
         try {
+            stream = backgroundTask.call();
             stream.forEachOrdered(this::publish);
         } finally {
             if (stream != null) {
@@ -83,11 +107,14 @@ public class BackgroundStreamer<T> extends SwingWorker<T, T> {
         }
     }
 
-    public static class Task<T> {
+    /**
+     * Background task.
+     */
+    public static class Task {
 
-        private final BackgroundStreamer<T> streamer;
+        private final BackgroundStreamer<?> streamer;
 
-        private Task(BackgroundStreamer<T> streamer) {
+        private Task(BackgroundStreamer<?> streamer) {
             this.streamer = streamer;
         }
 
