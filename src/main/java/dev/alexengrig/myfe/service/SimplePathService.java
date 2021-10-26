@@ -32,6 +32,11 @@ public class SimplePathService implements MyPathService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    /**
+     * Batch size in bytes.
+     */
+    private static final int FILE_PREVIEW_CONTENT_SIZE = 1_048_576; // 1Mb
+
     private final String rootName;
     private final MyPathRepository repository;
 
@@ -70,8 +75,13 @@ public class SimplePathService implements MyPathService {
     }
 
     @Override
-    public Stream<String> readFileContentInBatches(MyFile file) {
-        return repository.readInBatches(requireNonNullFile(file).getPath());
+    public String getFileContentPreview(MyFile file) {
+        return repository.readBatch(requireNonNullFile(file).getPath(), FILE_PREVIEW_CONTENT_SIZE);
+    }
+
+    @Override
+    public Stream<String> readFileContent(MyFile file) {
+        return repository.readInBatches(requireNonNullFile(file).getPath(), FILE_PREVIEW_CONTENT_SIZE, 1);
     }
 
     private MyDirectory requireNonNullDirectory(MyDirectory directory) {
