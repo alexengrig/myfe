@@ -19,6 +19,7 @@ package dev.alexengrig.myfe.model;
 /**
  * File of file explorer.
  */
+//FIXME: Rename to FeFile (File explorer file)
 public class MyFile extends MyPath {
 
     public MyFile(String path, String name) {

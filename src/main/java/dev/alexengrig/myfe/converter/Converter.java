@@ -16,9 +16,21 @@
 
 package dev.alexengrig.myfe.converter;
 
+/**
+ * Converter from source object to target object.
+ *
+ * @param <T> the type of source object
+ * @param <R> the type of target object
+ */
 @FunctionalInterface
 public interface Converter<T, R> {
 
+    /**
+     * Convert from {@link T} to {@link R}.
+     *
+     * @param source source object
+     * @return target object
+     */
     R convert(T source);
 
 }

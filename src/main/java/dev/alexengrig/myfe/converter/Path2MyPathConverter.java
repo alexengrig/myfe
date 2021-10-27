@@ -24,6 +24,9 @@ import dev.alexengrig.myfe.util.PathUtil;
 import java.nio.file.Path;
 import java.util.Objects;
 
+/**
+ * Converter from {@link Path} to {@link MyPath}.
+ */
 public class Path2MyPathConverter implements Converter<Path, MyPath> {
 
     private final Converter<Path, MyDirectory> directoryConverter;
