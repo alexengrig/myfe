@@ -43,6 +43,8 @@ dependencies {
     testImplementation "org.mockito:mockito-core:${mockitoVersion}"
     testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
 
+    testImplementation "org.mockftpserver:MockFtpServer:${mockFtpServerVersion}"
+
     testImplementation "org.openjdk.jcstress:jcstress-core:${jcstressVersion}"
 
     jmh "org.openjdk.jmh:jmh-core:${jmhVersion}"
