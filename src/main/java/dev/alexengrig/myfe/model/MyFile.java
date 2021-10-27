@@ -16,6 +16,9 @@
 
 package dev.alexengrig.myfe.model;
 
+/**
+ * File of file explorer.
+ */
 public class MyFile extends MyPath {
 
     public MyFile(String path, String name) {

@@ -18,52 +18,38 @@ package dev.alexengrig.myfe.model;
 
 import dev.alexengrig.myfe.util.MyPathUtil;
 
-import java.util.Objects;
-
-public abstract class MyPath {
-
-    private final String path;
-    private final String name;
+/**
+ * Path of file explorer.
+ */
+public abstract class MyPath extends AbstractPath {
 
     private transient String extension;
 
     protected MyPath(String path, String name) {
-        this.path = Objects.requireNonNull(path, "The path must not be null");
-        this.name = Objects.requireNonNull(name, "The name must not be null");
+        super(path, name);
     }
 
+    @Deprecated(forRemoval = true)
     public static MyPath of(String path, String name, boolean isDirectory) {
         return isDirectory ? directory(path, name) : file(path, name);
     }
 
+    @Deprecated(forRemoval = true)
     public static MyFile file(String path, String name) {
         return new MyFile(path, name);
     }
 
+    @Deprecated(forRemoval = true)
     public static MyDirectory directory(String path, String name) {
         return new MyDirectory(path, name);
     }
-
-    public abstract boolean isDirectory();
 
     public MyDirectory asDirectory() {
         return (MyDirectory) this;
     }
 
-    public boolean isFile() {
-        return !isDirectory();
-    }
-
     public MyFile asFile() {
         return (MyFile) this;
-    }
-
-    public String getPath() {
-        return path;
-    }
-
-    public String getName() {
-        return name;
     }
 
     public String getExtension() {
@@ -71,24 +57,6 @@ public abstract class MyPath {
             extension = MyPathUtil.getExtension(this);
         }
         return extension;
-    }
-
-    @Override
-    public String toString() {
-        return path;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        MyPath myPath = (MyPath) o;
-        return path.equals(myPath.path);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(path);
     }
 
 }
