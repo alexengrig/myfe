@@ -47,30 +47,35 @@ public class ApacheCommonsFtpClientFactory implements MyFtpClientFactory {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    private static final int DEFAULT_MAX_NUMBER_OF_CONNECTIONS = 10; //FIXME: Select the best number
     private static final int CONNECTION_TIMEOUT_IN_MILLIS = 7_000;
 
     //TODO: Windows, OK?
     private static final String ROOT_PATH = "/";
     private static final String SEPARATOR = "/";
 
-    private final Semaphore connectionPermits = new Semaphore(10, true);
-
     private final Converter<ContextFTPFile, MyFtpPath> pathConverter;
     private final Converter<ContextFTPFile, MyFtpDirectory> directoryConverter;
     private final FTPConnectionConfig connectionConfig;
+    private final Semaphore connectionPermits;
 
     public ApacheCommonsFtpClientFactory(FTPConnectionConfig connectionConfig) {
         //TODO: Get from context
-        this(new ContextFTPFile2MyPathConverter(), new ContextFTPFile2MyFtpDirectoryConverter(), connectionConfig);
+        this(
+                new ContextFTPFile2MyPathConverter(),
+                new ContextFTPFile2MyFtpDirectoryConverter(),
+                connectionConfig,
+                DEFAULT_MAX_NUMBER_OF_CONNECTIONS);
     }
 
     public ApacheCommonsFtpClientFactory(
             Converter<ContextFTPFile, MyFtpPath> pathConverter,
             Converter<ContextFTPFile, MyFtpDirectory> directoryConverter,
-            FTPConnectionConfig connectionConfig) {
+            FTPConnectionConfig connectionConfig, int maxNumberOfConnections) {
         this.pathConverter = pathConverter;
         this.directoryConverter = directoryConverter;
         this.connectionConfig = connectionConfig;
+        this.connectionPermits = new Semaphore(maxNumberOfConnections, true);
     }
 
     @Override
@@ -86,7 +91,9 @@ public class ApacheCommonsFtpClientFactory implements MyFtpClientFactory {
     private void acquireConnection() {
         try {
             connectionPermits.acquire();
+            LOGGER.trace("Acquired connection, available: {}", connectionPermits.availablePermits());
         } catch (InterruptedException e) {
+            LOGGER.warn("Interrupted", e);
             Thread.currentThread().interrupt();
             throw new RuntimeException("Interrupted"); //FIXME: Create exception
         }
@@ -94,6 +101,7 @@ public class ApacheCommonsFtpClientFactory implements MyFtpClientFactory {
 
     private void releaseConnection() {
         connectionPermits.release();
+        LOGGER.trace("Released connection, available: {}", connectionPermits.availablePermits());
     }
 
     @FunctionalInterface
@@ -148,7 +156,13 @@ public class ApacheCommonsFtpClientFactory implements MyFtpClientFactory {
             if (!acquiredConnection) {
                 acquireConnection();
                 acquiredConnection = true;
-                prepare();
+                try {
+                    prepare();
+                } catch (Exception e) {
+                    acquiredConnection = true;
+                    releaseConnection();
+                    throw e;
+                }
             }
         }
 
@@ -159,8 +173,11 @@ public class ApacheCommonsFtpClientFactory implements MyFtpClientFactory {
 
         @Override
         public void close() {
-            complete();
-            releaseConnection();
+            try {
+                complete();
+            } finally {
+                releaseConnection();
+            }
         }
 
         @Override
