@@ -16,18 +16,15 @@
 
 package dev.alexengrig.myfe.client;
 
-import dev.alexengrig.myfe.config.FTPConnectionConfig;
+import dev.alexengrig.myfe.WithFtpServerAndClientFactory;
 import dev.alexengrig.myfe.model.MyFtpDirectory;
 import dev.alexengrig.myfe.model.MyFtpPath;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockftpserver.fake.FakeFtpServer;
-import org.mockftpserver.fake.UserAccount;
 import org.mockftpserver.fake.filesystem.DirectoryEntry;
 import org.mockftpserver.fake.filesystem.FileEntry;
 import org.mockftpserver.fake.filesystem.FileSystem;
-import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
 
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -42,39 +39,16 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-class ApacheCommonsFTPClientFactoryTest {
-
-    final String host = "localhost";
-    final String username = "user";
-    final String password = "pass";
-
-    FakeFtpServer ftpServer;
-    ApacheCommonsFtpClientFactory clientFactory;
-
-    private ApacheCommonsFtpClientFactory createClientFactory() {
-        return new ApacheCommonsFtpClientFactory(FTPConnectionConfig.user(host, username, password.toCharArray()));
-    }
-
-    private FakeFtpServer createUnixFakeFtpServer() {
-        FakeFtpServer fakeFtpServer = new FakeFtpServer();
-        fakeFtpServer.addUserAccount(new UserAccount(username, password, "/"));
-        UnixFakeFileSystem fs = new UnixFakeFileSystem();
-        fs.add(new DirectoryEntry("/"));
-        fakeFtpServer.setFileSystem(fs);
-        return fakeFtpServer;
-    }
+class ApacheCommonsFTPClientFactoryTest extends WithFtpServerAndClientFactory {
 
     @BeforeEach
     void beforeEach() {
-        clientFactory = createClientFactory();
-        ftpServer = createUnixFakeFtpServer();
-        ftpServer.start();
+        super.setup();
     }
 
     @AfterEach
-    void afterEach() {
-        clientFactory.close();
-        ftpServer.stop();
+    void afterEach() throws Exception {
+        super.tearDown();
     }
 
     @Test
@@ -88,7 +62,7 @@ class ApacheCommonsFTPClientFactoryTest {
         DirectoryEntry dirEntry = new DirectoryEntry("/" + dirName);
         fs.add(dirEntry);
         // run
-        try (MyFtpClient client = clientFactory.createClient()) {
+        try (MyFtpClient client = ftpClientFactory.createClient()) {
             List<MyFtpPath> rootPaths = client.list().collect(Collectors.toList());
             // check
             assertEquals(2, rootPaths.size());
@@ -123,7 +97,7 @@ class ApacheCommonsFTPClientFactoryTest {
         FileEntry fileEntry = new FileEntry(path + "/" + fileName);
         fs.add(fileEntry);
         // run
-        try (MyFtpClient client = clientFactory.createClient()) {
+        try (MyFtpClient client = ftpClientFactory.createClient()) {
             List<MyFtpPath> dirPaths = client.list(path).collect(Collectors.toList());
             // check
             assertEquals(2, dirPaths.size());
@@ -155,7 +129,7 @@ class ApacheCommonsFTPClientFactoryTest {
         fs.add(dirEntry);
         fs.add(new FileEntry("/info.txt")); // ignored
         // run
-        try (MyFtpClient client = clientFactory.createClient()) {
+        try (MyFtpClient client = ftpClientFactory.createClient()) {
             List<MyFtpDirectory> rootSubdirectories = client.subdirectories().collect(Collectors.toList());
             // check
             assertEquals(1, rootSubdirectories.size());
@@ -177,7 +151,7 @@ class ApacheCommonsFTPClientFactoryTest {
         fs.add(dirEntry);
         fs.add(new FileEntry(path + "/" + "file.tmp"));
         // run
-        try (MyFtpClient client = clientFactory.createClient()) {
+        try (MyFtpClient client = ftpClientFactory.createClient()) {
             List<MyFtpDirectory> dirSubdirectories = client.subdirectories(path).collect(Collectors.toList());
             // check
             assertEquals(1, dirSubdirectories.size());
@@ -197,7 +171,7 @@ class ApacheCommonsFTPClientFactoryTest {
         FileEntry fileEntry = new FileEntry("/info.txt", fileContent);
         fs.add(fileEntry);
         // run
-        try (MyFtpClient client = clientFactory.createClient();
+        try (MyFtpClient client = ftpClientFactory.createClient();
              InputStream inputStream = client.inputStream(fileEntry.getPath())) {
             // check
             String content = new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
@@ -214,7 +188,7 @@ class ApacheCommonsFTPClientFactoryTest {
         ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
         for (int i = 0; i < numberOfThreads; i++) {
             executorService.submit(() -> {
-                try (MyFtpClient client = clientFactory.createClient()) {
+                try (MyFtpClient client = ftpClientFactory.createClient()) {
                     long result = client.list().count();
                     Thread.sleep(300L);
                     counter.decrementAndGet();
