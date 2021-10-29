@@ -16,41 +16,43 @@
 
 package dev.alexengrig.myfe.converter;
 
-import dev.alexengrig.myfe.model.ContextFTPFile;
+import dev.alexengrig.myfe.model.MyDirectory;
+import dev.alexengrig.myfe.model.MyFile;
 import dev.alexengrig.myfe.model.MyFtpDirectory;
 import dev.alexengrig.myfe.model.MyFtpFile;
 import dev.alexengrig.myfe.model.MyFtpPath;
+import dev.alexengrig.myfe.model.MyPath;
 
 import java.util.Objects;
 
 /**
- * Converter from {@link ContextFTPFile} to {@link MyFtpPath}.
+ * Converter from {@link MyFtpPath} to {@link MyPath}.
  */
-public class ContextFTPFile2MyPathConverter implements Converter<ContextFTPFile, MyFtpPath> {
+public class MyFtpPath2MyPathConverter implements Converter<MyFtpPath, MyPath> {
 
-    private final Converter<ContextFTPFile, MyFtpDirectory> directoryConverter;
-    private final Converter<ContextFTPFile, MyFtpFile> fileConverter;
+    private final Converter<MyFtpDirectory, MyDirectory> directoryConverter;
+    private final Converter<MyFtpFile, MyFile> fileConverter;
 
-    public ContextFTPFile2MyPathConverter() {
+    public MyFtpPath2MyPathConverter() {
         this(//TODO: Get from context
-                new ContextFTPFile2MyFtpDirectoryConverter(),
-                new ContextFTPFile2MyFtpFileConverter());
+                new MyFtpDirectory2MyDirectoryConverter(),
+                new MyFtpFile2MyFileConverter());
     }
 
-    public ContextFTPFile2MyPathConverter(
-            Converter<ContextFTPFile, MyFtpDirectory> directoryConverter,
-            Converter<ContextFTPFile, MyFtpFile> fileConverter) {
+    public MyFtpPath2MyPathConverter(
+            Converter<MyFtpDirectory, MyDirectory> directoryConverter,
+            Converter<MyFtpFile, MyFile> fileConverter) {
         this.directoryConverter = directoryConverter;
         this.fileConverter = fileConverter;
     }
 
     @Override
-    public MyFtpPath convert(ContextFTPFile source) {
+    public MyPath convert(MyFtpPath source) {
         Objects.requireNonNull(source, "The source must not be null");
         if (source.isDirectory()) {
-            return directoryConverter.convert(source);
+            return directoryConverter.convert(source.asDirectory());
         } else {
-            return fileConverter.convert(source);
+            return fileConverter.convert(source.asFile());
         }
     }
 

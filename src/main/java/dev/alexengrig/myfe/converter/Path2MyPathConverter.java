@@ -32,7 +32,15 @@ public class Path2MyPathConverter implements Converter<Path, MyPath> {
     private final Converter<Path, MyDirectory> directoryConverter;
     private final Converter<Path, MyFile> fileConverter;
 
-    public Path2MyPathConverter(Converter<Path, MyDirectory> directoryConverter, Converter<Path, MyFile> fileConverter) {
+    public Path2MyPathConverter() {
+        this(//TODO: Get from context
+                new Path2MyDirectoryConverter(),
+                new Path2MyFileConverter());
+    }
+
+    public Path2MyPathConverter(
+            Converter<Path, MyDirectory> directoryConverter,
+            Converter<Path, MyFile> fileConverter) {
         this.directoryConverter = directoryConverter;
         this.fileConverter = fileConverter;
     }
