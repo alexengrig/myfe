@@ -22,6 +22,13 @@ package dev.alexengrig.myfe.client;
 public interface MyFtpClientFactory extends AutoCloseable {
 
     /**
+     * Get information about connection: host, port, username, etc.
+     *
+     * @return information about connection
+     */
+    String getConnectionInfo();
+
+    /**
      * Create FTP client.
      *
      * @return FTP client

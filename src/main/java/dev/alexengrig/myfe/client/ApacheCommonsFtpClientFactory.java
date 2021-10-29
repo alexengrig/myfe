@@ -59,6 +59,8 @@ public class ApacheCommonsFtpClientFactory implements MyFtpClientFactory {
     private final FTPConnectionConfig connectionConfig;
     private final Semaphore connectionPermits;
 
+    private transient String connectionInfo;
+
     public ApacheCommonsFtpClientFactory(FTPConnectionConfig connectionConfig) {
         //TODO: Get from context
         this(
@@ -81,6 +83,15 @@ public class ApacheCommonsFtpClientFactory implements MyFtpClientFactory {
     @Override
     public void close() {
         // do nothing
+    }
+
+    @Override
+    public String getConnectionInfo() {
+        if (connectionInfo == null) {
+            connectionInfo = connectionConfig.getHost() + ":" + connectionConfig.getPort() +
+                    " by " + connectionConfig.getUsername();
+        }
+        return connectionInfo;
     }
 
     @Override
@@ -148,7 +159,7 @@ public class ApacheCommonsFtpClientFactory implements MyFtpClientFactory {
             if (!successfulLogin) {
                 LOGGER.warn("Could not login to \"{}:{}\" as user: {}", host, port, username);
                 throw new IllegalArgumentException("Could not login to \"" +
-                                                   host + ":" + port + "\" as user: " + username);
+                        host + ":" + port + "\" as user: " + username);
             }
         }
 
