@@ -23,7 +23,6 @@ import dev.alexengrig.myfe.model.MyFtpDirectory;
 import dev.alexengrig.myfe.model.MyFtpPath;
 import dev.alexengrig.myfe.model.MyPath;
 import dev.alexengrig.myfe.util.CloseOnTerminalOperationStreams;
-import org.apache.commons.net.ftp.FTPClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -40,15 +39,16 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /**
- * {@link FTPClient}-based implementation.
+ * {@link MyFtpClient}-based implementation.
  */
-public class FTPPathRepository implements MyPathRepository {
+//TODO: Create FileSystem of FTP server for FileSystemPathRepository
+public class FtpPathRepository implements MyPathRepository {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final MyFtpClientFactory clientFactory;
 
-    public FTPPathRepository(MyFtpClientFactory clientFactory) {
+    public FtpPathRepository(MyFtpClientFactory clientFactory) {
         this.clientFactory = clientFactory;
     }
 
@@ -105,9 +105,7 @@ public class FTPPathRepository implements MyPathRepository {
             }
             return "";
         } catch (Exception e) {
-            throw new RuntimeException("Exception of reading a batch: "
-                                       + filePath +
-                                       " - " + batchSize + " bytes", e);
+            throw new RuntimeException("Exception of reading a batch: " + filePath + " - " + batchSize + " bytes", e);
         }
     }
 

@@ -25,7 +25,7 @@ import dev.alexengrig.myfe.converter.Path2MyPathConverter;
 import dev.alexengrig.myfe.model.MyDirectory;
 import dev.alexengrig.myfe.model.MyFile;
 import dev.alexengrig.myfe.model.MyPath;
-import dev.alexengrig.myfe.repository.FTPPathRepository;
+import dev.alexengrig.myfe.repository.FtpPathRepository;
 import dev.alexengrig.myfe.repository.LocalFileSystemPathRepository;
 import dev.alexengrig.myfe.repository.MyPathRepository;
 import dev.alexengrig.myfe.repository.URIFileSystemPathRepository;
@@ -68,7 +68,7 @@ public class MyTabFactory {
         String title = "FTP: " + connectionConfig.getHost();
         String tip = connectionConfig.getHost() + ":" + connectionConfig.getPort();
         ApacheCommonsFtpClientFactory clientFactory = new ApacheCommonsFtpClientFactory(connectionConfig);
-        MyPathRepository repository = new FTPPathRepository(clientFactory);
+        MyPathRepository repository = new FtpPathRepository(clientFactory);
         return createTab(title, tip, connectionConfig.getHost(), repository);
     }
 
