@@ -32,6 +32,10 @@ import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -54,7 +58,9 @@ class ApacheCommonsFTPClientFactoryTest {
     private FakeFtpServer createUnixFakeFtpServer() {
         FakeFtpServer fakeFtpServer = new FakeFtpServer();
         fakeFtpServer.addUserAccount(new UserAccount(username, password, "/"));
-        fakeFtpServer.setFileSystem(new UnixFakeFileSystem());
+        UnixFakeFileSystem fs = new UnixFakeFileSystem();
+        fs.add(new DirectoryEntry("/"));
+        fakeFtpServer.setFileSystem(fs);
         return fakeFtpServer;
     }
 
@@ -62,6 +68,7 @@ class ApacheCommonsFTPClientFactoryTest {
     void beforeEach() {
         clientFactory = createClientFactory();
         ftpServer = createUnixFakeFtpServer();
+        ftpServer.start();
     }
 
     @AfterEach
@@ -81,7 +88,6 @@ class ApacheCommonsFTPClientFactoryTest {
         DirectoryEntry dirEntry = new DirectoryEntry("/" + dirName);
         fs.add(dirEntry);
         // run
-        ftpServer.start();
         try (MyFtpClient client = clientFactory.createClient()) {
             List<MyFtpPath> rootPaths = client.list().collect(Collectors.toList());
             // check
@@ -117,7 +123,6 @@ class ApacheCommonsFTPClientFactoryTest {
         FileEntry fileEntry = new FileEntry(path + "/" + fileName);
         fs.add(fileEntry);
         // run
-        ftpServer.start();
         try (MyFtpClient client = clientFactory.createClient()) {
             List<MyFtpPath> dirPaths = client.list(path).collect(Collectors.toList());
             // check
@@ -150,7 +155,6 @@ class ApacheCommonsFTPClientFactoryTest {
         fs.add(dirEntry);
         fs.add(new FileEntry("/info.txt")); // ignored
         // run
-        ftpServer.start();
         try (MyFtpClient client = clientFactory.createClient()) {
             List<MyFtpDirectory> rootSubdirectories = client.subdirectories().collect(Collectors.toList());
             // check
@@ -173,7 +177,6 @@ class ApacheCommonsFTPClientFactoryTest {
         fs.add(dirEntry);
         fs.add(new FileEntry(path + "/" + "file.tmp"));
         // run
-        ftpServer.start();
         try (MyFtpClient client = clientFactory.createClient()) {
             List<MyFtpDirectory> dirSubdirectories = client.subdirectories(path).collect(Collectors.toList());
             // check
@@ -194,7 +197,6 @@ class ApacheCommonsFTPClientFactoryTest {
         FileEntry fileEntry = new FileEntry("/info.txt", fileContent);
         fs.add(fileEntry);
         // run
-        ftpServer.start();
         try (MyFtpClient client = clientFactory.createClient();
              InputStream inputStream = client.inputStream(fileEntry.getPath())) {
             // check
@@ -203,6 +205,32 @@ class ApacheCommonsFTPClientFactoryTest {
         } catch (Exception exception) {
             fail(exception);
         }
+    }
+
+    @Test
+    void testPermits() throws InterruptedException {
+        int numberOfThreads = 30;
+        AtomicInteger counter = new AtomicInteger(numberOfThreads);
+        ExecutorService executorService = Executors.newFixedThreadPool(numberOfThreads);
+        for (int i = 0; i < numberOfThreads; i++) {
+            executorService.submit(() -> {
+                try (MyFtpClient client = clientFactory.createClient()) {
+                    long result = client.list().count();
+                    Thread.sleep(300L);
+                    counter.decrementAndGet();
+                    return result;
+                } catch (Exception e) {
+                    counter.incrementAndGet();
+                    return -1;
+                }
+            });
+        }
+        executorService.shutdown();
+        if (!executorService.awaitTermination(30, TimeUnit.SECONDS)) {
+            executorService.shutdownNow();
+            fail("Timeout expired");
+        }
+        assertEquals(0, counter.get(), "Counter");
     }
 
 }
