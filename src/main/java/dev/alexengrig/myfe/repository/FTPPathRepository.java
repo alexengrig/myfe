@@ -16,23 +16,21 @@
 
 package dev.alexengrig.myfe.repository;
 
-import dev.alexengrig.myfe.config.FTPConnectionConfig;
+import dev.alexengrig.myfe.client.MyFtpClient;
+import dev.alexengrig.myfe.client.MyFtpClientFactory;
 import dev.alexengrig.myfe.model.MyDirectory;
+import dev.alexengrig.myfe.model.MyFtpDirectory;
+import dev.alexengrig.myfe.model.MyFtpPath;
 import dev.alexengrig.myfe.model.MyPath;
 import dev.alexengrig.myfe.util.CloseOnTerminalOperationStreams;
 import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPFile;
-import org.apache.commons.net.ftp.FTPReply;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.UncheckedIOException;
 import java.lang.invoke.MethodHandles;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Spliterator;
@@ -48,187 +46,83 @@ public class FTPPathRepository implements MyPathRepository {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final FTPConnectionConfig config;
+    private final MyFtpClientFactory clientFactory;
 
-    //TODO: Create new abstraction for FTP client
-    private final ThreadLocal<FTPClient> clientHolder;
-
-    public FTPPathRepository(FTPConnectionConfig config) {
-        this.config = config;
-        this.clientHolder = ThreadLocal.withInitial(this::initClient);
-        testClientConnection();
-    }
-
-    private void testClientConnection() {
-        FTPClient testClient = initClient();
-        prepareClient(testClient);
-        completeClient(testClient);
-    }
-
-    private FTPClient initClient() {
-        FTPClient client = new FTPClient();
-        client.setConnectTimeout(5_000);
-        return client;
-    }
-
-    private void prepareClient(FTPClient client) {
-        try {
-            client.connect(config.getHost(), config.getPort());
-            if (!FTPReply.isPositiveCompletion(client.getReplyCode())) {
-                LOGGER.warn("Could not connect to: {}:{}", config.getHost(), config.getPort());
-                throw new IllegalArgumentException("Could not connect to: " + config.getHost() + ":" + config.getPort());
-            }
-            client.enterLocalPassiveMode();
-            if (!client.login(config.getUsername(), new String(config.getPassword()))) {
-                LOGGER.warn("Could not login to \"{}:{}\" as user: {}",
-                        config.getHost(), config.getPort(), config.getUsername());
-                throw new IllegalArgumentException("Could not login to \"" +
-                                                   config.getHost() + ":" + config.getPort() +
-                                                   "\" as user: " + config.getUsername());
-            }
-        } catch (IOException e) {
-            LOGGER.error("Exception of preparing FTP client for: {}:{}", config.getHost(), config.getPort());
-            throw new UncheckedIOException("Exception of preparing FTP client for: " +
-                                           config.getHost() + ":" + config.getPort(), e);
-        }
-    }
-
-    private void completeClient(FTPClient client) {
-        try {
-            client.logout();
-            client.disconnect();
-
-        } catch (IOException e) {
-            LOGGER.error("Exception of completing FTP client for: {}:{}", config.getHost(), config.getPort(), e);
-            throw new UncheckedIOException("Exception of completing FTP client for: " +
-                                           config.getHost() + ":" + config.getPort(), e);
-        }
-    }
-
-    private FTPClient getPreparedClient() {
-        //TODO: Add semaphore
-        FTPClient client = clientHolder.get();
-        prepareClient(client);
-        return client;
+    public FTPPathRepository(MyFtpClientFactory clientFactory) {
+        this.clientFactory = clientFactory;
     }
 
     @Override
-    public void close() {
-        // do nothing
+    public void close() throws Exception {
+        clientFactory.close();
     }
 
     @Override
     public List<MyDirectory> getRootDirectories() {
-        FTPClient client = getPreparedClient();
-        try {
-            LOGGER.debug("Start getting root directories \"{}:{}\"", config.getHost(), config.getPort());
-            FTPFile[] ftpFiles = client.listFiles();
-            LOGGER.debug("Got root directories {}:{}", config.getHost(), config.getPort());
-            List<MyDirectory> result = Arrays.stream(ftpFiles)
-                    .map(f -> new MyDirectory("/" + f.getName(), f.getName()))
+        try (MyFtpClient client = clientFactory.createClient()) {
+            Stream<MyFtpDirectory> ftpDirectories = client.subdirectories("/");
+            return ftpDirectories
+                    .map(f -> new MyDirectory("/" + f.getName(), f.getName())) //FIXME: Converter
                     .collect(Collectors.toList());
-            LOGGER.debug("Finished getting root directories \"{}:{}\": {} directory(-ies)",
-                    config.getHost(), config.getPort(), result.size());
-            return result;
-        } catch (IOException e) {
-            LOGGER.debug("Exception of getting root directories \"{}:{}\"", config.getHost(), config.getPort(), e);
-            throw new UncheckedIOException("Exception of getting root directories \"" +
-                                           config.getHost() + ":" + config.getPort() + "\"", e);
-        } finally {
-            completeClient(client);
+        } catch (Exception e) {
+            throw new RuntimeException("Exception of getting root directories \"" + "\"", e);
         }
     }
 
     @Override
     public List<MyPath> getChildren(String directoryPath) {
-        FTPClient client = getPreparedClient();
-        try {
-            LOGGER.debug("Start getting children for: {}:{}{}", config.getHost(), config.getPort(), directoryPath);
-            FTPFile[] ftpFiles = client.listFiles(directoryPath);
-            LOGGER.debug("Got children for: {}:{}{}", config.getHost(), config.getPort(), directoryPath);
-            List<MyPath> result = Arrays.stream(ftpFiles)
-                    .map(f -> MyPath.of(String.join("/", directoryPath, f.getName()), f.getName(), f.isDirectory()))
+        try (MyFtpClient client = clientFactory.createClient()) {
+            Stream<MyFtpPath> ftpFiles = client.list(directoryPath);
+            return ftpFiles
+                    .map(f -> MyPath.of(String.join("/", directoryPath, f.getName()), f.getName(), f.isDirectory())) //FIXME: Converter
                     .collect(Collectors.toList());
-            LOGGER.debug("Finished getting children for \"{}:{}{}\": {} child(-ren)",
-                    config.getHost(), config.getPort(), directoryPath, result.size());
-            return result;
-        } catch (IOException e) {
-            LOGGER.error("Exception of getting children for: {}:{}{}", config.getHost(), config.getPort(), directoryPath);
-            throw new UncheckedIOException("Exception of getting children for: " +
-                                           config.getHost() + ":" + config.getPort() + directoryPath, e);
-        } finally {
-            completeClient(client);
+        } catch (Exception e) {
+            throw new RuntimeException("Exception of getting children for: " + directoryPath, e);
         }
     }
 
     @Override
     public List<MyDirectory> getSubdirectories(String directoryPath) {
-        FTPClient client = getPreparedClient();
-        try {
-            LOGGER.debug("Start getting subdirectories for: {}:{}{}", config.getHost(), config.getPort(), directoryPath);
-            FTPFile[] ftpFiles = client.listFiles(directoryPath);
-            LOGGER.debug("Got subdirectories for: {}:{}{}", config.getHost(), config.getPort(), directoryPath);
-            List<MyDirectory> result = Arrays.stream(ftpFiles)
-                    .filter(FTPFile::isDirectory)
-                    .map(f -> new MyDirectory(String.join("/", directoryPath, f.getName()), f.getName()))
+        try (MyFtpClient client = clientFactory.createClient()) {
+            Stream<MyFtpPath> ftpPaths = client.list(directoryPath);
+            return ftpPaths
+                    .filter(MyFtpPath::isDirectory)
+                    .map(f -> new MyDirectory(String.join("/", directoryPath, f.getName()), f.getName())) //FIXME: Converter
                     .collect(Collectors.toList());
-            LOGGER.debug("Finished getting subdirectories for \"{}:{}{}\": {} subdirectory(-ies)",
-                    config.getHost(), config.getPort(), directoryPath, result.size());
-            return result;
-        } catch (IOException e) {
-            LOGGER.debug("Exception of getting subdirectories for: {}:{}{}", config.getHost(), config.getPort(), directoryPath, e);
-            throw new UncheckedIOException("Exception of getting subdirectories for: " +
-                                           config.getHost() + ":" + config.getPort() + directoryPath, e);
-        } finally {
-            completeClient(client);
+        } catch (Exception e) {
+            throw new RuntimeException("Exception of getting subdirectories for: " + directoryPath, e);
         }
     }
 
     @Override
     public String readBatch(String filePath, int batchSize) {
-        LOGGER.debug("Start reading a batch: {}:{}{} - {} bytes",
-                config.getHost(), config.getPort(), filePath, batchSize);
-        FTPClient client = getPreparedClient();
-        try (InputStream inputStream = client.retrieveFileStream(filePath)) {
+        try (MyFtpClient client = clientFactory.createClient()) {
+            InputStream inputStream = client.inputStream(filePath);
             byte[] buffer = new byte[batchSize];
             int count = inputStream.read(buffer);
             if (count != -1) {
                 return StandardCharsets.UTF_8.decode(ByteBuffer.wrap(buffer, 0, count)).toString();
             }
             return "";
-        } catch (IOException e) {
-            LOGGER.error("Exception of reading a batch: {}:{}{} - {} bytes",
-                    config.getHost(), config.getPort(), filePath, batchSize, e);
+        } catch (Exception e) {
             throw new RuntimeException("Exception of reading a batch: "
-                                       + config.getHost() + ":" + config.getPort() + filePath +
+                                       + filePath +
                                        " - " + batchSize + " bytes", e);
-        } finally {
-//            if (!client.completePendingCommand()) {
-//             FIXME: handle
-//            }
-            completeClient(client);
         }
     }
 
     @Override
     public Stream<String> readInBatches(String filePath, int batchSize, int numberOfBatches) {
-        FTPClient client = getPreparedClient();
-        try {
-            LOGGER.debug("Start reading by line: {}:{}{}", config.getHost(), config.getPort(), filePath);
-            InputStream inputStream = client.retrieveFileStream(filePath);
-            LOGGER.debug("Got input stream for reading by line: {}:{}{}", config.getHost(), config.getPort(), filePath);
+        try (MyFtpClient client = clientFactory.createClient()) {
+            InputStream inputStream = client.inputStream(filePath);
             Scanner scanner = new Scanner(inputStream);
             Spliterator<String> spliterator = Spliterators.spliteratorUnknownSize(
                     scanner, Spliterator.NONNULL | Spliterator.IMMUTABLE | Spliterator.ORDERED);
             Stream<String> result = StreamSupport.stream(spliterator, false)
-                    .onClose(() -> LOGGER.debug("Finished reading by line: {}:{}{}", config.getHost(), config.getPort(), filePath));
-            LOGGER.debug("Return stream of reading by line: {}:{}{}", config.getHost(), config.getPort(), filePath);
+                    .onClose(() -> LOGGER.debug("Finished reading by line: {}", filePath));
             return CloseOnTerminalOperationStreams.wrap(result);
         } catch (Exception e) {
-            LOGGER.error("Exception of reading by line: {}:{}{}", config.getHost(), config.getPort(), filePath, e);
-            throw new RuntimeException("Exception of reading by line: " + config.getHost() + ":" + config.getPort() + filePath, e);
-        } finally {
-            completeClient(client);
+            throw new RuntimeException("Exception of reading by line: " + filePath, e);
         }
     }
 

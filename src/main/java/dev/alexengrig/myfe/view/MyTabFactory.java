@@ -16,6 +16,7 @@
 
 package dev.alexengrig.myfe.view;
 
+import dev.alexengrig.myfe.client.ApacheCommonsFtpClientFactory;
 import dev.alexengrig.myfe.config.FTPConnectionConfig;
 import dev.alexengrig.myfe.converter.Converter;
 import dev.alexengrig.myfe.converter.Path2MyDirectoryConverter;
@@ -66,7 +67,8 @@ public class MyTabFactory {
     public MyTab createFTPTab(FTPConnectionConfig connectionConfig) {
         String title = "FTP: " + connectionConfig.getHost();
         String tip = connectionConfig.getHost() + ":" + connectionConfig.getPort();
-        MyPathRepository repository = new FTPPathRepository(connectionConfig);
+        ApacheCommonsFtpClientFactory clientFactory = new ApacheCommonsFtpClientFactory(connectionConfig);
+        MyPathRepository repository = new FTPPathRepository(clientFactory);
         return createTab(title, tip, connectionConfig.getHost(), repository);
     }
 
