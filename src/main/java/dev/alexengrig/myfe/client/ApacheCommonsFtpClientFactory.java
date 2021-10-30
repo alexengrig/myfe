@@ -20,14 +20,15 @@ import dev.alexengrig.myfe.config.FTPConnectionConfig;
 import dev.alexengrig.myfe.converter.ContextFTPFile2MyFtpDirectoryConverter;
 import dev.alexengrig.myfe.converter.ContextFTPFile2MyPathConverter;
 import dev.alexengrig.myfe.converter.Converter;
+import dev.alexengrig.myfe.exception.UncheckedInterruptedException;
 import dev.alexengrig.myfe.model.ContextFTPFile;
 import dev.alexengrig.myfe.model.MyFtpDirectory;
 import dev.alexengrig.myfe.model.MyFtpPath;
+import dev.alexengrig.myfe.util.LazyLogger;
+import dev.alexengrig.myfe.util.LazyLoggerFactory;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPReply;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,7 +46,7 @@ import java.util.stream.Stream;
  */
 public class ApacheCommonsFtpClientFactory implements MyFtpClientFactory {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final LazyLogger LOGGER = LazyLoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final int DEFAULT_MAX_NUMBER_OF_CONNECTIONS = 10; //FIXME: Select the best number
     private static final int CONNECTION_TIMEOUT_IN_MILLIS = 7_000;
@@ -58,12 +59,10 @@ public class ApacheCommonsFtpClientFactory implements MyFtpClientFactory {
     private final Converter<ContextFTPFile, MyFtpDirectory> directoryConverter;
     private final FTPConnectionConfig connectionConfig;
     private final Semaphore connectionPermits;
-
-    private transient String connectionInfo;
+    private final ClientAdapter clientAdapter = new ClientAdapter();
 
     public ApacheCommonsFtpClientFactory(FTPConnectionConfig connectionConfig) {
-        //TODO: Get from context
-        this(
+        this(//TODO: Get from context
                 new ContextFTPFile2MyPathConverter(),
                 new ContextFTPFile2MyFtpDirectoryConverter(),
                 connectionConfig,
@@ -87,32 +86,30 @@ public class ApacheCommonsFtpClientFactory implements MyFtpClientFactory {
 
     @Override
     public String getConnectionInfo() {
-        if (connectionInfo == null) {
-            connectionInfo = connectionConfig.getHost() + ":" + connectionConfig.getPort() +
-                    " by " + connectionConfig.getUsername();
-        }
-        return connectionInfo;
+        return connectionConfig.getInfo();
     }
 
     @Override
     public MyFtpClient createClient() {
-        return new ClientAdapter();
+        return clientAdapter;
     }
 
     private void acquireConnection() {
         try {
             connectionPermits.acquire();
-            LOGGER.trace("Acquired connection, available: {}", connectionPermits.availablePermits());
+            LOGGER.trace(m -> m.log("Acquired connection, available: {}",
+                    connectionPermits.availablePermits()));
         } catch (InterruptedException e) {
             LOGGER.warn("Interrupted", e);
             Thread.currentThread().interrupt();
-            throw new RuntimeException("Interrupted"); //FIXME: Create exception
+            throw new UncheckedInterruptedException(e);
         }
     }
 
     private void releaseConnection() {
         connectionPermits.release();
-        LOGGER.trace("Released connection, available: {}", connectionPermits.availablePermits());
+        LOGGER.trace(m -> m.log("Released connection, available: {}",
+                connectionPermits.availablePermits()));
     }
 
     @FunctionalInterface
@@ -145,50 +142,88 @@ public class ApacheCommonsFtpClientFactory implements MyFtpClientFactory {
             client.enterLocalPassiveMode();
         }
 
-        private void prepare() {
-            String host = connectionConfig.getHost();
-            int port = connectionConfig.getPort();
-            runInUncheckedIOException(() -> client.connect(host, port));
-            if (!FTPReply.isPositiveCompletion(client.getReplyCode())) {
-                LOGGER.warn("Could not connect to: {}:{}", host, port);
-                throw new IllegalArgumentException("Could not connect to: ");
-            }
-            String username = connectionConfig.getUsername();
-            boolean successfulLogin = callInUncheckedIOException(() ->
-                    client.login(username, new String(connectionConfig.getPassword())));
-            if (!successfulLogin) {
-                LOGGER.warn("Could not login to \"{}:{}\" as user: {}", host, port, username);
-                throw new IllegalArgumentException("Could not login to \"" +
-                        host + ":" + port + "\" as user: " + username);
-            }
-        }
-
         private void prepareIfNeed() {
             if (!acquiredConnection) {
-                acquireConnection();
+//                LOGGER.trace("Start preparing");
+//                acquireConnection();
                 acquiredConnection = true;
                 try {
                     prepare();
+                    LOGGER.trace("Finished preparing");
                 } catch (Exception e) {
-                    acquiredConnection = true;
-                    releaseConnection();
+                    acquiredConnection = false;
+//                    releaseConnection();
                     throw e;
                 }
             }
         }
 
-        private void complete() {
-            runInUncheckedIOException(client::logout);
-            runInUncheckedIOException(client::disconnect);
+        private void prepare() {
+            //FIXME: Remove below
+            LOGGER.trace(m -> m.log("Before connect: available={}, connected={}", client.isAvailable(), client.isConnected()));
+            connect();
+            //FIXME: Remove below
+            LOGGER.trace(m -> m.log("Before login: available={}, connected={}", client.isAvailable(), client.isConnected()));
+            login();
+        }
+
+        private void connect() {
+            runInUncheckedIOException(() -> client.connect(connectionConfig.getHost(), connectionConfig.getPort()));
+            if (!FTPReply.isPositiveCompletion(client.getReplyCode())) {
+                LOGGER.warn(m -> m.log("Could not connect to \"{}:{}\": {}",
+                        connectionConfig.getHost(), connectionConfig.getPort(), client.getReplyString()));
+                throw new IllegalArgumentException("Could not connect to \"" +
+                        connectionConfig.getHost() + ":" +
+                        connectionConfig.getPort() + "\": " +
+                        client.getReplyString());
+            }
+        }
+
+        private void login() {
+            String username = connectionConfig.getUsername();
+            boolean successfulLogin = callInUncheckedIOException(() ->
+                    client.login(username, new String(connectionConfig.getPassword())));
+            if (!successfulLogin || !FTPReply.isPositiveCompletion(client.getReplyCode())) {
+                LOGGER.warn("Could not login to \"{}:{}\" as user \"{}\": {}",
+                        connectionConfig.getHost(), connectionConfig.getPort(), username, client.getReplyString());
+                throw new IllegalArgumentException("Could not login to \"" +
+                        connectionConfig.getHost() + ":" +
+                        connectionConfig.getPort() + "\" as user \"" +
+                        username + "\": " +
+                        client.getReplyString());
+            }
         }
 
         @Override
         public void close() {
+//            LOGGER.trace("Start completing");
             try {
-                complete();
+//                complete();
+//                LOGGER.trace("Finished completing");
             } finally {
-                releaseConnection();
+//                releaseConnection();
+//                acquiredConnection = false;
             }
+        }
+
+        private void complete() {
+            if (client.isConnected()) {
+                logout();
+                disconnect();
+            }
+        }
+
+        private void logout() {
+            runInUncheckedIOException(() -> {
+                boolean logout = client.logout();
+                if (!logout) {
+                    logout = true;
+                }
+            });
+        }
+
+        private void disconnect() {
+            runInUncheckedIOException(client::disconnect);
         }
 
         @Override
@@ -198,9 +233,14 @@ public class ApacheCommonsFtpClientFactory implements MyFtpClientFactory {
 
         @Override
         public Stream<MyFtpPath> list(String directoryPath) {
+            LOGGER.trace(m -> m.log("Start getting children for: {}",
+                    directoryPath));
             prepareIfNeed();
             FTPFile[] ftpFiles = callInUncheckedIOException(() -> client.listFiles(directoryPath));
-            return convertToPaths(directoryPath, ftpFiles);
+            Stream<MyFtpPath> result = convertToPaths(directoryPath, ftpFiles);
+            LOGGER.trace(m -> m.log("Finished getting children for: {}",
+                    directoryPath));
+            return result;
         }
 
         @Override
@@ -210,22 +250,33 @@ public class ApacheCommonsFtpClientFactory implements MyFtpClientFactory {
 
         @Override
         public Stream<MyFtpDirectory> subdirectories(String directoryPath) {
+            LOGGER.trace(m -> m.log("Start getting subdirectories for: {}",
+                    directoryPath));
             prepareIfNeed();
             FTPFile[] ftpFiles = callInUncheckedIOException(() ->
                     client.listFiles(directoryPath, FTPFile::isDirectory));
-            return convertToDirectories(directoryPath, ftpFiles);
+            Stream<MyFtpDirectory> result = convertToDirectories(directoryPath, ftpFiles);
+            LOGGER.trace(m -> m.log("Finished getting subdirectories for: {}",
+                    directoryPath));
+            return result;
         }
 
         @Override
         public InputStream inputStream(String path) {
+            LOGGER.trace(m -> m.log("Start getting InputStream for: {}",
+                    path));
             prepareIfNeed();
-            return callInUncheckedIOException(() -> client.retrieveFileStream(path));
+            InputStream result = callInUncheckedIOException(() -> client.retrieveFileStream(path));
+            LOGGER.trace(m -> m.log("Finished getting InputStream for: {}",
+                    path));
+            return result;
         }
 
         private void runInUncheckedIOException(IORunnable runnable) {
             try {
                 runnable.run();
             } catch (IOException e) {
+                LOGGER.error("Exception of running: " + client.getReplyString(), e);
                 throw new UncheckedIOException(e);
             }
         }
@@ -234,6 +285,7 @@ public class ApacheCommonsFtpClientFactory implements MyFtpClientFactory {
             try {
                 return callable.call();
             } catch (IOException e) {
+                LOGGER.error("Exception of getting: " + client.getReplyString(), e);
                 throw new UncheckedIOException(e);
             }
         }

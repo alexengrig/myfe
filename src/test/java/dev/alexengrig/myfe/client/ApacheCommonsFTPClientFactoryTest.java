@@ -16,7 +16,8 @@
 
 package dev.alexengrig.myfe.client;
 
-import dev.alexengrig.myfe.WithFtpServerAndClientFactory;
+import dev.alexengrig.myfe.WithFtpServer;
+import dev.alexengrig.myfe.config.FTPConnectionConfig;
 import dev.alexengrig.myfe.model.MyFtpDirectory;
 import dev.alexengrig.myfe.model.MyFtpPath;
 import org.junit.jupiter.api.AfterEach;
@@ -39,15 +40,23 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
-class ApacheCommonsFTPClientFactoryTest extends WithFtpServerAndClientFactory {
+class ApacheCommonsFTPClientFactoryTest extends WithFtpServer {
+
+    ApacheCommonsFtpClientFactory ftpClientFactory;
+
+    ApacheCommonsFtpClientFactory createFtpClientFactory() {
+        return new ApacheCommonsFtpClientFactory(FTPConnectionConfig.user(host, username, password.toCharArray()));
+    }
 
     @BeforeEach
     void beforeEach() {
+        ftpClientFactory = createFtpClientFactory();
         super.setup();
     }
 
     @AfterEach
     void afterEach() throws Exception {
+        ftpClientFactory.close();
         super.tearDown();
     }
 
