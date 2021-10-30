@@ -117,9 +117,9 @@ public class BackgroundWorker<T, V, X extends Throwable> extends SwingWorker<T, 
             } else {
                 throw new ExecutionBackgroundTaskException(exception);
             }
-        } catch (InterruptedException ignore) {
+        } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
-            throw new InterruptedBackgroundTaskException();
+            throw new InterruptedBackgroundTaskException(e);
         }
         resultHandler.accept(result); // don't catch handler's unchecked exceptions
     }

@@ -18,42 +18,25 @@ package dev.alexengrig.myfe;
 
 import dev.alexengrig.myfe.client.ApacheCommonsFtpClientFactory;
 import dev.alexengrig.myfe.config.FTPConnectionConfig;
-import org.mockftpserver.fake.FakeFtpServer;
-import org.mockftpserver.fake.UserAccount;
-import org.mockftpserver.fake.filesystem.DirectoryEntry;
-import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
 
-public class WithFtpServerAndClientFactory {
+public abstract class WithFtpClientFactory extends WithFtpServer {
 
-    final String host = "localhost";
-    final String username = "user";
-    final String password = "pass";
-
-    protected FakeFtpServer ftpServer;
     protected ApacheCommonsFtpClientFactory ftpClientFactory;
 
     ApacheCommonsFtpClientFactory createFtpClientFactory() {
         return new ApacheCommonsFtpClientFactory(FTPConnectionConfig.user(host, username, password.toCharArray()));
     }
 
-    FakeFtpServer createUnixFakeFtpServer() {
-        FakeFtpServer fakeFtpServer = new FakeFtpServer();
-        fakeFtpServer.addUserAccount(new UserAccount(username, password, "/"));
-        UnixFakeFileSystem fs = new UnixFakeFileSystem();
-        fs.add(new DirectoryEntry("/"));
-        fakeFtpServer.setFileSystem(fs);
-        return fakeFtpServer;
-    }
-
+    @Override
     protected void setup() {
         ftpClientFactory = createFtpClientFactory();
-        ftpServer = createUnixFakeFtpServer();
-        ftpServer.start();
+        super.setup();
     }
 
+    @Override
     protected void tearDown() throws Exception {
         ftpClientFactory.close();
-        ftpServer.stop();
+        super.tearDown();
     }
 
 }

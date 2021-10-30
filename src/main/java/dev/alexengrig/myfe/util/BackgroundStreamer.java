@@ -97,7 +97,7 @@ public class BackgroundStreamer<T> extends SwingWorker<T, T> {
         try {
             get();
         } catch (InterruptedException e) {
-            throw new InterruptedBackgroundTaskException();
+            throw new InterruptedBackgroundTaskException(e);
         } catch (ExecutionException e) {
             throw new ExecutionBackgroundTaskException(e.getCause());
         } catch (CancellationException ignore) {

@@ -16,41 +16,78 @@
 
 package dev.alexengrig.myfe.util;
 
+import dev.alexengrig.myfe.exception.ExecutionBackgroundTaskException;
+import dev.alexengrig.myfe.exception.InterruptedBackgroundTaskException;
+
 import javax.swing.*;
+import java.lang.invoke.MethodHandles;
 import java.util.concurrent.Callable;
+import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class BackgroundExecutor<T> extends SwingWorker<T, T> {
 
-    private final Callable<T> task;
-    private final Consumer<T> doneHandler;
+    private static final LazyLogger LOGGER = LazyLoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    protected BackgroundExecutor(Callable<T> backgroundTask, Consumer<T> doneHandler) {
-        this.task = backgroundTask;
-        this.doneHandler = doneHandler;
+    private final Supplier<String> descriptionSupplier;
+    private final Callable<T> backgroundTask;
+    private final Consumer<T> resultHandler;
+
+    protected BackgroundExecutor(
+            Supplier<String> descriptionSupplier,
+            Callable<T> backgroundTask,
+            Consumer<T> resultHandler) {
+        this.descriptionSupplier = descriptionSupplier;
+        this.backgroundTask = backgroundTask;
+        this.resultHandler = resultHandler;
     }
 
-    public static <T> BackgroundTask execute(Callable<T> task, Consumer<T> handler) {
-        BackgroundExecutor<T> worker = new BackgroundExecutor<>(task, handler);
+    public static <T> BackgroundTask execute(
+            Supplier<String> description,
+            Callable<T> task,
+            Consumer<T> handler) {
+        BackgroundExecutor<T> worker = new BackgroundExecutor<>(description, task, handler);
         worker.execute();
         return BackgroundTask.of(worker);
     }
 
     @Override
     protected final T doInBackground() throws Exception {
-        return task.call();
+        LOGGER.debug(m -> m.log("Start doing in background - {}",
+                descriptionSupplier.get()));
+        T result = backgroundTask.call();
+        LOGGER.debug(m -> m.log("Finished doing in background - {}",
+                descriptionSupplier.get()));
+        return result;
     }
 
     @Override
     protected final void done() {
+        LOGGER.debug(m -> m.log("Start waiting result - {}",
+                descriptionSupplier.get()));
         T result;
         try {
             result = get();
-        } catch (InterruptedException | ExecutionException e) {
-            throw new RuntimeException(e);
+        } catch (InterruptedException e) {
+            LOGGER.warn(m -> m.log("Interrupted exception of waiting result",
+                    descriptionSupplier.get(), e));
+            throw new InterruptedBackgroundTaskException("Interrupted exception of waiting result" +
+                    descriptionSupplier.get(),
+                    e);
+        } catch (ExecutionException e) {
+            LOGGER.warn(m -> m.log("Execution exception of waiting result",
+                    descriptionSupplier.get(), e));
+            throw new ExecutionBackgroundTaskException(e.getCause());
+        } catch (CancellationException ignore) {
+            LOGGER.warn(m -> m.log("Cancellation exception of waiting result",
+                    descriptionSupplier.get()));
+            return;
         }
-        doneHandler.accept(result);
+        LOGGER.debug(m -> m.log("Finished waiting result - {}",
+                descriptionSupplier.get()));
+        resultHandler.accept(result); // don't catch handler's exceptions
     }
 
 }

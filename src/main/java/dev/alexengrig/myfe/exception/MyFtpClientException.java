@@ -17,16 +17,23 @@
 package dev.alexengrig.myfe.exception;
 
 /**
- * {@link InterruptedException} in background tasks.
+ * {@link InternalException} of {@link dev.alexengrig.myfe.client.MyFtpClient}.
  */
-public class InterruptedBackgroundTaskException extends UncheckedInterruptedException {
+public class MyFtpClientException extends InternalException {
 
-    public InterruptedBackgroundTaskException(InterruptedException cause) {
-        super(cause);
+    public MyFtpClientException() {
     }
 
-    public InterruptedBackgroundTaskException(String message, InterruptedException cause) {
+    public MyFtpClientException(String message) {
+        super(message);
+    }
+
+    public MyFtpClientException(String message, Throwable cause) {
         super(message, cause);
+    }
+
+    public MyFtpClientException(Throwable cause) {
+        super(cause);
     }
 
 }

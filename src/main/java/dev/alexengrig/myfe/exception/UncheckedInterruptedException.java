@@ -17,16 +17,16 @@
 package dev.alexengrig.myfe.exception;
 
 /**
- * {@link InterruptedException} in background tasks.
+ * Unchecked exception of {@link InterruptedException}.
  */
-public class InterruptedBackgroundTaskException extends UncheckedInterruptedException {
+public class UncheckedInterruptedException extends RuntimeException {
 
-    public InterruptedBackgroundTaskException(InterruptedException cause) {
-        super(cause);
+    public UncheckedInterruptedException(String message, InterruptedException cause) {
+        super(message, cause);
     }
 
-    public InterruptedBackgroundTaskException(String message, InterruptedException cause) {
-        super(message, cause);
+    public UncheckedInterruptedException(InterruptedException cause) {
+        super(cause);
     }
 
 }
