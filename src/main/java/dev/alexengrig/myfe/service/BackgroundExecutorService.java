@@ -20,9 +20,14 @@ import dev.alexengrig.myfe.util.BackgroundTask;
 
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public interface BackgroundExecutorService {
 
-    <T> BackgroundTask execute(Callable<T> backgroundTask, Consumer<T> resultHandler);
+    <T> BackgroundTask execute(Supplier<String> descriptionSupplier, Callable<T> backgroundTask, Consumer<T> resultHandler);
+
+    default <T> BackgroundTask execute(String description, Callable<T> backgroundTask, Consumer<T> resultHandler) {
+        return execute(() -> description, backgroundTask, resultHandler);
+    }
 
 }
