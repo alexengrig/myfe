@@ -16,7 +16,8 @@
 
 package dev.alexengrig.myfe.repository;
 
-import dev.alexengrig.myfe.WithFtpServerAndClientFactory;
+import dev.alexengrig.myfe.WithFtpServer;
+import dev.alexengrig.myfe.config.FTPConnectionConfig;
 import dev.alexengrig.myfe.model.MyDirectory;
 import dev.alexengrig.myfe.model.MyPath;
 import org.junit.jupiter.api.AfterEach;
@@ -27,11 +28,13 @@ import org.mockftpserver.fake.filesystem.FileEntry;
 import org.mockftpserver.fake.filesystem.FileSystem;
 
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class FtpPathRepositoryTest extends WithFtpServerAndClientFactory {
+class FtpPathRepositoryTest extends WithFtpServer {
 
     FtpPathRepository ftpPathRepository;
 
@@ -39,7 +42,7 @@ class FtpPathRepositoryTest extends WithFtpServerAndClientFactory {
     @Override
     protected void setup() {
         super.setup();
-        ftpPathRepository = new FtpPathRepository(ftpClientFactory);
+        ftpPathRepository = new FtpPathRepository(FTPConnectionConfig.user(host, username, password.toCharArray()));
     }
 
     @AfterEach
@@ -80,6 +83,32 @@ class FtpPathRepositoryTest extends WithFtpServerAndClientFactory {
         assertEquals("/pub/text.txt", file.getPath(), "File path");
     }
 
-    //FIXME: Add other tests
+    @Test
+    void should_return_subdirectories() {
+        FileSystem fs = ftpServer.getFileSystem();
+        fs.add(new DirectoryEntry("/pub/empty"));
+        fs.add(new FileEntry("/pub/text.txt"));
+        List<MyDirectory> subdirectories = ftpPathRepository.getSubdirectories("/pub");
+        assertEquals(1, subdirectories.size(), "Number of subdirectories");
+    }
+
+    @Test
+    void should_read_batch() {
+        FileSystem fs = ftpServer.getFileSystem();
+        fs.add(new FileEntry("/text.txt", new String(new byte[]{'t', 'e', 'x', 't'})));
+        String batch = ftpPathRepository.readBatch("/text.txt", 2);
+        assertEquals("te", batch, "Batch");
+    }
+
+    @Test
+    void should_read_inBatches() {
+        FileSystem fs = ftpServer.getFileSystem();
+        fs.add(new FileEntry("/text.txt", new String(new byte[]{'t', 'e', 'x', 't'})));
+        Stream<String> batchStream = ftpPathRepository.readInBatches("/text.txt", 2, 4);
+        List<String> batches = batchStream.collect(Collectors.toList());
+        assertEquals(2, batches.size(), () -> "Number of batches, batches: " + batches);
+        assertEquals("te", batches.get(0), "First batch");
+        assertEquals("xt", batches.get(1), "Second batch");
+    }
 
 }

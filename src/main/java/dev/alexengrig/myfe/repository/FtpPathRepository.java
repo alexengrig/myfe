@@ -17,7 +17,7 @@
 package dev.alexengrig.myfe.repository;
 
 import dev.alexengrig.myfe.client.MyFtpClient;
-import dev.alexengrig.myfe.client.MyFtpClientFactory;
+import dev.alexengrig.myfe.config.FTPConnectionConfig;
 import dev.alexengrig.myfe.converter.Converter;
 import dev.alexengrig.myfe.converter.MyFtpDirectory2MyDirectoryConverter;
 import dev.alexengrig.myfe.converter.MyFtpPath2MyPathConverter;
@@ -27,24 +27,33 @@ import dev.alexengrig.myfe.model.MyFtpDirectory;
 import dev.alexengrig.myfe.model.MyFtpPath;
 import dev.alexengrig.myfe.model.MyPath;
 import dev.alexengrig.myfe.util.CloseOnTerminalOperationStreams;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import dev.alexengrig.myfe.util.LazyLogger;
+import dev.alexengrig.myfe.util.LazyLoggerFactory;
+import org.apache.commons.vfs2.FileObject;
+import org.apache.commons.vfs2.FileSelectInfo;
+import org.apache.commons.vfs2.FileSelector;
+import org.apache.commons.vfs2.FileSystemException;
+import org.apache.commons.vfs2.FileSystemManager;
+import org.apache.commons.vfs2.FileSystemOptions;
+import org.apache.commons.vfs2.VFS;
+import org.apache.commons.vfs2.provider.ftp.FtpFileSystem;
+import org.apache.commons.vfs2.provider.ftp.FtpFileSystemConfigBuilder;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.lang.invoke.MethodHandles;
-import java.nio.ByteBuffer;
-import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Scanner;
+import java.util.NoSuchElementException;
 import java.util.Spliterator;
 import java.util.Spliterators;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.Spliterator.NONNULL;
 import static java.util.Spliterator.ORDERED;
 
@@ -54,72 +63,110 @@ import static java.util.Spliterator.ORDERED;
 //TODO: Create FileSystem of FTP server for FileSystemPathRepository
 public class FtpPathRepository implements MyPathRepository {
 
-    //TODO: Use lazy-arguments logger
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final LazyLogger LOGGER = LazyLoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+    static {
+        FileSystemOptions options = new FileSystemOptions();
+        FtpFileSystemConfigBuilder.getInstance().setUserDirIsRoot(options, false);
+    }
 
     private final Converter<MyFtpPath, MyPath> pathConverter;
     private final Converter<MyFtpDirectory, MyDirectory> directoryConverter;
-    private final MyFtpClientFactory clientFactory;
+    private final FTPConnectionConfig config;
+    private final FtpFileSystem fs;
 
-    public FtpPathRepository(MyFtpClientFactory clientFactory) {
+    public FtpPathRepository(FTPConnectionConfig connectionConfig) {
         this(//TODO: Get from context
                 new MyFtpPath2MyPathConverter(),
                 new MyFtpDirectory2MyDirectoryConverter(),
-                clientFactory);
+                connectionConfig);
     }
 
     public FtpPathRepository(
             Converter<MyFtpPath, MyPath> pathConverter,
             Converter<MyFtpDirectory, MyDirectory> directoryConverter,
-            MyFtpClientFactory clientFactory) {
+            FTPConnectionConfig connectionConfig) {
         this.pathConverter = pathConverter;
         this.directoryConverter = directoryConverter;
-        this.clientFactory = clientFactory;
+        this.config = connectionConfig;
+        this.fs = createFtpFileSystem(connectionConfig);
+    }
+
+    private FtpFileSystem createFtpFileSystem(FTPConnectionConfig cfg) {
+        try {
+            String username = cfg.getUsername();
+            String password = new String(cfg.getPassword());
+            String host = cfg.getHost();
+            int port = cfg.getPort();
+            FileSystemManager fsManager = VFS.getManager();
+            FileObject file = fsManager.resolveFile("ftp://" + username + ":" + password + "@" + host + ":" + port + "/");
+            return (FtpFileSystem) file.getFileSystem();
+        } catch (FileSystemException e) {
+            throw new MyPathRepositoryException(e);
+        }
     }
 
     @Override
     public void close() throws Exception {
-        clientFactory.close();
+        fs.close();
     }
 
     @Override
     public List<MyDirectory> getRootDirectories() {
-        LOGGER.debug("Start getting root directories \"{}\"",
-                clientFactory.getConnectionInfo());
-        try (MyFtpClient client = clientFactory.createClient()) {
-            Stream<MyFtpDirectory> ftpDirectories = client.subdirectories("/");
-            List<MyDirectory> result = ftpDirectories
-                    .map(directoryConverter::convert)
+        LOGGER.debug(m -> m.log("Start getting root directories \"{}\"",
+                config.getInfo()));
+        try {
+            FileObject[] directories = fs.getRoot().findFiles(new FileSelector() {
+                @Override
+                public boolean includeFile(FileSelectInfo fileInfo) throws Exception {
+                    return fileInfo.getFile().isFolder();
+                }
+
+                @Override
+                public boolean traverseDescendents(FileSelectInfo fileInfo) {
+                    return false;
+                }
+            });
+            List<MyDirectory> result = Arrays.stream(directories)
+                    .map(f -> new MyDirectory(f.getName().getPath(), f.getName().getBaseName())) //FIXME: Converter
                     .collect(Collectors.toList());
-            LOGGER.debug("Finished getting root directories \"{}\", number of directories: {}",
-                    clientFactory.getConnectionInfo(), result.size());
+            LOGGER.debug(m -> m.log("Finished getting root directories \"{}\", number of directories: {}",
+                    config.getInfo(), result.size()));
             return result;
         } catch (Exception e) {
-            LOGGER.error("Exception of getting root directories \"{}\"",
-                    clientFactory.getConnectionInfo(), e);
+            LOGGER.error(m -> m.log("Exception of getting root directories \"{}\"",
+                    config.getInfo(), e));
             throw new MyPathRepositoryException("Exception of getting root directories \"" +
-                    clientFactory.getConnectionInfo() + "\"",
+                    config.getInfo() + "\"",
                     e);
         }
     }
 
     @Override
     public List<MyPath> getChildren(String directoryPath) {
-        LOGGER.debug("Start getting children \"{}\" for: {}",
-                clientFactory.getConnectionInfo(), directoryPath);
-        try (MyFtpClient client = clientFactory.createClient()) {
-            Stream<MyFtpPath> ftpPaths = client.list(directoryPath);
-            List<MyPath> result = ftpPaths
-                    .map(pathConverter::convert)
+        LOGGER.debug(m -> m.log("Start getting children \"{}\" for: {}",
+                config.getInfo(), directoryPath));
+        try {
+            FileObject directory = fs.resolveFile(directoryPath);
+            //FIXME: Check on folder
+            FileObject[] children = directory.getChildren();
+            List<MyPath> result = Arrays.stream(children)
+                    .map(f -> {
+                        try {
+                            return MyPath.of(f.getName().getPath(), f.getName().getBaseName(), f.isFolder());
+                        } catch (FileSystemException e) {
+                            throw new MyPathRepositoryException(e);
+                        }
+                    })
                     .collect(Collectors.toList());
-            LOGGER.debug("Finished getting children \"{}\" in \"{}\", number of elements: {}",
-                    clientFactory.getConnectionInfo(), directoryPath, result.size());
+            LOGGER.debug(m -> m.log("Finished getting children \"{}\" in \"{}\", number of elements: {}",
+                    config.getInfo(), directoryPath, result.size()));
             return result;
         } catch (Exception e) {
-            LOGGER.error("Exception of getting children \"{}\" for: {}",
-                    clientFactory.getConnectionInfo(), directoryPath, e);
+            LOGGER.error(m -> m.log("Exception of getting children \"{}\" for: {}",
+                    config.getInfo(), directoryPath, e));
             throw new MyPathRepositoryException("Exception of getting children \"" +
-                    clientFactory.getConnectionInfo() + "\" for: " +
+                    config.getInfo() + "\" for: " +
                     directoryPath,
                     e);
         }
@@ -127,23 +174,32 @@ public class FtpPathRepository implements MyPathRepository {
 
     @Override
     public List<MyDirectory> getSubdirectories(String directoryPath) {
-        LOGGER.debug("Start getting subdirectories \"{}\" for: {}",
-                clientFactory.getConnectionInfo(), directoryPath);
-        try (MyFtpClient client = clientFactory.createClient()) {
-            Stream<MyFtpPath> ftpPaths = client.list(directoryPath);
-            List<MyDirectory> result = ftpPaths
-                    .filter(MyFtpPath::isDirectory)
-                    .map(MyFtpPath::asDirectory)
-                    .map(directoryConverter::convert)
+        LOGGER.debug(m -> m.log("Start getting subdirectories \"{}\" for: {}",
+                config.getInfo(), directoryPath));
+        try {
+            FileObject directory = fs.resolveFile(directoryPath);
+            FileObject[] directories = directory.findFiles(new FileSelector() {
+                @Override
+                public boolean includeFile(FileSelectInfo fileInfo) throws Exception {
+                    return fileInfo.getFile().isFolder();
+                }
+
+                @Override
+                public boolean traverseDescendents(FileSelectInfo fileInfo) {
+                    return false;
+                }
+            });
+            List<MyDirectory> result = Arrays.stream(directories)
+                    .map(f -> new MyDirectory(f.getName().getPath(), f.getName().getBaseName())) //FIXME: Converter
                     .collect(Collectors.toList());
-            LOGGER.debug("Finished getting subdirectories \"{}\" in \"{}\", number of directories: {}",
-                    clientFactory.getConnectionInfo(), directoryPath, result.size());
+            LOGGER.debug(m -> m.log("Finished getting subdirectories \"{}\" in \"{}\", number of directories: {}",
+                    config.getInfo(), directoryPath, result.size()));
             return result;
         } catch (Exception e) {
-            LOGGER.error("Exception of getting subdirectories \"{}\" for: {}",
-                    clientFactory.getConnectionInfo(), directoryPath, e);
+            LOGGER.error(m -> m.log("Exception of getting subdirectories \"{}\" for: {}",
+                    config.getInfo(), directoryPath, e));
             throw new MyPathRepositoryException("Exception of getting subdirectories \"" +
-                    clientFactory.getConnectionInfo() + "\" for: " +
+                    config.getInfo() + "\" for: " +
                     directoryPath,
                     e);
         }
@@ -151,27 +207,28 @@ public class FtpPathRepository implements MyPathRepository {
 
     @Override
     public String readBatch(String filePath, int batchSize) {
-        LOGGER.debug("Start reading a batch of {} byte(s) \"{}\" for: {}",
-                batchSize, clientFactory.getConnectionInfo(), filePath);
-        try (MyFtpClient client = clientFactory.createClient()) {
-            InputStream inputStream = client.inputStream(filePath);
+        LOGGER.debug(m -> m.log("Start reading a batch of {} byte(s) \"{}\" for: {}",
+                batchSize, config.getInfo(), filePath));
+        try {
+            FileObject file = fs.resolveFile(filePath);
+            InputStream inputStream = file.getContent().getInputStream();
             byte[] buffer = new byte[batchSize];
             int count = inputStream.read(buffer);
             String result;
             if (count != -1) {
-                result = StandardCharsets.UTF_8.decode(ByteBuffer.wrap(buffer, 0, count)).toString();
+                result = new String(buffer, 0, count, UTF_8);
             } else {
                 result = "";
             }
-            LOGGER.debug("Finished reading a batch of {} byte(s) \"{}\" in \"{}\", number of characters: {}",
-                    batchSize, clientFactory.getConnectionInfo(), filePath, result.length());
+            LOGGER.debug(m -> m.log("Finished reading a batch of {} byte(s) \"{}\" in \"{}\", number of characters: {}",
+                    batchSize, config.getInfo(), filePath, result.length()));
             return result;
         } catch (Exception e) {
-            LOGGER.error("Exception of reading a batch of {} byte(s) \"{}\" for: {}",
-                    batchSize, clientFactory.getConnectionInfo(), filePath, e);
+            LOGGER.error(m -> m.log("Exception of reading a batch of {} byte(s) \"{}\" for: {}",
+                    batchSize, config.getInfo(), filePath, e));
             throw new MyPathRepositoryException("Exception of reading a batch of " +
                     batchSize + " byte(s) \"" +
-                    clientFactory.getConnectionInfo() + "\" for: " +
+                    config.getInfo() + "\" for: " +
                     filePath,
                     e);
         }
@@ -179,42 +236,93 @@ public class FtpPathRepository implements MyPathRepository {
 
     @Override
     public Stream<String> readInBatches(String filePath, int batchSize, int numberOfBatches) {
-        LOGGER.debug("Start reading {} batch(es) of {} byte(s) \"{}\" for: {}",
-                numberOfBatches, batchSize, clientFactory.getConnectionInfo(), filePath);
-        try (MyFtpClient client = clientFactory.createClient()) {
-            InputStream inputStream = client.inputStream(filePath);
-            Iterator<String> iterator = new Scanner(inputStream); //FIXME: Replace with custom iterator
+        LOGGER.debug(m -> m.log("Start reading {} batch(es) of {} byte(s) \"{}\" for: {}",
+                numberOfBatches, batchSize, config.getInfo(), filePath));
+        try {
+            FileObject file = fs.resolveFile(filePath);
+            InputStream inputStream = file.getContent().getInputStream();
+            Iterator<String> iterator = new InputStreamIterator(inputStream, new byte[batchSize], numberOfBatches);
             Spliterator<String> spliterator = Spliterators.spliteratorUnknownSize(iterator, NONNULL | ORDERED);
             Stream<String> result = StreamSupport.stream(spliterator, false)
                     .onClose(() -> {
                         try {
                             inputStream.close();
-                            LOGGER.debug("Closed InputStream of reading {} batch(es) of {} byte(s) \"{}\" for: {}",
-                                    numberOfBatches, batchSize, clientFactory.getConnectionInfo(), filePath);
+                            LOGGER.debug(m -> m.log("Closed InputStream of reading {} batch(es) of {} byte(s) \"{}\" for: {}",
+                                    numberOfBatches, batchSize, config.getInfo(), filePath));
                         } catch (IOException e) {
-                            LOGGER.error("Exception of closing InputStream of reading {} batch(es) of {} byte(s) \"{}\" for: {}",
-                                    numberOfBatches, batchSize, clientFactory.getConnectionInfo(), filePath, e);
+                            LOGGER.error(m -> m.log("Exception of closing InputStream of reading {} batch(es) of {} byte(s) \"{}\" for: {}",
+                                    numberOfBatches, batchSize, config.getInfo(), filePath, e));
                             throw new UncheckedIOException("Exception of closing InputStream of reading " +
                                     numberOfBatches + " batch(es) of " +
                                     batchSize + " byte(s) \"" +
-                                    clientFactory.getConnectionInfo() + "\" for: " +
+                                    config.getInfo() + "\" for: " +
                                     filePath,
                                     e);
                         }
                     });
-            LOGGER.debug("Return Stream of reading {} batch(es) of {} byte(s) \"{}\" for: {}",
-                    numberOfBatches, batchSize, clientFactory.getConnectionInfo(), filePath);
+            LOGGER.debug(m -> m.log("Return Stream of reading {} batch(es) of {} byte(s) \"{}\" for: {}",
+                    numberOfBatches, batchSize, config.getInfo(), filePath));
             return CloseOnTerminalOperationStreams.wrap(result);
         } catch (Exception e) {
-            LOGGER.error("Exception of reading {} batch(es) of {} byte(s) \"{}\" for: {}",
-                    numberOfBatches, batchSize, clientFactory.getConnectionInfo(), filePath, e);
+            LOGGER.error(m -> m.log("Exception of reading {} batch(es) of {} byte(s) \"{}\" for: {}",
+                    numberOfBatches, batchSize, config.getInfo(), filePath, e));
             throw new MyPathRepositoryException("Exception of reading " +
                     numberOfBatches + " batch(es) of " +
                     batchSize + " byte(s) \"" +
-                    clientFactory.getConnectionInfo() + "\" for: " +
+                    config.getInfo() + "\" for: " +
                     filePath,
                     e);
         }
+    }
+
+    private static class InputStreamIterator implements Iterator<String> {
+
+        private final InputStream inputStream;
+        private final byte[] buffer;
+        private final int maxNumberOfBatches;
+
+        int numberOfBatches = 0;
+        String nextBatch = null;
+
+        public InputStreamIterator(InputStream inputStream, byte[] buffer, int maxNumberOfBatches) {
+            this.inputStream = inputStream;
+            this.buffer = buffer;
+            this.maxNumberOfBatches = maxNumberOfBatches;
+        }
+
+        private String readBatch() {
+            try {
+                int count = inputStream.read(buffer);
+                if (count != -1 && numberOfBatches++ < maxNumberOfBatches) {
+                    return new String(buffer, 0, count, UTF_8);
+                }
+                return null;
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        }
+
+        @Override
+        public boolean hasNext() {
+            if (nextBatch != null) {
+                return true;
+            } else {
+                nextBatch = readBatch();
+                return nextBatch != null;
+            }
+        }
+
+        @Override
+        public String next() {
+            if (nextBatch != null || hasNext()) {
+                String result = nextBatch;
+                nextBatch = null;
+                return result;
+            } else {
+                throw new NoSuchElementException();
+            }
+        }
+
     }
 
 }

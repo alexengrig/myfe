@@ -29,6 +29,8 @@ public class FTPConnectionConfig {
     private final String username;
     private final char[] password;
 
+    private transient String info;
+
     public FTPConnectionConfig(String host, int port, String username, char[] password) {
         this.host = Objects.requireNonNull(host, "The host must not be null");
         this.port = requirePositivePort(port);
@@ -73,6 +75,13 @@ public class FTPConnectionConfig {
 
     public char[] getPassword() {
         return password;
+    }
+
+    public String getInfo() {
+        if (info == null) {
+            info = host + ":" + port + " by " + username;
+        }
+        return info;
     }
 
     @Override
