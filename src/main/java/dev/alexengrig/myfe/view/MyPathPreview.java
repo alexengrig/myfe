@@ -22,9 +22,9 @@ import dev.alexengrig.myfe.model.MyPathModel;
 import dev.alexengrig.myfe.model.event.MyPathModelEvent;
 import dev.alexengrig.myfe.model.event.MyPathModelListener;
 import dev.alexengrig.myfe.service.MyPathPreviewBackgroundService;
+import dev.alexengrig.myfe.util.LazyLogger;
+import dev.alexengrig.myfe.util.LazyLoggerFactory;
 import dev.alexengrig.myfe.util.MyPathUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -32,7 +32,7 @@ import java.lang.invoke.MethodHandles;
 
 public class MyPathPreview extends JPanel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final LazyLogger LOGGER = LazyLoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final MyPathModel model;
     private final MyPathPreviewBackgroundService backgroundService;
@@ -91,7 +91,10 @@ public class MyPathPreview extends JPanel {
 
     private JComponent createTextPreviewComponent(MyFile file) {
         MyText component = new MyText();
-        backgroundService.loadTextPreview(file, component::append);
+        backgroundService.loadTextPreview(file, str -> {
+            LOGGER.debug("Got preview text for: {}", file);
+            component.append(str);
+        });
         return component;
     }
 

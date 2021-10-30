@@ -28,8 +28,9 @@ import dev.alexengrig.myfe.service.BackgroundExecutorService;
 import dev.alexengrig.myfe.service.MyDirectoryTreeBackgroundService;
 import dev.alexengrig.myfe.service.MyPathPreviewBackgroundService;
 import dev.alexengrig.myfe.service.MyPathService;
-import dev.alexengrig.myfe.util.BackgroundExecutor;
 import dev.alexengrig.myfe.util.BackgroundTask;
+import dev.alexengrig.myfe.util.LazyLogger;
+import dev.alexengrig.myfe.util.LazyLoggerFactory;
 import dev.alexengrig.myfe.util.MyPathUtil;
 import dev.alexengrig.myfe.view.event.MyDirectoryTreeEvent;
 import dev.alexengrig.myfe.view.event.MyDirectoryTreeListener;
@@ -39,8 +40,6 @@ import dev.alexengrig.myfe.view.event.MyPathTableEvent;
 import dev.alexengrig.myfe.view.event.MyPathTableListener;
 import dev.alexengrig.myfe.view.event.MyTabEvent;
 import dev.alexengrig.myfe.view.event.MyTabListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -52,7 +51,7 @@ import java.util.function.Consumer;
 
 public class MyTab extends JPanel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+    private static final LazyLogger LOGGER = LazyLoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final List<MyTabListener> listeners = new LinkedList<>();
 
@@ -155,10 +154,13 @@ public class MyTab extends JPanel {
     private void handleSelectRoot() {
         LOGGER.debug("Handle select root");
         //TODO: Spinner to table
-        BackgroundExecutor.execute(service::getRootDirectories, paths -> {
-            tableModel.setPaths(paths);
-            filterModel.setPaths(paths);
-        });
+        backgroundExecutor.execute(
+                () -> "Getting root directories",
+                service::getRootDirectories,
+                paths -> {
+                    tableModel.setPaths(paths);
+                    filterModel.setPaths(paths);
+                });
         pathModel.setPath(null);
         directoryStack.push(null);
     }
@@ -166,10 +168,13 @@ public class MyTab extends JPanel {
     private void handleSelectDirectory(MyDirectory directory) {
         LOGGER.debug("Handle select directory: {}", directory);
         //TODO: Spinner to table
-        BackgroundExecutor.execute(() -> service.getDirectoryContent(directory), paths -> {
-            tableModel.setPaths(paths);
-            filterModel.setPaths(paths);
-        });
+        backgroundExecutor.execute(
+                "Getting directory content:",
+                () -> service.getDirectoryContent(directory),
+                paths -> {
+                    tableModel.setPaths(paths);
+                    filterModel.setPaths(paths);
+                });
         pathModel.setPath(null);
         directoryStack.push(directory);
     }
@@ -303,7 +308,14 @@ public class MyTab extends JPanel {
 
         @Override
         public void loadSubdirectories(MyDirectory directory, Consumer<List<MyDirectory>> handler) {
-            BackgroundExecutor.execute(() -> service.getSubdirectories(directory), handler);
+            LOGGER.debug("Start loading subdirectories for: {}", directory);
+            backgroundExecutor.execute(
+                    () -> "Loading subdirectories for: " + directory,
+                    () -> service.getSubdirectories(directory),
+                    result -> {
+                        handler.accept(result);
+                        LOGGER.debug("Finished loading subdirectories for: {}", directory);
+                    });
         }
 
     }
@@ -317,8 +329,12 @@ public class MyTab extends JPanel {
 
         @Override
         public void loadTextPreview(MyFile file, Consumer<String> handler) {
+            LOGGER.debug("Start loading text preview for: {}", file);
             cancelPreviousTaskIfNeed();
-            previousTask = backgroundExecutor.execute(() -> service.getFileContentPreview(file), handler);
+            previousTask = backgroundExecutor.execute(() -> "Loading text preview for: " + file, () -> service.getFileContentPreview(file), result -> {
+                handler.accept(result);
+                LOGGER.debug("Finished loading text preview for: {}", file);
+            });
         }
 
         private void cancelPreviousTaskIfNeed() {
