@@ -14,24 +14,7 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.util;
-
 /**
- * Like {@link java.util.function.Predicate}, but with throwing an exception.
- *
- * @param <T> the type of the input to the throwable predicate
+ * Package with utils of {@link java.util.function}.
  */
-@FunctionalInterface
-public interface ThrowablePredicate<T> {
-
-    /**
-     * Evaluates this throwable predicate on the given argument.
-     *
-     * @param t the input argument
-     * @return {@code true} if the input argument matches the throwable predicate,
-     * otherwise {@code false}
-     * @throws Exception when computing
-     */
-    boolean test(T t) throws Exception;
-
-}
+package dev.alexengrig.myfe.util.function;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.util;
+package dev.alexengrig.myfe.util.function;
 
 /**
  * Like {@link java.util.function.Function}, but with throwing an exception.

@@ -24,7 +24,7 @@ import dev.alexengrig.myfe.exception.MyPathRepositoryException;
 import dev.alexengrig.myfe.model.MyDirectory;
 import dev.alexengrig.myfe.model.MyPath;
 import dev.alexengrig.myfe.util.CloseOnTerminalOperationStreams;
-import dev.alexengrig.myfe.util.ThrowablePredicate;
+import dev.alexengrig.myfe.util.function.ThrowablePredicate;
 import dev.alexengrig.myfe.util.logging.LazyLogAdapter;
 import dev.alexengrig.myfe.util.logging.LazyLogger;
 import dev.alexengrig.myfe.util.logging.LazyLoggerFactory;
