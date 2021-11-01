@@ -16,7 +16,7 @@
 
 package dev.alexengrig.myfe.view;
 
-import dev.alexengrig.myfe.model.MyPathFilterModel;
+import dev.alexengrig.myfe.model.FeContentFilterModel;
 import dev.alexengrig.myfe.view.event.MyPathFilterEvent;
 import dev.alexengrig.myfe.view.event.MyPathFilterListener;
 import org.slf4j.Logger;
@@ -36,9 +36,9 @@ public class MyPathFilter extends JPanel {
 
     private final List<MyPathFilterListener> listeners = new LinkedList<>();
 
-    private final MyPathFilterModel filterModel;
+    private final FeContentFilterModel filterModel;
 
-    public MyPathFilter(MyPathFilterModel filterModel) {
+    public MyPathFilter(FeContentFilterModel filterModel) {
         super(new BorderLayout());
         this.filterModel = filterModel;
         init();
@@ -47,7 +47,7 @@ public class MyPathFilter extends JPanel {
     private void init() {
         add(new JLabel("Filter type: "), BorderLayout.WEST);
         TypeComboBoxModel typeComboBoxModel = new TypeComboBoxModel();
-        filterModel.addMyPathFilterModelListener(event -> typeComboBoxModel.reset());
+        filterModel.addFeContentFilterModelListener(event -> typeComboBoxModel.reset());
         add(new JComboBox<>(typeComboBoxModel));
     }
 

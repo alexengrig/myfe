@@ -16,8 +16,8 @@
 
 package dev.alexengrig.myfe.model;
 
-import dev.alexengrig.myfe.model.event.MyPathFilterModelEvent;
-import dev.alexengrig.myfe.model.event.MyPathFilterModelListener;
+import dev.alexengrig.myfe.model.event.FeContentFilterModelEvent;
+import dev.alexengrig.myfe.model.event.FeContentFilterModelListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,15 +26,20 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class MyPathFilterModel {
+/**
+ * Model of file explorer content filter.
+ *
+ * @see dev.alexengrig.myfe.view.MyPathFilter
+ */
+public class FeContentFilterModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final List<MyPathFilterModelListener> listeners = new LinkedList<>();
+    private final List<FeContentFilterModelListener> listeners = new LinkedList<>();
 
     private List<String> types;
 
-    public MyPathFilterModel(List<? extends FePath> paths) {
+    public FeContentFilterModel(List<? extends FePath> paths) {
         this.types = createTypes(paths);
     }
 
@@ -54,20 +59,20 @@ public class MyPathFilterModel {
 
     public void setTypes(List<String> types) {
         this.types = types;
-        fireChangeTypes(new MyPathFilterModelEvent(types));
+        fireChangeTypes(new FeContentFilterModelEvent(types));
     }
 
-    public void addMyPathFilterModelListener(MyPathFilterModelListener listener) {
+    public void addFeContentFilterModelListener(FeContentFilterModelListener listener) {
         listeners.add(listener);
     }
 
-    public void removeMyPathFilterModelListener(MyPathFilterModelListener listener) {
+    public void removeFeContentFilterModelListener(FeContentFilterModelListener listener) {
         listeners.remove(listener);
     }
 
-    private void fireChangeTypes(MyPathFilterModelEvent event) {
+    private void fireChangeTypes(FeContentFilterModelEvent event) {
         LOGGER.debug("Fire change types: {}", event);
-        for (MyPathFilterModelListener listener : listeners) {
+        for (FeContentFilterModelListener listener : listeners) {
             listener.changeTypes(event);
         }
     }

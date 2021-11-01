@@ -16,25 +16,13 @@
 
 package dev.alexengrig.myfe.model.event;
 
-import java.util.List;
+import java.util.EventListener;
 
-public class MyPathFilterModelEvent {
+/**
+ * Event listener of {@link dev.alexengrig.myfe.model.FeContentFilterModel}.
+ */
+public interface FeContentFilterModelListener extends EventListener {
 
-    private final List<String> types;
-
-    public MyPathFilterModelEvent(List<String> types) {
-        this.types = types;
-    }
-
-    public List<String> getTypes() {
-        return types;
-    }
-
-    @Override
-    public String toString() {
-        return "MyPathFilterModelEvent{" +
-                "types=" + types +
-                '}';
-    }
+    void changeTypes(FeContentFilterModelEvent event);
 
 }
