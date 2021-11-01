@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.util;
+package dev.alexengrig.myfe.util.swing;
 
 import javax.swing.*;
 import java.util.Objects;

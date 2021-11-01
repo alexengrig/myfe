@@ -31,8 +31,8 @@ import dev.alexengrig.myfe.repository.URIFileSystemPathRepository;
 import dev.alexengrig.myfe.service.BackgroundExecutorService;
 import dev.alexengrig.myfe.service.MyPathService;
 import dev.alexengrig.myfe.service.SimplePathService;
-import dev.alexengrig.myfe.util.BackgroundExecutor;
 import dev.alexengrig.myfe.util.PathUtil;
+import dev.alexengrig.myfe.util.swing.BackgroundExecutor;
 
 import java.net.URI;
 import java.nio.file.Path;

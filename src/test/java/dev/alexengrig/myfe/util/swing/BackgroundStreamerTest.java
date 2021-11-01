@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.util;
+package dev.alexengrig.myfe.util.swing;
 
 import dev.alexengrig.myfe.exception.ExecutionBackgroundTaskException;
 import org.junit.jupiter.api.Test;

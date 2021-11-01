@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.util;
+package dev.alexengrig.myfe.util.swing;
 
 import dev.alexengrig.myfe.exception.ExecutionBackgroundTaskException;
 import dev.alexengrig.myfe.exception.InterruptedBackgroundTaskException;
@@ -212,7 +212,7 @@ class BackgroundWorkerTest {
                                 throw new IOException("expected");
                             }, Assertions::fail, Assertions::fail));
             assertEquals("The X must be a particular type, not generic - MY_EXCEPTION; " +
-                         "otherwise inherit from: dev.alexengrig.myfe.util.BackgroundWorker.WithExceptionType",
+                            "otherwise inherit from: dev.alexengrig.myfe.util.swing.BackgroundWorker.WithExceptionType",
                     exception.getMessage(), "Message of exception");
         }
 

@@ -14,20 +14,7 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.service;
-
-import dev.alexengrig.myfe.util.swing.BackgroundTask;
-
-import java.util.concurrent.Callable;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
-public interface BackgroundExecutorService {
-
-    <T> BackgroundTask execute(Supplier<String> descriptionSupplier, Callable<T> backgroundTask, Consumer<T> resultHandler);
-
-    default <T> BackgroundTask execute(String description, Callable<T> backgroundTask, Consumer<T> resultHandler) {
-        return execute(() -> description, backgroundTask, resultHandler);
-    }
-
-}
+/**
+ * Package with Swing utils.
+ */
+package dev.alexengrig.myfe.util.swing;
