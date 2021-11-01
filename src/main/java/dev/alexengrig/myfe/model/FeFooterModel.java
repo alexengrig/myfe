@@ -16,8 +16,8 @@
 
 package dev.alexengrig.myfe.model;
 
-import dev.alexengrig.myfe.model.event.MyFooterModelEvent;
-import dev.alexengrig.myfe.model.event.MyFooterModelListener;
+import dev.alexengrig.myfe.model.event.FeFooterModelEvent;
+import dev.alexengrig.myfe.model.event.FeFooterModelListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,15 +26,20 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
-public class MyFooterModel {
+/**
+ * Model of file explorer footer.
+ *
+ * @see dev.alexengrig.myfe.view.MyFooter
+ */
+public class FeFooterModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final List<MyFooterModelListener> listeners = new LinkedList<>();
+    private final List<FeFooterModelListener> listeners = new LinkedList<>();
 
     private Integer numberOfElements;
 
-    public MyFooterModel(Integer numberOfElements) {
+    public FeFooterModel(Integer numberOfElements) {
         this.numberOfElements = numberOfElements;
     }
 
@@ -45,21 +50,21 @@ public class MyFooterModel {
     public void setNumberOfElements(Integer numberOfElements) {
         if (!Objects.equals(this.numberOfElements, numberOfElements)) {
             this.numberOfElements = numberOfElements;
-            fireChangeNumberOfElements(new MyFooterModelEvent(numberOfElements));
+            fireChangeNumberOfElements(new FeFooterModelEvent(numberOfElements));
         }
     }
 
-    public void addMyFooterModelListener(MyFooterModelListener listener) {
+    public void addFeFooterModelListener(FeFooterModelListener listener) {
         listeners.add(listener);
     }
 
-    public void removeMyFooterModelListener(MyFooterModelListener listener) {
+    public void removeFeFooterModelListener(FeFooterModelListener listener) {
         listeners.remove(listener);
     }
 
-    private void fireChangeNumberOfElements(MyFooterModelEvent event) {
+    private void fireChangeNumberOfElements(FeFooterModelEvent event) {
         LOGGER.debug("Fire change number of elements: {}", event);
-        for (MyFooterModelListener listener : listeners) {
+        for (FeFooterModelListener listener : listeners) {
             listener.changeNumberOfElements(event);
         }
     }

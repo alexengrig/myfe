@@ -16,9 +16,9 @@
 
 package dev.alexengrig.myfe.view;
 
-import dev.alexengrig.myfe.model.MyFooterModel;
-import dev.alexengrig.myfe.model.event.MyFooterModelEvent;
-import dev.alexengrig.myfe.model.event.MyFooterModelListener;
+import dev.alexengrig.myfe.model.FeFooterModel;
+import dev.alexengrig.myfe.model.event.FeFooterModelEvent;
+import dev.alexengrig.myfe.model.event.FeFooterModelListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,10 +30,10 @@ public class MyFooter extends JPanel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final MyFooterModel model;
+    private final FeFooterModel model;
     private final JPanel contentPane;
 
-    public MyFooter(MyFooterModel model) {
+    public MyFooter(FeFooterModel model) {
         super(new BorderLayout());
         this.model = model;
         this.contentPane = new JPanel(new BorderLayout());
@@ -42,7 +42,7 @@ public class MyFooter extends JPanel {
 
     private void init() {
         add(contentPane);
-        model.addMyFooterModelListener(new ModelListener());
+        model.addFeFooterModelListener(new ModelListener());
         handleChangeNumberOfElements(model.getNumberOfElements());
     }
 
@@ -69,10 +69,10 @@ public class MyFooter extends JPanel {
         contentPane.repaint();
     }
 
-    private class ModelListener implements MyFooterModelListener {
+    private class ModelListener implements FeFooterModelListener {
 
         @Override
-        public void changeNumberOfElements(MyFooterModelEvent event) {
+        public void changeNumberOfElements(FeFooterModelEvent event) {
             Integer numberOfElements = event.getNumberOfElements();
             handleChangeNumberOfElements(numberOfElements);
         }

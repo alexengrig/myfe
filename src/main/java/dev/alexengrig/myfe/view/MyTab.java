@@ -18,9 +18,9 @@ package dev.alexengrig.myfe.view;
 
 import dev.alexengrig.myfe.model.FeDirectory;
 import dev.alexengrig.myfe.model.FeFile;
+import dev.alexengrig.myfe.model.FeFooterModel;
 import dev.alexengrig.myfe.model.FePath;
 import dev.alexengrig.myfe.model.MyDirectoryTreeModel;
-import dev.alexengrig.myfe.model.MyFooterModel;
 import dev.alexengrig.myfe.model.MyPathFilterModel;
 import dev.alexengrig.myfe.model.MyPathTableModel;
 import dev.alexengrig.myfe.model.SelectedFePathModel;
@@ -68,7 +68,7 @@ public class MyTab extends JPanel {
     private MyPathTableModel tableModel;
     private MyPathFilterModel filterModel;
     private SelectedFePathModel pathModel;
-    private MyFooterModel footerModel;
+    private FeFooterModel footerModel;
 
     private MyHeader headerView;
     private MyDirectoryTree treeView;
@@ -113,7 +113,7 @@ public class MyTab extends JPanel {
         tableModel = new MyPathTableModel(rootDirectories);
         filterModel = new MyPathFilterModel(rootDirectories);
         pathModel = new SelectedFePathModel();
-        footerModel = new MyFooterModel(rootDirectories.size());
+        footerModel = new FeFooterModel(rootDirectories.size());
         LOGGER.debug("Finished initializing models");
     }
 

@@ -46,7 +46,7 @@ public class MyPathPreview extends JPanel {
 
     private void init() {
         addPreviewComponent(model.getPath());
-        model.addFePathModelListener(new ModelListener());
+        model.addSelectedFePathModelListener(new ModelListener());
     }
 
     private void handleChangePath(FePath path) {

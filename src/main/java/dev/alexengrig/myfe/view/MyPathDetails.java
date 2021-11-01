@@ -36,7 +36,7 @@ public class MyPathDetails extends JPanel {
 
     private void init() {
         addDetailsComponents();
-        model.addFePathModelListener(event -> updateDetailsComponents());
+        model.addSelectedFePathModelListener(event -> updateDetailsComponents());
         add(contentPane);
     }
 

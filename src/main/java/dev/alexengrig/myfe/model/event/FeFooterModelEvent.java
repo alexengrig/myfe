@@ -16,10 +16,26 @@
 
 package dev.alexengrig.myfe.model.event;
 
-import java.util.EventListener;
+/**
+ * Event of {@link FeFooterModelListener}.
+ */
+public class FeFooterModelEvent {
 
-public interface MyFooterModelListener extends EventListener {
+    private final Integer numberOfElements;
 
-    void changeNumberOfElements(MyFooterModelEvent event);
+    public FeFooterModelEvent(Integer numberOfElements) {
+        this.numberOfElements = numberOfElements;
+    }
+
+    public Integer getNumberOfElements() {
+        return numberOfElements;
+    }
+
+    @Override
+    public String toString() {
+        return "FeFooterModelEvent{" +
+                "numberOfElements=" + numberOfElements +
+                '}';
+    }
 
 }
