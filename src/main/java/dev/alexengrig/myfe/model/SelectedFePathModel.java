@@ -46,15 +46,18 @@ public class SelectedFePathModel {
     }
 
     public void setPath(FePath path) {
-        FePath oldPath = this.path;
-        this.path = path;
-        if (!Objects.equals(oldPath, path)) {
+        if (!Objects.equals(this.path, path)) {
+            this.path = path;
             fireChangePath(new SelectedFePathModelEvent(path));
         }
     }
 
-    public void addFePathModelListener(SelectedFePathModelListener listener) {
+    public void addSelectedFePathModelListener(SelectedFePathModelListener listener) {
         listeners.add(listener);
+    }
+
+    public void removeSelectedFePathModelListener(SelectedFePathModelListener listener) {
+        listeners.remove(listener);
     }
 
     private void fireChangePath(SelectedFePathModelEvent event) {
