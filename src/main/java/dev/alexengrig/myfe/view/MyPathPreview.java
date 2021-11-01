@@ -18,9 +18,9 @@ package dev.alexengrig.myfe.view;
 
 import dev.alexengrig.myfe.model.FeFile;
 import dev.alexengrig.myfe.model.FePath;
-import dev.alexengrig.myfe.model.MyPathModel;
-import dev.alexengrig.myfe.model.event.FePathModelEvent;
-import dev.alexengrig.myfe.model.event.MyPathModelListener;
+import dev.alexengrig.myfe.model.SelectedFePathModel;
+import dev.alexengrig.myfe.model.event.SelectedFePathModelEvent;
+import dev.alexengrig.myfe.model.event.SelectedFePathModelListener;
 import dev.alexengrig.myfe.service.MyPathPreviewBackgroundService;
 import dev.alexengrig.myfe.util.MyPathUtil;
 import dev.alexengrig.myfe.util.logging.LazyLogger;
@@ -34,10 +34,10 @@ public class MyPathPreview extends JPanel {
 
     private static final LazyLogger LOGGER = LazyLoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final MyPathModel model;
+    private final SelectedFePathModel model;
     private final MyPathPreviewBackgroundService backgroundService;
 
-    public MyPathPreview(MyPathModel model, MyPathPreviewBackgroundService backgroundService) {
+    public MyPathPreview(SelectedFePathModel model, MyPathPreviewBackgroundService backgroundService) {
         super(new BorderLayout());
         this.model = model;
         this.backgroundService = backgroundService;
@@ -46,7 +46,7 @@ public class MyPathPreview extends JPanel {
 
     private void init() {
         addPreviewComponent(model.getPath());
-        model.addMyPathModelListener(new ModelListener());
+        model.addFePathModelListener(new ModelListener());
     }
 
     private void handleChangePath(FePath path) {
@@ -103,10 +103,10 @@ public class MyPathPreview extends JPanel {
      *
      * @see MyPathPreview#handleChangePath(FePath)
      */
-    private class ModelListener implements MyPathModelListener {
+    private class ModelListener implements SelectedFePathModelListener {
 
         @Override
-        public void changePath(FePathModelEvent event) {
+        public void changePath(SelectedFePathModelEvent event) {
             handleChangePath(event.getPath());
         }
 

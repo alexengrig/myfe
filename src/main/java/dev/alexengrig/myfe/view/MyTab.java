@@ -22,8 +22,8 @@ import dev.alexengrig.myfe.model.FePath;
 import dev.alexengrig.myfe.model.MyDirectoryTreeModel;
 import dev.alexengrig.myfe.model.MyFooterModel;
 import dev.alexengrig.myfe.model.MyPathFilterModel;
-import dev.alexengrig.myfe.model.MyPathModel;
 import dev.alexengrig.myfe.model.MyPathTableModel;
+import dev.alexengrig.myfe.model.SelectedFePathModel;
 import dev.alexengrig.myfe.service.BackgroundExecutorService;
 import dev.alexengrig.myfe.service.MyDirectoryTreeBackgroundService;
 import dev.alexengrig.myfe.service.MyPathPreviewBackgroundService;
@@ -67,7 +67,7 @@ public class MyTab extends JPanel {
     private MyDirectoryTreeModel treeModel;
     private MyPathTableModel tableModel;
     private MyPathFilterModel filterModel;
-    private MyPathModel pathModel;
+    private SelectedFePathModel pathModel;
     private MyFooterModel footerModel;
 
     private MyHeader headerView;
@@ -112,7 +112,7 @@ public class MyTab extends JPanel {
         treeModel = new MyDirectoryTreeModel(service.getRootName(), rootDirectories);
         tableModel = new MyPathTableModel(rootDirectories);
         filterModel = new MyPathFilterModel(rootDirectories);
-        pathModel = new MyPathModel();
+        pathModel = new SelectedFePathModel();
         footerModel = new MyFooterModel(rootDirectories.size());
         LOGGER.debug("Finished initializing models");
     }

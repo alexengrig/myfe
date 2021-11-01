@@ -16,10 +16,28 @@
 
 package dev.alexengrig.myfe.model.event;
 
-import java.util.EventListener;
+import dev.alexengrig.myfe.model.FePath;
 
-public interface MyPathModelListener extends EventListener {
+/**
+ * Event of {@link SelectedFePathModelListener}.
+ */
+public class SelectedFePathModelEvent {
 
-    void changePath(FePathModelEvent event);
+    private final FePath path;
+
+    public SelectedFePathModelEvent(FePath path) {
+        this.path = path;
+    }
+
+    public FePath getPath() {
+        return path;
+    }
+
+    @Override
+    public String toString() {
+        return "SelectedFePathModelEvent{" +
+                "path=" + path +
+                '}';
+    }
 
 }

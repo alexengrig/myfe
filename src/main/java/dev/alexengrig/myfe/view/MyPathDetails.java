@@ -17,7 +17,7 @@
 package dev.alexengrig.myfe.view;
 
 import dev.alexengrig.myfe.model.FePath;
-import dev.alexengrig.myfe.model.MyPathModel;
+import dev.alexengrig.myfe.model.SelectedFePathModel;
 
 import javax.swing.*;
 import java.awt.*;
@@ -25,10 +25,10 @@ import java.util.List;
 
 public class MyPathDetails extends JPanel {
 
-    private final MyPathModel model;
+    private final SelectedFePathModel model;
     private final JPanel contentPane;
 
-    public MyPathDetails(MyPathModel model) {
+    public MyPathDetails(SelectedFePathModel model) {
         this.model = model;
         this.contentPane = new JPanel(new GridLayout(0, 1));
         init();
@@ -36,7 +36,7 @@ public class MyPathDetails extends JPanel {
 
     private void init() {
         addDetailsComponents();
-        model.addMyPathModelListener(event -> updateDetailsComponents());
+        model.addFePathModelListener(event -> updateDetailsComponents());
         add(contentPane);
     }
 
