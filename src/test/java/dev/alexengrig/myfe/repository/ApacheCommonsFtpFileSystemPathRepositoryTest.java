@@ -17,7 +17,7 @@
 package dev.alexengrig.myfe.repository;
 
 import dev.alexengrig.myfe.WithFtpServer;
-import dev.alexengrig.myfe.config.FTPConnectionConfig;
+import dev.alexengrig.myfe.config.FtpConnectionConfig;
 import dev.alexengrig.myfe.model.FeDirectory;
 import dev.alexengrig.myfe.model.FePath;
 import org.junit.jupiter.api.AfterEach;
@@ -42,7 +42,7 @@ class ApacheCommonsFtpFileSystemPathRepositoryTest extends WithFtpServer {
     @Override
     protected void setup() {
         super.setup();
-        FTPConnectionConfig config = FTPConnectionConfig.user(host, username, password.toCharArray());
+        FtpConnectionConfig config = FtpConnectionConfig.user(host, username, password.toCharArray());
         ftpPathRepository = new ApacheCommonsFtpFileSystemPathRepository(config);
     }
 

@@ -18,7 +18,10 @@ package dev.alexengrig.myfe.config;
 
 import java.util.Objects;
 
-public class FTPConnectionConfig {
+/**
+ * Configuration of FTP connection.
+ */
+public class FtpConnectionConfig {
 
     public static final int DEFAULT_PORT = 21;
     public static final char[] DEFAULT_PASSWORD = new char[]{};
@@ -31,7 +34,7 @@ public class FTPConnectionConfig {
 
     private transient String info;
 
-    public FTPConnectionConfig(String host, int port, String username, char[] password) {
+    public FtpConnectionConfig(String host, int port, String username, char[] password) {
         this.host = Objects.requireNonNull(host, "The host must not be null");
         this.port = requirePositivePort(port);
         this.username = Objects.requireNonNull(username, "The username must not be null");
@@ -45,20 +48,20 @@ public class FTPConnectionConfig {
         return port;
     }
 
-    public static FTPConnectionConfig anonymous(String host) {
+    public static FtpConnectionConfig anonymous(String host) {
         return anonymous(host, DEFAULT_PORT);
     }
 
-    public static FTPConnectionConfig anonymous(String host, int port) {
-        return new FTPConnectionConfig(host, port, ANONYMOUS_USERNAME, DEFAULT_PASSWORD);
+    public static FtpConnectionConfig anonymous(String host, int port) {
+        return new FtpConnectionConfig(host, port, ANONYMOUS_USERNAME, DEFAULT_PASSWORD);
     }
 
-    public static FTPConnectionConfig user(String host, String username, char[] password) {
+    public static FtpConnectionConfig user(String host, String username, char[] password) {
         return user(host, DEFAULT_PORT, username, password);
     }
 
-    public static FTPConnectionConfig user(String host, int port, String username, char[] password) {
-        return new FTPConnectionConfig(host, port, username, password);
+    public static FtpConnectionConfig user(String host, int port, String username, char[] password) {
+        return new FtpConnectionConfig(host, port, username, password);
     }
 
     public String getHost() {
@@ -86,7 +89,7 @@ public class FTPConnectionConfig {
 
     @Override
     public String toString() {
-        return "FTPConnectionConfig{" +
+        return "FtpConnectionConfig{" +
                 "host='" + host + '\'' +
                 ", port=" + port +
                 ", username='" + username + '\'' +

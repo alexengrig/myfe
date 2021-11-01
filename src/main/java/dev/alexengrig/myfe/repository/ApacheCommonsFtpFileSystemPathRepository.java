@@ -16,7 +16,7 @@
 
 package dev.alexengrig.myfe.repository;
 
-import dev.alexengrig.myfe.config.FTPConnectionConfig;
+import dev.alexengrig.myfe.config.FtpConnectionConfig;
 import dev.alexengrig.myfe.converter.Converter;
 import dev.alexengrig.myfe.converter.FileObject2MyDirectoryConverter;
 import dev.alexengrig.myfe.converter.FileObject2MyPathConverter;
@@ -71,10 +71,10 @@ public class ApacheCommonsFtpFileSystemPathRepository implements MyPathRepositor
 
     private final Converter<FileObject, FePath> pathConverter;
     private final Converter<FileObject, FeDirectory> directoryConverter;
-    private final FTPConnectionConfig config;
+    private final FtpConnectionConfig config;
     private final FtpFileSystem fileSystem;
 
-    public ApacheCommonsFtpFileSystemPathRepository(FTPConnectionConfig connectionConfig) {
+    public ApacheCommonsFtpFileSystemPathRepository(FtpConnectionConfig connectionConfig) {
         this(//TODO: Get from context
                 new FileObject2MyPathConverter(),
                 new FileObject2MyDirectoryConverter(),
@@ -84,7 +84,7 @@ public class ApacheCommonsFtpFileSystemPathRepository implements MyPathRepositor
     public ApacheCommonsFtpFileSystemPathRepository(
             Converter<FileObject, FePath> pathConverter,
             Converter<FileObject, FeDirectory> directoryConverter,
-            FTPConnectionConfig connectionConfig) {
+            FtpConnectionConfig connectionConfig) {
         this.pathConverter = pathConverter;
         this.directoryConverter = directoryConverter;
         this.config = connectionConfig;
@@ -92,7 +92,7 @@ public class ApacheCommonsFtpFileSystemPathRepository implements MyPathRepositor
         fileSystem.setLogger(new LogAdapter(connectionConfig));
     }
 
-    private FtpFileSystem createFtpFileSystem(FTPConnectionConfig config) {
+    private FtpFileSystem createFtpFileSystem(FtpConnectionConfig config) {
         try {
             String username = config.getUsername();
             String password = new String(config.getPassword());
@@ -112,7 +112,7 @@ public class ApacheCommonsFtpFileSystemPathRepository implements MyPathRepositor
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() {
         fileSystem.close();
     }
 
@@ -256,9 +256,9 @@ public class ApacheCommonsFtpFileSystemPathRepository implements MyPathRepositor
 
     private static class LogAdapter extends LazyLogAdapter {
 
-        private final FTPConnectionConfig config;
+        private final FtpConnectionConfig config;
 
-        public LogAdapter(FTPConnectionConfig config) {
+        public LogAdapter(FtpConnectionConfig config) {
             super(LOGGER);
             this.config = config;
         }

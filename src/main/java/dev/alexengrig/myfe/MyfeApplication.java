@@ -16,7 +16,7 @@
 
 package dev.alexengrig.myfe;
 
-import dev.alexengrig.myfe.config.FTPConnectionConfig;
+import dev.alexengrig.myfe.config.FtpConnectionConfig;
 import dev.alexengrig.myfe.view.MyTab;
 import dev.alexengrig.myfe.view.MyTabFactory;
 import dev.alexengrig.myfe.view.MyTabbedPane;
@@ -76,7 +76,7 @@ public final class MyfeApplication extends JFrame {
         tabbedPane.addMyTab(archiveTab);
     }
 
-    private void handleConnectToFTPServer(FTPConnectionConfig connectionConfig) {
+    private void handleConnectToFTPServer(FtpConnectionConfig connectionConfig) {
         MyTab ftpTab = tabFactory.createFTPTab(connectionConfig);
         tabbedPane.addMyTab(ftpTab);
     }
@@ -158,7 +158,7 @@ public final class MyfeApplication extends JFrame {
                     JButton button = new JButton(new AbstractAction() {
                         @Override
                         public void actionPerformed(ActionEvent e) {
-                            FTPConnectionConfig ftpConnectionConfig = FTPConnectionConfig.user(
+                            FtpConnectionConfig ftpConnectionConfig = FtpConnectionConfig.user(
                                     hostField.getText(),
                                     Integer.parseInt(portField.getText()),
                                     usernameField.getText(),
