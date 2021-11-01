@@ -22,9 +22,9 @@ import dev.alexengrig.myfe.model.MyPathModel;
 import dev.alexengrig.myfe.model.event.MyPathModelEvent;
 import dev.alexengrig.myfe.model.event.MyPathModelListener;
 import dev.alexengrig.myfe.service.MyPathPreviewBackgroundService;
-import dev.alexengrig.myfe.util.LazyLogger;
-import dev.alexengrig.myfe.util.LazyLoggerFactory;
 import dev.alexengrig.myfe.util.MyPathUtil;
+import dev.alexengrig.myfe.util.logging.LazyLogger;
+import dev.alexengrig.myfe.util.logging.LazyLoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.util;
+package dev.alexengrig.myfe.util.logging;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

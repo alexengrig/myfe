@@ -18,6 +18,8 @@ package dev.alexengrig.myfe.util;
 
 import dev.alexengrig.myfe.exception.ExecutionBackgroundTaskException;
 import dev.alexengrig.myfe.exception.InterruptedBackgroundTaskException;
+import dev.alexengrig.myfe.util.logging.LazyLogger;
+import dev.alexengrig.myfe.util.logging.LazyLoggerFactory;
 
 import javax.swing.*;
 import java.lang.invoke.MethodHandles;

@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.util;
+package dev.alexengrig.myfe.util.logging;
 
 /**
- * {@link org.slf4j.Logger}-method.
+ * Factory of {@link LazyLogger}.
  */
-public interface LoggerMethod {
+public final class LazyLoggerFactory {
 
-    void log(String format, Object arg);
-
-    void log(String format, Object arg1, Object arg2);
-
-    void log(String format, Object... arguments);
-
-    void log(String msg, Throwable t);
+    /**
+     * @see LazyLogger
+     */
+    public static LazyLogger getLogger(Class<?> clazz) {
+        return new LazyLogger(clazz);
+    }
 
 }
