@@ -16,22 +16,24 @@
 
 package dev.alexengrig.myfe.converter;
 
-import dev.alexengrig.myfe.model.MyFile;
-import dev.alexengrig.myfe.model.MyFtpFile;
+import dev.alexengrig.myfe.model.MyDirectory;
+import org.apache.commons.vfs2.FileName;
+import org.apache.commons.vfs2.FileObject;
 
 import java.util.Objects;
 
 /**
- * Converter from {@link MyFtpFile} to {@link MyFile}.
+ * Converter from {@link FileObject} to {@link MyDirectory}.
  */
-public class MyFtpFile2MyFileConverter implements Converter<MyFtpFile, MyFile> {
+public class FileObject2MyDirectoryConverter implements Converter<FileObject, MyDirectory> {
 
     @Override
-    public MyFile convert(MyFtpFile source) {
+    public MyDirectory convert(FileObject source) {
         Objects.requireNonNull(source, "The source must not be null");
-        String path = source.getPath();
-        String name = source.getName();
-        return new MyFile(path, name);
+        FileName fileName = source.getName();
+        String path = fileName.getPath();
+        String name = fileName.getBaseName();
+        return new MyDirectory(path, name);
     }
 
 }
