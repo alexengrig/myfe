@@ -19,6 +19,8 @@ package dev.alexengrig.myfe;
 import org.mockftpserver.fake.FakeFtpServer;
 import org.mockftpserver.fake.UserAccount;
 import org.mockftpserver.fake.filesystem.DirectoryEntry;
+import org.mockftpserver.fake.filesystem.FileEntry;
+import org.mockftpserver.fake.filesystem.FileSystem;
 import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
 
 public abstract class WithFtpServer {
@@ -29,6 +31,20 @@ public abstract class WithFtpServer {
     protected final String password = "pass";
 
     protected FakeFtpServer ftpServer;
+
+    public static void main(String[] args) throws Exception {
+        WithFtpServer instance = new WithFtpServer() {
+        };
+        instance.setup();
+        FileSystem fs = instance.ftpServer.getFileSystem();
+        fs.add(new FileEntry("/pub/text.txt", "This is text.txt"));
+        fs.add(new FileEntry("/pub/other.txt", "This is other.txt"));
+        int read;
+        do {
+            read = System.in.read();
+        } while (read != 1);
+        instance.tearDown();
+    }
 
     FakeFtpServer createUnixFakeFtpServer() {
         FakeFtpServer fakeFtpServer = new FakeFtpServer();
