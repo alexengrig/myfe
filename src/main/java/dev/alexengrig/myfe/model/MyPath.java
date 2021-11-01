@@ -29,21 +29,6 @@ public abstract class MyPath extends AbstractPath {
         super(path, name);
     }
 
-    @Deprecated(forRemoval = true)
-    public static MyPath of(String path, String name, boolean isDirectory) {
-        return isDirectory ? directory(path, name) : file(path, name);
-    }
-
-    @Deprecated(forRemoval = true)
-    public static MyFile file(String path, String name) {
-        return new MyFile(path, name);
-    }
-
-    @Deprecated(forRemoval = true)
-    public static MyDirectory directory(String path, String name) {
-        return new MyDirectory(path, name);
-    }
-
     public MyDirectory asDirectory() {
         return (MyDirectory) this;
     }
