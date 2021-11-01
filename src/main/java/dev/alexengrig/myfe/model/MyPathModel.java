@@ -16,7 +16,7 @@
 
 package dev.alexengrig.myfe.model;
 
-import dev.alexengrig.myfe.model.event.MyPathModelEvent;
+import dev.alexengrig.myfe.model.event.FePathModelEvent;
 import dev.alexengrig.myfe.model.event.MyPathModelListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,26 +31,26 @@ public class MyPathModel {
 
     private final List<MyPathModelListener> listeners = new LinkedList<>();
 
-    private MyPath path;
+    private FePath path;
 
     public boolean isEmpty() {
         return path == null;
     }
 
-    public MyPath getPath() {
+    public FePath getPath() {
         return path;
     }
 
-    public void setPath(MyPath path) {
+    public void setPath(FePath path) {
         this.path = path;
-        fireChangePath(new MyPathModelEvent(path));
+        fireChangePath(new FePathModelEvent(path));
     }
 
     public void addMyPathModelListener(MyPathModelListener listener) {
         listeners.add(listener);
     }
 
-    private void fireChangePath(MyPathModelEvent event) {
+    private void fireChangePath(FePathModelEvent event) {
         LOGGER.debug("Fire change path: {}", event);
         for (MyPathModelListener listener : listeners) {
             listener.changePath(event);

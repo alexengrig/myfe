@@ -16,9 +16,9 @@
 
 package dev.alexengrig.myfe.service;
 
-import dev.alexengrig.myfe.model.MyDirectory;
-import dev.alexengrig.myfe.model.MyFile;
-import dev.alexengrig.myfe.model.MyPath;
+import dev.alexengrig.myfe.model.FeDirectory;
+import dev.alexengrig.myfe.model.FeFile;
+import dev.alexengrig.myfe.model.FePath;
 
 import java.util.List;
 import java.util.stream.Stream;
@@ -29,14 +29,14 @@ public interface MyPathService {
 
     String getRootName();
 
-    List<MyDirectory> getRootDirectories();
+    List<FeDirectory> getRootDirectories();
 
-    List<MyDirectory> getSubdirectories(MyDirectory directory);
+    List<FeDirectory> getSubdirectories(FeDirectory directory);
 
-    List<MyPath> getDirectoryContent(MyDirectory directory);
+    List<FePath> getDirectoryContent(FeDirectory directory);
 
-    String getFileContentPreview(MyFile file);
+    String getFileContentPreview(FeFile file);
 
-    Stream<String> readFileContent(MyFile file);
+    Stream<String> readFileContent(FeFile file);
 
 }

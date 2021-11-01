@@ -20,6 +20,6 @@ import java.util.EventListener;
 
 public interface MyPathModelListener extends EventListener {
 
-    void changePath(MyPathModelEvent event);
+    void changePath(FePathModelEvent event);
 
 }

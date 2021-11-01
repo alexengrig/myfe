@@ -16,7 +16,7 @@
 
 package dev.alexengrig.myfe.view;
 
-import dev.alexengrig.myfe.model.MyDirectory;
+import dev.alexengrig.myfe.model.FeDirectory;
 import dev.alexengrig.myfe.model.MyDirectoryTreeModel;
 import dev.alexengrig.myfe.model.MyDirectoryTreeNode;
 import dev.alexengrig.myfe.model.RootDirectoryTreeNode;
@@ -74,7 +74,7 @@ public class MyDirectoryTree extends JTree {
 
     private void handleLoadChildDirectories(MyDirectoryTreeNode node) {
         LOGGER.debug("Handle load child directories: {}", node);
-        MyDirectory directory = node.getUserObject();
+        FeDirectory directory = node.getUserObject();
         node.setLoaded(true);
         try {
             backgroundService.loadSubdirectories(directory, children -> {

@@ -16,9 +16,9 @@
 
 package dev.alexengrig.myfe.service;
 
-import dev.alexengrig.myfe.model.MyDirectory;
-import dev.alexengrig.myfe.model.MyFile;
-import dev.alexengrig.myfe.model.MyPath;
+import dev.alexengrig.myfe.model.FeDirectory;
+import dev.alexengrig.myfe.model.FeFile;
+import dev.alexengrig.myfe.model.FePath;
 import dev.alexengrig.myfe.repository.MyPathRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -60,35 +60,35 @@ public class SimplePathService implements MyPathService {
     }
 
     @Override
-    public List<MyDirectory> getRootDirectories() {
+    public List<FeDirectory> getRootDirectories() {
         return repository.getRootDirectories();
     }
 
     @Override
-    public List<MyDirectory> getSubdirectories(MyDirectory directory) {
+    public List<FeDirectory> getSubdirectories(FeDirectory directory) {
         return repository.getSubdirectories(requireNonNullDirectory(directory).getPath());
     }
 
     @Override
-    public List<MyPath> getDirectoryContent(MyDirectory directory) {
+    public List<FePath> getDirectoryContent(FeDirectory directory) {
         return repository.getChildren(requireNonNullDirectory(directory).getPath());
     }
 
     @Override
-    public String getFileContentPreview(MyFile file) {
+    public String getFileContentPreview(FeFile file) {
         return repository.readBatch(requireNonNullFile(file).getPath(), FILE_PREVIEW_CONTENT_SIZE);
     }
 
     @Override
-    public Stream<String> readFileContent(MyFile file) {
+    public Stream<String> readFileContent(FeFile file) {
         return repository.readInBatches(requireNonNullFile(file).getPath(), FILE_PREVIEW_CONTENT_SIZE, 1);
     }
 
-    private MyDirectory requireNonNullDirectory(MyDirectory directory) {
+    private FeDirectory requireNonNullDirectory(FeDirectory directory) {
         return Objects.requireNonNull(directory, "The directory must not be null");
     }
 
-    private MyFile requireNonNullFile(MyFile file) {
+    private FeFile requireNonNullFile(FeFile file) {
         return Objects.requireNonNull(file, "The file must not be null");
     }
 

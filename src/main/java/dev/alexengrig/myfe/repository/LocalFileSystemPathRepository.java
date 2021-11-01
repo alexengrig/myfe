@@ -17,8 +17,8 @@
 package dev.alexengrig.myfe.repository;
 
 import dev.alexengrig.myfe.converter.Converter;
-import dev.alexengrig.myfe.model.MyDirectory;
-import dev.alexengrig.myfe.model.MyPath;
+import dev.alexengrig.myfe.model.FeDirectory;
+import dev.alexengrig.myfe.model.FePath;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
@@ -29,8 +29,8 @@ import java.nio.file.Path;
 public class LocalFileSystemPathRepository extends FileSystemPathRepository {
 
     public LocalFileSystemPathRepository(
-            Converter<Path, MyDirectory> directoryConverter,
-            Converter<Path, MyPath> pathConverter) {
+            Converter<Path, FeDirectory> directoryConverter,
+            Converter<Path, FePath> pathConverter) {
         super(FileSystems.getDefault(), directoryConverter, pathConverter);
     }
 

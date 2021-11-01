@@ -16,24 +16,24 @@
 
 package dev.alexengrig.myfe.converter;
 
-import dev.alexengrig.myfe.model.MyDirectory;
+import dev.alexengrig.myfe.model.FeDirectory;
 import org.apache.commons.vfs2.FileName;
 import org.apache.commons.vfs2.FileObject;
 
 import java.util.Objects;
 
 /**
- * Converter from {@link FileObject} to {@link MyDirectory}.
+ * Converter from {@link FileObject} to {@link FeDirectory}.
  */
-public class FileObject2MyDirectoryConverter implements Converter<FileObject, MyDirectory> {
+public class FileObject2MyDirectoryConverter implements Converter<FileObject, FeDirectory> {
 
     @Override
-    public MyDirectory convert(FileObject source) {
+    public FeDirectory convert(FileObject source) {
         Objects.requireNonNull(source, "The source must not be null");
         FileName fileName = source.getName();
         String path = fileName.getPath();
         String name = fileName.getBaseName();
-        return new MyDirectory(path, name);
+        return new FeDirectory(path, name);
     }
 
 }

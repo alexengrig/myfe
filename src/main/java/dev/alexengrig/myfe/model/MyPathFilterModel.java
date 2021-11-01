@@ -34,16 +34,16 @@ public class MyPathFilterModel {
 
     private List<String> types;
 
-    public MyPathFilterModel(List<? extends MyPath> paths) {
+    public MyPathFilterModel(List<? extends FePath> paths) {
         this.types = createTypes(paths);
     }
 
-    private List<String> createTypes(List<? extends MyPath> paths) {
+    private List<String> createTypes(List<? extends FePath> paths) {
         //FIXME: Improve it
-        return paths.stream().map(MyPath::getExtension).distinct().sorted().collect(Collectors.toList());
+        return paths.stream().map(FePath::getExtension).distinct().sorted().collect(Collectors.toList());
     }
 
-    public void setPaths(List<? extends MyPath> paths) {
+    public void setPaths(List<? extends FePath> paths) {
         List<String> types = createTypes(paths);
         setTypes(types);
     }

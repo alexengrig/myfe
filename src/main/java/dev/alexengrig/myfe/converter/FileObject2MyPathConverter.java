@@ -16,21 +16,21 @@
 
 package dev.alexengrig.myfe.converter;
 
-import dev.alexengrig.myfe.model.MyDirectory;
-import dev.alexengrig.myfe.model.MyFile;
-import dev.alexengrig.myfe.model.MyPath;
+import dev.alexengrig.myfe.model.FeDirectory;
+import dev.alexengrig.myfe.model.FeFile;
+import dev.alexengrig.myfe.model.FePath;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 
 import java.util.Objects;
 
 /**
- * Converter from {@link FileObject} to {@link MyPath}.
+ * Converter from {@link FileObject} to {@link FePath}.
  */
-public class FileObject2MyPathConverter implements Converter<FileObject, MyPath> {
+public class FileObject2MyPathConverter implements Converter<FileObject, FePath> {
 
-    private final Converter<FileObject, MyDirectory> directoryConverter;
-    private final Converter<FileObject, MyFile> fileConverter;
+    private final Converter<FileObject, FeDirectory> directoryConverter;
+    private final Converter<FileObject, FeFile> fileConverter;
 
     public FileObject2MyPathConverter() {
         this(//TODO: Get from context
@@ -39,14 +39,14 @@ public class FileObject2MyPathConverter implements Converter<FileObject, MyPath>
     }
 
     public FileObject2MyPathConverter(
-            Converter<FileObject, MyDirectory> directoryConverter,
-            Converter<FileObject, MyFile> fileConverter) {
+            Converter<FileObject, FeDirectory> directoryConverter,
+            Converter<FileObject, FeFile> fileConverter) {
         this.directoryConverter = directoryConverter;
         this.fileConverter = fileConverter;
     }
 
     @Override
-    public MyPath convert(FileObject source) {
+    public FePath convert(FileObject source) {
         Objects.requireNonNull(source, "The source must not be null");
         if (isDirectory(source)) {
             return directoryConverter.convert(source);

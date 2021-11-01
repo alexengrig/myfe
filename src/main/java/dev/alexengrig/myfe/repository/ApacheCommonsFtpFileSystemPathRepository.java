@@ -21,8 +21,8 @@ import dev.alexengrig.myfe.converter.Converter;
 import dev.alexengrig.myfe.converter.FileObject2MyDirectoryConverter;
 import dev.alexengrig.myfe.converter.FileObject2MyPathConverter;
 import dev.alexengrig.myfe.exception.MyPathRepositoryException;
-import dev.alexengrig.myfe.model.MyDirectory;
-import dev.alexengrig.myfe.model.MyPath;
+import dev.alexengrig.myfe.model.FeDirectory;
+import dev.alexengrig.myfe.model.FePath;
 import dev.alexengrig.myfe.util.CloseOnTerminalOperationStreams;
 import dev.alexengrig.myfe.util.function.ThrowablePredicate;
 import dev.alexengrig.myfe.util.logging.LazyLogAdapter;
@@ -69,8 +69,8 @@ public class ApacheCommonsFtpFileSystemPathRepository implements MyPathRepositor
         config.setPassiveMode(options, true);
     }
 
-    private final Converter<FileObject, MyPath> pathConverter;
-    private final Converter<FileObject, MyDirectory> directoryConverter;
+    private final Converter<FileObject, FePath> pathConverter;
+    private final Converter<FileObject, FeDirectory> directoryConverter;
     private final FTPConnectionConfig config;
     private final FtpFileSystem fileSystem;
 
@@ -82,8 +82,8 @@ public class ApacheCommonsFtpFileSystemPathRepository implements MyPathRepositor
     }
 
     public ApacheCommonsFtpFileSystemPathRepository(
-            Converter<FileObject, MyPath> pathConverter,
-            Converter<FileObject, MyDirectory> directoryConverter,
+            Converter<FileObject, FePath> pathConverter,
+            Converter<FileObject, FeDirectory> directoryConverter,
             FTPConnectionConfig connectionConfig) {
         this.pathConverter = pathConverter;
         this.directoryConverter = directoryConverter;
@@ -117,12 +117,12 @@ public class ApacheCommonsFtpFileSystemPathRepository implements MyPathRepositor
     }
 
     @Override
-    public List<MyDirectory> getRootDirectories() {
+    public List<FeDirectory> getRootDirectories() {
         LOGGER.debug(m -> m.log("Start getting root directories \"{}\"",
                 config.getInfo()));
         try {
             FileObject[] directories = fileSystem.getRoot().findFiles(Selector.of(FileObject::isFolder));
-            List<MyDirectory> result = Arrays.stream(directories)
+            List<FeDirectory> result = Arrays.stream(directories)
                     .map(directoryConverter::convert)
                     .collect(Collectors.toList());
             LOGGER.debug(m -> m.log("Finished getting root directories \"{}\", number of directories: {}",
@@ -138,14 +138,14 @@ public class ApacheCommonsFtpFileSystemPathRepository implements MyPathRepositor
     }
 
     @Override
-    public List<MyPath> getChildren(String directoryPath) {
+    public List<FePath> getChildren(String directoryPath) {
         LOGGER.debug(m -> m.log("Start getting children \"{}\" for: {}",
                 config.getInfo(), directoryPath));
         try {
             FileObject directory = fileSystem.resolveFile(directoryPath);
             //FIXME: Check on folder
             FileObject[] children = directory.getChildren();
-            List<MyPath> result = Arrays.stream(children)
+            List<FePath> result = Arrays.stream(children)
                     .map(pathConverter::convert)
                     .collect(Collectors.toList());
             LOGGER.debug(m -> m.log("Finished getting children \"{}\" in \"{}\", number of elements: {}",
@@ -162,13 +162,13 @@ public class ApacheCommonsFtpFileSystemPathRepository implements MyPathRepositor
     }
 
     @Override
-    public List<MyDirectory> getSubdirectories(String directoryPath) {
+    public List<FeDirectory> getSubdirectories(String directoryPath) {
         LOGGER.debug(m -> m.log("Start getting subdirectories \"{}\" for: {}",
                 config.getInfo(), directoryPath));
         try {
             FileObject directory = fileSystem.resolveFile(directoryPath);
             FileObject[] directories = directory.findFiles(Selector.of(FileObject::isFolder));
-            List<MyDirectory> result = Arrays.stream(directories)
+            List<FeDirectory> result = Arrays.stream(directories)
                     .map(directoryConverter::convert)
                     .collect(Collectors.toList());
             LOGGER.debug(m -> m.log("Finished getting subdirectories \"{}\" in \"{}\", number of directories: {}",

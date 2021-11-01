@@ -22,12 +22,12 @@ import java.util.stream.Collectors;
 
 public class MyDirectoryTreeModel extends DefaultTreeModel {
 
-    public MyDirectoryTreeModel(String rootName, List<MyDirectory> rootDirectories) {
+    public MyDirectoryTreeModel(String rootName, List<FeDirectory> rootDirectories) {
         super(new RootDirectoryTreeNode(rootName), true);
         addChildrenInto(getRoot(), rootDirectories);
     }
 
-    public void addChildrenInto(MyTreeNode<?> parent, List<MyDirectory> children) {
+    public void addChildrenInto(MyTreeNode<?> parent, List<FeDirectory> children) {
         List<MyDirectoryTreeNode> nodes = children.stream()
                 .map(MyDirectoryTreeNode::new)
                 .collect(Collectors.toList());

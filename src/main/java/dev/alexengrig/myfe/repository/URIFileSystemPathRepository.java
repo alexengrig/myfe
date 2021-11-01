@@ -17,8 +17,8 @@
 package dev.alexengrig.myfe.repository;
 
 import dev.alexengrig.myfe.converter.Converter;
-import dev.alexengrig.myfe.model.MyDirectory;
-import dev.alexengrig.myfe.model.MyPath;
+import dev.alexengrig.myfe.model.FeDirectory;
+import dev.alexengrig.myfe.model.FePath;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;
@@ -35,8 +35,8 @@ public class URIFileSystemPathRepository extends FileSystemPathRepository {
 
     public URIFileSystemPathRepository(
             URI uri,
-            Converter<Path, MyDirectory> directoryConverter,
-            Converter<Path, MyPath> pathConverter) {
+            Converter<Path, FeDirectory> directoryConverter,
+            Converter<Path, FePath> pathConverter) {
         super(createFileSystem(uri), directoryConverter, pathConverter);
     }
 

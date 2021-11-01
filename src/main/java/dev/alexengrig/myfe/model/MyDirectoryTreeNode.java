@@ -18,14 +18,14 @@ package dev.alexengrig.myfe.model;
 
 import java.util.Objects;
 
-public class MyDirectoryTreeNode extends MyTreeNode<MyDirectory> {
+public class MyDirectoryTreeNode extends MyTreeNode<FeDirectory> {
 
     /**
      * Are the children of this node loaded?
      */
     private boolean loaded;
 
-    public MyDirectoryTreeNode(MyDirectory directory) {
+    public MyDirectoryTreeNode(FeDirectory directory) {
         super(Objects.requireNonNull(directory, "The directory must not be null"), true);
     }
 

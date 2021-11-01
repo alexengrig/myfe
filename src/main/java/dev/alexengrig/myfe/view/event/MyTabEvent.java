@@ -16,17 +16,17 @@
 
 package dev.alexengrig.myfe.view.event;
 
-import dev.alexengrig.myfe.model.MyFile;
+import dev.alexengrig.myfe.model.FeFile;
 
 public class MyTabEvent {
 
-    private final MyFile file;
+    private final FeFile file;
 
-    public MyTabEvent(MyFile file) {
+    public MyTabEvent(FeFile file) {
         this.file = file;
     }
 
-    public MyFile getFile() {
+    public FeFile getFile() {
         return file;
     }
 

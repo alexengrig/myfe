@@ -16,7 +16,7 @@
 
 package dev.alexengrig.myfe.view;
 
-import dev.alexengrig.myfe.model.MyPath;
+import dev.alexengrig.myfe.model.FePath;
 import dev.alexengrig.myfe.model.MyPathTableModel;
 import dev.alexengrig.myfe.view.event.DoNothingKeyListener;
 import dev.alexengrig.myfe.view.event.DoNothingMouseListener;
@@ -85,7 +85,7 @@ public class MyPathTable extends JTable {
         return (MyPathTableModel) super.getModel();
     }
 
-    private MyPath getSelectedPath() {
+    private FePath getSelectedPath() {
         int rowIndex = getSelectedRow();
         int pathIndex = getRowSorter().convertRowIndexToModel(rowIndex);
         return getModel().getPathAt(pathIndex);
@@ -134,12 +134,12 @@ public class MyPathTable extends JTable {
      */
     private class SelectPathListener implements ListSelectionListener {
 
-        private transient MyPath previousPath;
+        private transient FePath previousPath;
 
         @Override
         public void valueChanged(ListSelectionEvent event) {
             if (getSelectedRowCount() == 1) {
-                MyPath path = getSelectedPath();
+                FePath path = getSelectedPath();
                 //FIXME: Don't handle same path
                 if (Objects.equals(previousPath, path)) {
                     return;
@@ -161,7 +161,7 @@ public class MyPathTable extends JTable {
         @Override
         public void mouseClicked(MouseEvent e) {
             if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() > 1 && getSelectedRowCount() == 1) {
-                MyPath path = getSelectedPath();
+                FePath path = getSelectedPath();
                 fireDoubleClickOnPath(new MyPathTableEvent(path));
             }
         }
@@ -169,7 +169,7 @@ public class MyPathTable extends JTable {
         @Override
         public void keyPressed(KeyEvent e) {
             if (e.getKeyCode() == KeyEvent.VK_ENTER && getSelectedRowCount() == 1) {
-                MyPath path = getSelectedPath();
+                FePath path = getSelectedPath();
                 fireDoubleClickOnPath(new MyPathTableEvent(path));
             }
         }

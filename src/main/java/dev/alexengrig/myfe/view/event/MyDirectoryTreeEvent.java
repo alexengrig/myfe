@@ -16,14 +16,14 @@
 
 package dev.alexengrig.myfe.view.event;
 
-import dev.alexengrig.myfe.model.MyDirectory;
+import dev.alexengrig.myfe.model.FeDirectory;
 
 public class MyDirectoryTreeEvent {
 
-    private final MyDirectory directory;
+    private final FeDirectory directory;
     private final String rootName;
 
-    public MyDirectoryTreeEvent(MyDirectory directory) {
+    public MyDirectoryTreeEvent(FeDirectory directory) {
         this(directory, null);
     }
 
@@ -31,12 +31,12 @@ public class MyDirectoryTreeEvent {
         this(null, rootName);
     }
 
-    public MyDirectoryTreeEvent(MyDirectory directory, String rootName) {
+    public MyDirectoryTreeEvent(FeDirectory directory, String rootName) {
         this.directory = directory;
         this.rootName = rootName;
     }
 
-    public MyDirectory getDirectory() {
+    public FeDirectory getDirectory() {
         return directory;
     }
 

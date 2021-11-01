@@ -16,7 +16,7 @@
 
 package dev.alexengrig.myfe.converter;
 
-import dev.alexengrig.myfe.model.MyFile;
+import dev.alexengrig.myfe.model.FeFile;
 import org.apache.commons.vfs2.FileName;
 import org.apache.commons.vfs2.FileObject;
 import org.junit.jupiter.api.Test;
@@ -41,7 +41,7 @@ class FileObject2MyFileConverterTest {
         when(fileName.getBaseName()).thenReturn(name);
         when(source.getName()).thenReturn(fileName);
         // run
-        MyFile result = converter.convert(source);
+        FeFile result = converter.convert(source);
         // check
         assertNotNull(result, "Result");
         assertEquals(path, result.getPath(), "Path");

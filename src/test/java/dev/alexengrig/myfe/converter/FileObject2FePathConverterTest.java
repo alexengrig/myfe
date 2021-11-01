@@ -16,9 +16,9 @@
 
 package dev.alexengrig.myfe.converter;
 
-import dev.alexengrig.myfe.model.MyDirectory;
-import dev.alexengrig.myfe.model.MyFile;
-import dev.alexengrig.myfe.model.MyPath;
+import dev.alexengrig.myfe.model.FeDirectory;
+import dev.alexengrig.myfe.model.FeFile;
+import dev.alexengrig.myfe.model.FePath;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-class FileObject2MyPathConverterTest {
+class FileObject2FePathConverterTest {
 
     @Mock
     FileObject2MyDirectoryConverter directoryConverter;
@@ -50,10 +50,10 @@ class FileObject2MyPathConverterTest {
         // setup
         FileObject source = mock(FileObject.class);
         when(source.isFolder()).thenReturn(true);
-        MyDirectory directory = mock(MyDirectory.class);
+        FeDirectory directory = mock(FeDirectory.class);
         when(directoryConverter.convert(same(source))).thenReturn(directory);
         // run
-        MyPath result = converter.convert(source);
+        FePath result = converter.convert(source);
         // check
         assertSame(directory, result, "Result");
         verify(directoryConverter).convert(same(source));
@@ -65,10 +65,10 @@ class FileObject2MyPathConverterTest {
         // setup
         FileObject source = mock(FileObject.class);
         when(source.isFolder()).thenReturn(false);
-        MyFile file = mock(MyFile.class);
+        FeFile file = mock(FeFile.class);
         when(fileConverter.convert(same(source))).thenReturn(file);
         // run
-        MyPath result = converter.convert(source);
+        FePath result = converter.convert(source);
         // check
         assertSame(file, result, "Result");
         verify(directoryConverter, never()).convert(same(source));

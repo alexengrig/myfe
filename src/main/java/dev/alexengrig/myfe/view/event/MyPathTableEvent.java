@@ -16,14 +16,14 @@
 
 package dev.alexengrig.myfe.view.event;
 
-import dev.alexengrig.myfe.model.MyPath;
+import dev.alexengrig.myfe.model.FePath;
 
 public class MyPathTableEvent {
 
-    private final MyPath path;
+    private final FePath path;
     private final Integer rowCount;
 
-    public MyPathTableEvent(MyPath path, Integer rowCount) {
+    public MyPathTableEvent(FePath path, Integer rowCount) {
         this.path = path;
         this.rowCount = rowCount;
     }
@@ -32,7 +32,7 @@ public class MyPathTableEvent {
         this(null, null);
     }
 
-    public MyPathTableEvent(MyPath path) {
+    public MyPathTableEvent(FePath path) {
         this(path, null);
     }
 
@@ -40,7 +40,7 @@ public class MyPathTableEvent {
         this(null, rowCount);
     }
 
-    public MyPath getPath() {
+    public FePath getPath() {
         return path;
     }
 

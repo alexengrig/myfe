@@ -23,25 +23,25 @@ import java.util.stream.Collectors;
 
 public class MyPathTableModel extends DefaultTableModel {
 
-    private List<? extends MyPath> paths;
+    private List<? extends FePath> paths;
     private String filteredType;
 
-    public MyPathTableModel(List<? extends MyPath> paths) {
+    public MyPathTableModel(List<? extends FePath> paths) {
         super(convertToVector(paths), convertToVector(new Object[]{"Name", "Type"}));
         this.paths = paths;
     }
 
-    private static Vector<Vector<?>> convertToVector(List<? extends MyPath> data) {
+    private static Vector<Vector<?>> convertToVector(List<? extends FePath> data) {
         return data.stream()
                 .map(path -> new Vector<>(List.of(path.getName(), path.getExtension())))
                 .collect(Collectors.toCollection(Vector::new));
     }
 
-    public MyPath getPathAt(int index) {
+    public FePath getPathAt(int index) {
         return paths.get(index);
     }
 
-    public void setPaths(List<? extends MyPath> paths) {
+    public void setPaths(List<? extends FePath> paths) {
         this.paths = paths;
         this.filteredType = null;
         setDataVector(convertToVector(paths), columnIdentifiers);

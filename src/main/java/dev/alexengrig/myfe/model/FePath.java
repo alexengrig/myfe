@@ -16,18 +16,32 @@
 
 package dev.alexengrig.myfe.model;
 
-/**
- * Directory of file explorer.
- */
-public class MyDirectory extends MyPath {
+import dev.alexengrig.myfe.util.MyPathUtil;
 
-    public MyDirectory(String path, String name) {
+/**
+ * Path of file explorer.
+ */
+public abstract class FePath extends AbstractPath {
+
+    private transient String extension;
+
+    protected FePath(String path, String name) {
         super(path, name);
     }
 
-    @Override
-    public boolean isDirectory() {
-        return true;
+    public FeDirectory asDirectory() {
+        return (FeDirectory) this;
+    }
+
+    public FeFile asFile() {
+        return (FeFile) this;
+    }
+
+    public String getExtension() {
+        if (extension == null) {
+            extension = MyPathUtil.getExtension(this);
+        }
+        return extension;
     }
 
 }

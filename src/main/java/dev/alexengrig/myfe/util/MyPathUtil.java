@@ -16,14 +16,14 @@
 
 package dev.alexengrig.myfe.util;
 
-import dev.alexengrig.myfe.model.MyFile;
-import dev.alexengrig.myfe.model.MyPath;
+import dev.alexengrig.myfe.model.FeFile;
+import dev.alexengrig.myfe.model.FePath;
 
 import java.util.Objects;
 import java.util.Set;
 
 /**
- * A utility class for {@link MyPath}.
+ * A utility class for {@link FePath}.
  */
 public class MyPathUtil {
 
@@ -35,7 +35,7 @@ public class MyPathUtil {
         throw new IllegalAccessException("This is utility class");
     }
 
-    public static String getExtension(MyPath path) {
+    public static String getExtension(FePath path) {
         if (requireNonNullPath(path).isDirectory()) {
             return "File folder";
         } else {
@@ -49,23 +49,23 @@ public class MyPathUtil {
         }
     }
 
-    public static boolean isImage(MyFile file) {
+    public static boolean isImage(FeFile file) {
         return IMAGE_FILE_EXTENSIONS.contains(requireNonNullFile(file).getExtension());
     }
 
-    public static boolean isText(MyFile file) {
+    public static boolean isText(FeFile file) {
         return TEXT_FILE_EXTENSIONS.contains(requireNonNullFile(file).getExtension());
     }
 
-    public static boolean isArchive(MyFile file) {
+    public static boolean isArchive(FeFile file) {
         return ARCHIVE_FILE_EXTENSIONS.contains(requireNonNullFile(file).getExtension());
     }
 
-    private static MyPath requireNonNullPath(MyPath path) {
+    private static FePath requireNonNullPath(FePath path) {
         return Objects.requireNonNull(path, "The path must not be null");
     }
 
-    private static MyFile requireNonNullFile(MyFile file) {
+    private static FeFile requireNonNullFile(FeFile file) {
         return Objects.requireNonNull(file, "The file must not be null");
     }
 

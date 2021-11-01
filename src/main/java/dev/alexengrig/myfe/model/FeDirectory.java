@@ -14,27 +14,20 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.model.event;
+package dev.alexengrig.myfe.model;
 
-import dev.alexengrig.myfe.model.MyPath;
+/**
+ * Directory of file explorer.
+ */
+public class FeDirectory extends FePath {
 
-public class MyPathModelEvent {
-
-    private final MyPath path;
-
-    public MyPathModelEvent(MyPath path) {
-        this.path = path;
-    }
-
-    public MyPath getPath() {
-        return path;
+    public FeDirectory(String path, String name) {
+        super(path, name);
     }
 
     @Override
-    public String toString() {
-        return "MyPathModelEvent{" +
-                "path=" + path +
-                '}';
+    public boolean isDirectory() {
+        return true;
     }
 
 }

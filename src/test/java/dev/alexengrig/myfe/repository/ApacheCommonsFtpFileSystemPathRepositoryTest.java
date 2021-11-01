@@ -18,8 +18,8 @@ package dev.alexengrig.myfe.repository;
 
 import dev.alexengrig.myfe.WithFtpServer;
 import dev.alexengrig.myfe.config.FTPConnectionConfig;
-import dev.alexengrig.myfe.model.MyDirectory;
-import dev.alexengrig.myfe.model.MyPath;
+import dev.alexengrig.myfe.model.FeDirectory;
+import dev.alexengrig.myfe.model.FePath;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,7 +57,7 @@ class ApacheCommonsFtpFileSystemPathRepositoryTest extends WithFtpServer {
     void should_return_rootDirectories() {
         FileSystem fs = ftpServer.getFileSystem();
         fs.add(new DirectoryEntry("/pub"));
-        List<MyDirectory> rootDirectories = ftpPathRepository.getRootDirectories();
+        List<FeDirectory> rootDirectories = ftpPathRepository.getRootDirectories();
         assertEquals(1, rootDirectories.size(), "Number of root directories");
     }
 
@@ -66,9 +66,9 @@ class ApacheCommonsFtpFileSystemPathRepositoryTest extends WithFtpServer {
         FileSystem fs = ftpServer.getFileSystem();
         fs.add(new DirectoryEntry("/pub/empty"));
         fs.add(new FileEntry("/pub/text.txt"));
-        List<MyPath> children = ftpPathRepository.getChildren("/pub");
+        List<FePath> children = ftpPathRepository.getChildren("/pub");
         assertEquals(2, children.size(), "Number of children");
-        MyPath dir, file;
+        FePath dir, file;
         if (children.get(0).isDirectory()) {
             dir = children.get(0);
             file = children.get(1);
@@ -89,7 +89,7 @@ class ApacheCommonsFtpFileSystemPathRepositoryTest extends WithFtpServer {
         FileSystem fs = ftpServer.getFileSystem();
         fs.add(new DirectoryEntry("/pub/empty"));
         fs.add(new FileEntry("/pub/text.txt"));
-        List<MyDirectory> subdirectories = ftpPathRepository.getSubdirectories("/pub");
+        List<FeDirectory> subdirectories = ftpPathRepository.getSubdirectories("/pub");
         assertEquals(1, subdirectories.size(), "Number of subdirectories");
     }
 

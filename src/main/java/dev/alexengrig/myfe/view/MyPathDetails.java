@@ -16,7 +16,7 @@
 
 package dev.alexengrig.myfe.view;
 
-import dev.alexengrig.myfe.model.MyPath;
+import dev.alexengrig.myfe.model.FePath;
 import dev.alexengrig.myfe.model.MyPathModel;
 
 import javax.swing.*;
@@ -63,7 +63,7 @@ public class MyPathDetails extends JPanel {
     }
 
     private List<JComponent> createComponent() {
-        MyPath path = model.getPath();
+        FePath path = model.getPath();
         return List.of(
                 new JLabel("Name: " + path.getName()),
                 new JLabel("Type: " + path.getExtension())

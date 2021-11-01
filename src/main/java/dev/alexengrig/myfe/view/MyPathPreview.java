@@ -16,10 +16,10 @@
 
 package dev.alexengrig.myfe.view;
 
-import dev.alexengrig.myfe.model.MyFile;
-import dev.alexengrig.myfe.model.MyPath;
+import dev.alexengrig.myfe.model.FeFile;
+import dev.alexengrig.myfe.model.FePath;
 import dev.alexengrig.myfe.model.MyPathModel;
-import dev.alexengrig.myfe.model.event.MyPathModelEvent;
+import dev.alexengrig.myfe.model.event.FePathModelEvent;
 import dev.alexengrig.myfe.model.event.MyPathModelListener;
 import dev.alexengrig.myfe.service.MyPathPreviewBackgroundService;
 import dev.alexengrig.myfe.util.MyPathUtil;
@@ -49,7 +49,7 @@ public class MyPathPreview extends JPanel {
         model.addMyPathModelListener(new ModelListener());
     }
 
-    private void handleChangePath(MyPath path) {
+    private void handleChangePath(FePath path) {
         LOGGER.debug("Handle change path: {}", path);
         removeAll();
         addPreviewComponent(path);
@@ -57,12 +57,12 @@ public class MyPathPreview extends JPanel {
         repaint();
     }
 
-    private void addPreviewComponent(MyPath path) {
+    private void addPreviewComponent(FePath path) {
         JComponent component = createPreviewComponent(path);
         add(component);
     }
 
-    private JComponent createPreviewComponent(MyPath path) {
+    private JComponent createPreviewComponent(FePath path) {
         if (path == null) {
             return createEmptyPreviewComponent();
         } else {
@@ -85,11 +85,11 @@ public class MyPathPreview extends JPanel {
         return new JTextArea("No preview available");
     }
 
-    private JComponent createImagePreviewComponent(MyFile file) {
+    private JComponent createImagePreviewComponent(FeFile file) {
         return new MyImage(file);
     }
 
-    private JComponent createTextPreviewComponent(MyFile file) {
+    private JComponent createTextPreviewComponent(FeFile file) {
         MyText component = new MyText();
         backgroundService.loadTextPreview(file, str -> {
             LOGGER.debug("Got preview text for: {}", file);
@@ -101,12 +101,12 @@ public class MyPathPreview extends JPanel {
     /**
      * Events from model.
      *
-     * @see MyPathPreview#handleChangePath(MyPath)
+     * @see MyPathPreview#handleChangePath(FePath)
      */
     private class ModelListener implements MyPathModelListener {
 
         @Override
-        public void changePath(MyPathModelEvent event) {
+        public void changePath(FePathModelEvent event) {
             handleChangePath(event.getPath());
         }
 

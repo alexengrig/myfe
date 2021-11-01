@@ -14,21 +14,27 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.model;
+package dev.alexengrig.myfe.model.event;
 
-/**
- * File of file explorer.
- */
-//FIXME: Rename to FeFile (File explorer file)
-public class MyFile extends MyPath {
+import dev.alexengrig.myfe.model.FePath;
 
-    public MyFile(String path, String name) {
-        super(path, name);
+public class FePathModelEvent {
+
+    private final FePath path;
+
+    public FePathModelEvent(FePath path) {
+        this.path = path;
+    }
+
+    public FePath getPath() {
+        return path;
     }
 
     @Override
-    public boolean isDirectory() {
-        return false;
+    public String toString() {
+        return "MyPathModelEvent{" +
+                "path=" + path +
+                '}';
     }
 
 }

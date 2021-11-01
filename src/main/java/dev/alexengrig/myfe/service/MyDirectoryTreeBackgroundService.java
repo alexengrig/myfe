@@ -16,13 +16,13 @@
 
 package dev.alexengrig.myfe.service;
 
-import dev.alexengrig.myfe.model.MyDirectory;
+import dev.alexengrig.myfe.model.FeDirectory;
 
 import java.util.List;
 import java.util.function.Consumer;
 
 public interface MyDirectoryTreeBackgroundService {
 
-    void loadSubdirectories(MyDirectory directory, Consumer<List<MyDirectory>> handler);
+    void loadSubdirectories(FeDirectory directory, Consumer<List<FeDirectory>> handler);
 
 }

@@ -17,8 +17,8 @@
 package dev.alexengrig.myfe.repository;
 
 import dev.alexengrig.myfe.converter.Converter;
-import dev.alexengrig.myfe.model.MyDirectory;
-import dev.alexengrig.myfe.model.MyPath;
+import dev.alexengrig.myfe.model.FeDirectory;
+import dev.alexengrig.myfe.model.FePath;
 import dev.alexengrig.myfe.util.CloseOnTerminalOperationStreams;
 import dev.alexengrig.myfe.util.PathUtil;
 import org.slf4j.Logger;
@@ -55,13 +55,13 @@ public class FileSystemPathRepository implements MyPathRepository {
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final FileSystem fileSystem;
-    private final Converter<Path, MyDirectory> directoryConverter;
-    private final Converter<Path, MyPath> pathConverter;
+    private final Converter<Path, FeDirectory> directoryConverter;
+    private final Converter<Path, FePath> pathConverter;
 
     public FileSystemPathRepository(
             FileSystem fileSystem,
-            Converter<Path, MyDirectory> directoryConverter,
-            Converter<Path, MyPath> pathConverter) {
+            Converter<Path, FeDirectory> directoryConverter,
+            Converter<Path, FePath> pathConverter) {
         this.fileSystem = fileSystem;
         this.directoryConverter = directoryConverter;
         this.pathConverter = pathConverter;
@@ -74,7 +74,7 @@ public class FileSystemPathRepository implements MyPathRepository {
     }
 
     @Override
-    public List<MyDirectory> getRootDirectories() {
+    public List<FeDirectory> getRootDirectories() {
         LOGGER.debug("Getting root directories");
         Iterable<Path> directories = fileSystem.getRootDirectories();
         return StreamSupport.stream(directories.spliterator(), false)
@@ -83,7 +83,7 @@ public class FileSystemPathRepository implements MyPathRepository {
     }
 
     @Override
-    public List<MyPath> getChildren(String directoryPath) {
+    public List<FePath> getChildren(String directoryPath) {
         LOGGER.debug("Getting children: {}", directoryPath);
         Path directory = fileSystem.getPath(requireNonNullPath(directoryPath));
         List<Path> children = PathUtil.getChildren(directory);
@@ -93,7 +93,7 @@ public class FileSystemPathRepository implements MyPathRepository {
     }
 
     @Override
-    public List<MyDirectory> getSubdirectories(String directoryPath) {
+    public List<FeDirectory> getSubdirectories(String directoryPath) {
         LOGGER.debug("Getting subdirectories: {}", directoryPath);
         Path directory = fileSystem.getPath(requireNonNullPath(directoryPath));
         final List<Path> subdirectories = PathUtil.getSubdirectories(directory);

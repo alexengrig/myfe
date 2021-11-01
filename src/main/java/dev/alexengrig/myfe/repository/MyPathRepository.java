@@ -16,19 +16,19 @@
 
 package dev.alexengrig.myfe.repository;
 
-import dev.alexengrig.myfe.model.MyDirectory;
-import dev.alexengrig.myfe.model.MyPath;
+import dev.alexengrig.myfe.model.FeDirectory;
+import dev.alexengrig.myfe.model.FePath;
 
 import java.util.List;
 import java.util.stream.Stream;
 
 public interface MyPathRepository extends AutoCloseable {
 
-    List<MyDirectory> getRootDirectories();
+    List<FeDirectory> getRootDirectories();
 
-    List<MyPath> getChildren(String directoryPath);
+    List<FePath> getChildren(String directoryPath);
 
-    List<MyDirectory> getSubdirectories(String directoryPath);
+    List<FeDirectory> getSubdirectories(String directoryPath);
 
     String readBatch(String filePath, int batchSize);
 

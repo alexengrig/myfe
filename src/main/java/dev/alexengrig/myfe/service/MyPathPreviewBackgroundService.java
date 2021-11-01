@@ -16,12 +16,12 @@
 
 package dev.alexengrig.myfe.service;
 
-import dev.alexengrig.myfe.model.MyFile;
+import dev.alexengrig.myfe.model.FeFile;
 
 import java.util.function.Consumer;
 
 public interface MyPathPreviewBackgroundService {
 
-    void loadTextPreview(MyFile file, Consumer<String> handler);
+    void loadTextPreview(FeFile file, Consumer<String> handler);
 
 }

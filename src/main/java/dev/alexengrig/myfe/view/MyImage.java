@@ -16,13 +16,13 @@
 
 package dev.alexengrig.myfe.view;
 
-import dev.alexengrig.myfe.model.MyFile;
+import dev.alexengrig.myfe.model.FeFile;
 
 import javax.swing.*;
 
 public class MyImage extends JLabel {
 
-    public MyImage(MyFile file) {
+    public MyImage(FeFile file) {
         super(new ImageIcon(file.getPath()));
     }
 

@@ -16,11 +16,11 @@
 
 package dev.alexengrig.myfe.view;
 
-import dev.alexengrig.myfe.model.MyDirectory;
+import dev.alexengrig.myfe.model.FeDirectory;
+import dev.alexengrig.myfe.model.FeFile;
+import dev.alexengrig.myfe.model.FePath;
 import dev.alexengrig.myfe.model.MyDirectoryTreeModel;
-import dev.alexengrig.myfe.model.MyFile;
 import dev.alexengrig.myfe.model.MyFooterModel;
-import dev.alexengrig.myfe.model.MyPath;
 import dev.alexengrig.myfe.model.MyPathFilterModel;
 import dev.alexengrig.myfe.model.MyPathModel;
 import dev.alexengrig.myfe.model.MyPathTableModel;
@@ -62,7 +62,7 @@ public class MyTab extends JPanel {
     /**
      * Current directory on the top; {@code null} - the root.
      */
-    private final Deque<MyDirectory> directoryStack;
+    private final Deque<FeDirectory> directoryStack;
 
     private MyDirectoryTreeModel treeModel;
     private MyPathTableModel tableModel;
@@ -108,7 +108,7 @@ public class MyTab extends JPanel {
     private void initModels() {
         LOGGER.debug("Start initializing models");
         //TODO: Getting root directories is slow - add spinner and background task
-        List<MyDirectory> rootDirectories = service.getRootDirectories();
+        List<FeDirectory> rootDirectories = service.getRootDirectories();
         treeModel = new MyDirectoryTreeModel(service.getRootName(), rootDirectories);
         tableModel = new MyPathTableModel(rootDirectories);
         filterModel = new MyPathFilterModel(rootDirectories);
@@ -165,7 +165,7 @@ public class MyTab extends JPanel {
         directoryStack.push(null);
     }
 
-    private void handleSelectDirectory(MyDirectory directory) {
+    private void handleSelectDirectory(FeDirectory directory) {
         LOGGER.debug("Handle select directory: {}", directory);
         //TODO: Spinner to table
         backgroundExecutor.execute(
@@ -179,14 +179,14 @@ public class MyTab extends JPanel {
         directoryStack.push(directory);
     }
 
-    private void handleSelectPath(MyPath path) {
+    private void handleSelectPath(FePath path) {
         LOGGER.debug("Handle select path: {}", path);
         pathModel.setPath(path);
     }
 
     private void handleGoToPreviousDirectory() {
-        MyDirectory currentDirectory = directoryStack.poll();
-        MyDirectory previousDirectory = directoryStack.poll();
+        FeDirectory currentDirectory = directoryStack.poll();
+        FeDirectory previousDirectory = directoryStack.poll();
         LOGGER.debug("Handle go to previous directory: {}", previousDirectory);
         if (previousDirectory == null) {
             handleSelectRoot();
@@ -230,7 +230,7 @@ public class MyTab extends JPanel {
      * Events from Tree.
      *
      * @see MyTab#handleSelectRoot()
-     * @see MyTab#handleSelectDirectory(MyDirectory)
+     * @see MyTab#handleSelectDirectory(FeDirectory)
      */
     private class TreeListener implements MyDirectoryTreeListener {
 
@@ -241,7 +241,7 @@ public class MyTab extends JPanel {
 
         @Override
         public void selectDirectory(MyDirectoryTreeEvent event) {
-            MyDirectory directory = event.getDirectory();
+            FeDirectory directory = event.getDirectory();
             handleSelectDirectory(directory);
         }
 
@@ -250,8 +250,8 @@ public class MyTab extends JPanel {
     /**
      * Events from table.
      *
-     * @see MyTab#handleSelectPath(MyPath)
-     * @see MyTab#handleSelectDirectory(MyDirectory)
+     * @see MyTab#handleSelectPath(FePath)
+     * @see MyTab#handleSelectDirectory(FeDirectory)
      * @see MyTab#handleGoToPreviousDirectory()
      * @see MyTab#handleChangeNumberOfElements(Integer)
      * @see MyTab#fireOpenArchive(MyTabEvent)
@@ -260,13 +260,13 @@ public class MyTab extends JPanel {
 
         @Override
         public void selectPath(MyPathTableEvent event) {
-            MyPath path = event.getPath();
+            FePath path = event.getPath();
             handleSelectPath(path);
         }
 
         @Override
         public void doubleClickOnPath(MyPathTableEvent event) {
-            MyPath path = event.getPath();
+            FePath path = event.getPath();
             if (path.isDirectory()) {
                 handleSelectDirectory(path.asDirectory());
             } else if (MyPathUtil.isArchive(path.asFile())) {
@@ -307,7 +307,7 @@ public class MyTab extends JPanel {
     private class TreeService implements MyDirectoryTreeBackgroundService {
 
         @Override
-        public void loadSubdirectories(MyDirectory directory, Consumer<List<MyDirectory>> handler) {
+        public void loadSubdirectories(FeDirectory directory, Consumer<List<FeDirectory>> handler) {
             LOGGER.debug("Start loading subdirectories for: {}", directory);
             backgroundExecutor.execute(
                     () -> "Loading subdirectories for: " + directory,
@@ -328,7 +328,7 @@ public class MyTab extends JPanel {
         private BackgroundTask previousTask;
 
         @Override
-        public void loadTextPreview(MyFile file, Consumer<String> handler) {
+        public void loadTextPreview(FeFile file, Consumer<String> handler) {
             LOGGER.debug("Start loading text preview for: {}", file);
             cancelPreviousTaskIfNeed();
             previousTask = backgroundExecutor.execute(() -> "Loading text preview for: " + file, () -> service.getFileContentPreview(file), result -> {
