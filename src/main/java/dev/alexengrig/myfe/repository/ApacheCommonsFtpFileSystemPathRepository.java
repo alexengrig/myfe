@@ -16,15 +16,12 @@
 
 package dev.alexengrig.myfe.repository;
 
-import dev.alexengrig.myfe.client.MyFtpClient;
 import dev.alexengrig.myfe.config.FTPConnectionConfig;
 import dev.alexengrig.myfe.converter.Converter;
-import dev.alexengrig.myfe.converter.MyFtpDirectory2MyDirectoryConverter;
-import dev.alexengrig.myfe.converter.MyFtpPath2MyPathConverter;
+import dev.alexengrig.myfe.converter.FileObject2MyDirectoryConverter;
+import dev.alexengrig.myfe.converter.FileObject2MyPathConverter;
 import dev.alexengrig.myfe.exception.MyPathRepositoryException;
 import dev.alexengrig.myfe.model.MyDirectory;
-import dev.alexengrig.myfe.model.MyFtpDirectory;
-import dev.alexengrig.myfe.model.MyFtpPath;
 import dev.alexengrig.myfe.model.MyPath;
 import dev.alexengrig.myfe.util.CloseOnTerminalOperationStreams;
 import dev.alexengrig.myfe.util.LazyLogger;
@@ -58,10 +55,9 @@ import static java.util.Spliterator.NONNULL;
 import static java.util.Spliterator.ORDERED;
 
 /**
- * {@link MyFtpClient}-based implementation.
+ * {@link FtpFileSystem}-based implementation.
  */
-//TODO: Create FileSystem of FTP server for FileSystemPathRepository
-public class FtpPathRepository implements MyPathRepository {
+public class ApacheCommonsFtpFileSystemPathRepository implements MyPathRepository {
 
     private static final LazyLogger LOGGER = LazyLoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -70,21 +66,21 @@ public class FtpPathRepository implements MyPathRepository {
         FtpFileSystemConfigBuilder.getInstance().setUserDirIsRoot(options, false);
     }
 
-    private final Converter<MyFtpPath, MyPath> pathConverter;
-    private final Converter<MyFtpDirectory, MyDirectory> directoryConverter;
+    private final Converter<FileObject, MyPath> pathConverter;
+    private final Converter<FileObject, MyDirectory> directoryConverter;
     private final FTPConnectionConfig config;
     private final FtpFileSystem fs;
 
-    public FtpPathRepository(FTPConnectionConfig connectionConfig) {
+    public ApacheCommonsFtpFileSystemPathRepository(FTPConnectionConfig connectionConfig) {
         this(//TODO: Get from context
-                new MyFtpPath2MyPathConverter(),
-                new MyFtpDirectory2MyDirectoryConverter(),
+                new FileObject2MyPathConverter(),
+                new FileObject2MyDirectoryConverter(),
                 connectionConfig);
     }
 
-    public FtpPathRepository(
-            Converter<MyFtpPath, MyPath> pathConverter,
-            Converter<MyFtpDirectory, MyDirectory> directoryConverter,
+    public ApacheCommonsFtpFileSystemPathRepository(
+            Converter<FileObject, MyPath> pathConverter,
+            Converter<FileObject, MyDirectory> directoryConverter,
             FTPConnectionConfig connectionConfig) {
         this.pathConverter = pathConverter;
         this.directoryConverter = directoryConverter;
@@ -128,7 +124,7 @@ public class FtpPathRepository implements MyPathRepository {
                 }
             });
             List<MyDirectory> result = Arrays.stream(directories)
-                    .map(f -> new MyDirectory(f.getName().getPath(), f.getName().getBaseName())) //FIXME: Converter
+                    .map(directoryConverter::convert)
                     .collect(Collectors.toList());
             LOGGER.debug(m -> m.log("Finished getting root directories \"{}\", number of directories: {}",
                     config.getInfo(), result.size()));
@@ -151,13 +147,7 @@ public class FtpPathRepository implements MyPathRepository {
             //FIXME: Check on folder
             FileObject[] children = directory.getChildren();
             List<MyPath> result = Arrays.stream(children)
-                    .map(f -> {
-                        try {
-                            return MyPath.of(f.getName().getPath(), f.getName().getBaseName(), f.isFolder());
-                        } catch (FileSystemException e) {
-                            throw new MyPathRepositoryException(e);
-                        }
-                    })
+                    .map(pathConverter::convert)
                     .collect(Collectors.toList());
             LOGGER.debug(m -> m.log("Finished getting children \"{}\" in \"{}\", number of elements: {}",
                     config.getInfo(), directoryPath, result.size()));
@@ -190,7 +180,7 @@ public class FtpPathRepository implements MyPathRepository {
                 }
             });
             List<MyDirectory> result = Arrays.stream(directories)
-                    .map(f -> new MyDirectory(f.getName().getPath(), f.getName().getBaseName())) //FIXME: Converter
+                    .map(directoryConverter::convert)
                     .collect(Collectors.toList());
             LOGGER.debug(m -> m.log("Finished getting subdirectories \"{}\" in \"{}\", number of directories: {}",
                     config.getInfo(), directoryPath, result.size()));

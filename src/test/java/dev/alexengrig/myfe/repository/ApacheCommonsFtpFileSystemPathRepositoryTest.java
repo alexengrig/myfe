@@ -34,15 +34,16 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class FtpPathRepositoryTest extends WithFtpServer {
+class ApacheCommonsFtpFileSystemPathRepositoryTest extends WithFtpServer {
 
-    FtpPathRepository ftpPathRepository;
+    ApacheCommonsFtpFileSystemPathRepository ftpPathRepository;
 
     @BeforeEach
     @Override
     protected void setup() {
         super.setup();
-        ftpPathRepository = new FtpPathRepository(FTPConnectionConfig.user(host, username, password.toCharArray()));
+        FTPConnectionConfig config = FTPConnectionConfig.user(host, username, password.toCharArray());
+        ftpPathRepository = new ApacheCommonsFtpFileSystemPathRepository(config);
     }
 
     @AfterEach
