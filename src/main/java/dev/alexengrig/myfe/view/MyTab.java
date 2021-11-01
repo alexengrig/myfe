@@ -16,13 +16,13 @@
 
 package dev.alexengrig.myfe.view;
 
+import dev.alexengrig.myfe.model.FeContentTableModel;
 import dev.alexengrig.myfe.model.FeDirectory;
 import dev.alexengrig.myfe.model.FeFile;
 import dev.alexengrig.myfe.model.FeFooterModel;
 import dev.alexengrig.myfe.model.FePath;
 import dev.alexengrig.myfe.model.MyDirectoryTreeModel;
 import dev.alexengrig.myfe.model.MyPathFilterModel;
-import dev.alexengrig.myfe.model.MyPathTableModel;
 import dev.alexengrig.myfe.model.SelectedFePathModel;
 import dev.alexengrig.myfe.service.BackgroundExecutorService;
 import dev.alexengrig.myfe.service.MyDirectoryTreeBackgroundService;
@@ -65,7 +65,7 @@ public class MyTab extends JPanel {
     private final Deque<FeDirectory> directoryStack;
 
     private MyDirectoryTreeModel treeModel;
-    private MyPathTableModel tableModel;
+    private FeContentTableModel tableModel;
     private MyPathFilterModel filterModel;
     private SelectedFePathModel pathModel;
     private FeFooterModel footerModel;
@@ -110,7 +110,7 @@ public class MyTab extends JPanel {
         //TODO: Getting root directories is slow - add spinner and background task
         List<FeDirectory> rootDirectories = service.getRootDirectories();
         treeModel = new MyDirectoryTreeModel(service.getRootName(), rootDirectories);
-        tableModel = new MyPathTableModel(rootDirectories);
+        tableModel = new FeContentTableModel(rootDirectories);
         filterModel = new MyPathFilterModel(rootDirectories);
         pathModel = new SelectedFePathModel();
         footerModel = new FeFooterModel(rootDirectories.size());

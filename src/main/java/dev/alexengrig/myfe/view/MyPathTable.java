@@ -16,8 +16,8 @@
 
 package dev.alexengrig.myfe.view;
 
+import dev.alexengrig.myfe.model.FeContentTableModel;
 import dev.alexengrig.myfe.model.FePath;
-import dev.alexengrig.myfe.model.MyPathTableModel;
 import dev.alexengrig.myfe.view.event.DoNothingKeyListener;
 import dev.alexengrig.myfe.view.event.DoNothingMouseListener;
 import dev.alexengrig.myfe.view.event.MyPathTableEvent;
@@ -44,7 +44,7 @@ public class MyPathTable extends JTable {
 
     private final List<MyPathTableListener> listeners = new LinkedList<>();
 
-    public MyPathTable(MyPathTableModel model) {
+    public MyPathTable(FeContentTableModel model) {
         super(model);
         init();
     }
@@ -56,10 +56,10 @@ public class MyPathTable extends JTable {
     }
 
     private void initSorter() {
-        TableRowSorter<MyPathTableModel> sorter = new TableRowSorter<>(getModel());
+        TableRowSorter<FeContentTableModel> sorter = new TableRowSorter<>(getModel());
         sorter.setRowFilter(new RowFilter<>() {
             @Override
-            public boolean include(Entry<? extends MyPathTableModel, ? extends Integer> entry) {
+            public boolean include(Entry<? extends FeContentTableModel, ? extends Integer> entry) {
                 String filteredType = getModel().getFilteredType();
                 if (filteredType == null) {
                     return true;
@@ -81,8 +81,8 @@ public class MyPathTable extends JTable {
     }
 
     @Override
-    public MyPathTableModel getModel() {
-        return (MyPathTableModel) super.getModel();
+    public FeContentTableModel getModel() {
+        return (FeContentTableModel) super.getModel();
     }
 
     private FePath getSelectedPath() {

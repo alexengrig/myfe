@@ -21,12 +21,18 @@ import java.util.List;
 import java.util.Vector;
 import java.util.stream.Collectors;
 
-public class MyPathTableModel extends DefaultTableModel {
+/**
+ * Model of file explorer content table.
+ *
+ * @see dev.alexengrig.myfe.view.MyPathTable
+ */
+//TODO: Extends AbstractTableModel
+public class FeContentTableModel extends DefaultTableModel {
 
     private List<? extends FePath> paths;
     private String filteredType;
 
-    public MyPathTableModel(List<? extends FePath> paths) {
+    public FeContentTableModel(List<? extends FePath> paths) {
         super(convertToVector(paths), convertToVector(new Object[]{"Name", "Type"}));
         this.paths = paths;
     }
