@@ -24,8 +24,10 @@ import dev.alexengrig.myfe.exception.MyPathRepositoryException;
 import dev.alexengrig.myfe.model.MyDirectory;
 import dev.alexengrig.myfe.model.MyPath;
 import dev.alexengrig.myfe.util.CloseOnTerminalOperationStreams;
+import dev.alexengrig.myfe.util.LazyLogAdapter;
 import dev.alexengrig.myfe.util.LazyLogger;
 import dev.alexengrig.myfe.util.LazyLoggerFactory;
+import dev.alexengrig.myfe.util.ThrowablePredicate;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSelectInfo;
 import org.apache.commons.vfs2.FileSelector;
@@ -63,13 +65,14 @@ public class ApacheCommonsFtpFileSystemPathRepository implements MyPathRepositor
 
     static {
         FileSystemOptions options = new FileSystemOptions();
-        FtpFileSystemConfigBuilder.getInstance().setUserDirIsRoot(options, false);
+        FtpFileSystemConfigBuilder config = FtpFileSystemConfigBuilder.getInstance();
+        config.setPassiveMode(options, true);
     }
 
     private final Converter<FileObject, MyPath> pathConverter;
     private final Converter<FileObject, MyDirectory> directoryConverter;
     private final FTPConnectionConfig config;
-    private final FtpFileSystem fs;
+    private final FtpFileSystem fileSystem;
 
     public ApacheCommonsFtpFileSystemPathRepository(FTPConnectionConfig connectionConfig) {
         this(//TODO: Get from context
@@ -85,26 +88,32 @@ public class ApacheCommonsFtpFileSystemPathRepository implements MyPathRepositor
         this.pathConverter = pathConverter;
         this.directoryConverter = directoryConverter;
         this.config = connectionConfig;
-        this.fs = createFtpFileSystem(connectionConfig);
+        this.fileSystem = createFtpFileSystem(connectionConfig);
+        fileSystem.setLogger(new LogAdapter(connectionConfig));
     }
 
-    private FtpFileSystem createFtpFileSystem(FTPConnectionConfig cfg) {
+    private FtpFileSystem createFtpFileSystem(FTPConnectionConfig config) {
         try {
-            String username = cfg.getUsername();
-            String password = new String(cfg.getPassword());
-            String host = cfg.getHost();
-            int port = cfg.getPort();
+            String username = config.getUsername();
+            String password = new String(config.getPassword());
+            String host = config.getHost();
+            int port = config.getPort();
             FileSystemManager fsManager = VFS.getManager();
-            FileObject file = fsManager.resolveFile("ftp://" + username + ":" + password + "@" + host + ":" + port + "/");
+            String path = "ftp://" + username + ":" + password + "@" + host + ":" + port + "/";
+            FileObject file = fsManager.resolveFile(path);
             return (FtpFileSystem) file.getFileSystem();
         } catch (FileSystemException e) {
-            throw new MyPathRepositoryException(e);
+            LOGGER.error(m -> m.log("Exception of creating FTP file system: {}",
+                    config.getInfo(), e));
+            throw new MyPathRepositoryException("Exception of creating FTP file system: " +
+                    config.getInfo(),
+                    e);
         }
     }
 
     @Override
     public void close() throws Exception {
-        fs.close();
+        fileSystem.close();
     }
 
     @Override
@@ -112,17 +121,7 @@ public class ApacheCommonsFtpFileSystemPathRepository implements MyPathRepositor
         LOGGER.debug(m -> m.log("Start getting root directories \"{}\"",
                 config.getInfo()));
         try {
-            FileObject[] directories = fs.getRoot().findFiles(new FileSelector() {
-                @Override
-                public boolean includeFile(FileSelectInfo fileInfo) throws Exception {
-                    return fileInfo.getFile().isFolder();
-                }
-
-                @Override
-                public boolean traverseDescendents(FileSelectInfo fileInfo) {
-                    return false;
-                }
-            });
+            FileObject[] directories = fileSystem.getRoot().findFiles(Selector.of(FileObject::isFolder));
             List<MyDirectory> result = Arrays.stream(directories)
                     .map(directoryConverter::convert)
                     .collect(Collectors.toList());
@@ -143,7 +142,7 @@ public class ApacheCommonsFtpFileSystemPathRepository implements MyPathRepositor
         LOGGER.debug(m -> m.log("Start getting children \"{}\" for: {}",
                 config.getInfo(), directoryPath));
         try {
-            FileObject directory = fs.resolveFile(directoryPath);
+            FileObject directory = fileSystem.resolveFile(directoryPath);
             //FIXME: Check on folder
             FileObject[] children = directory.getChildren();
             List<MyPath> result = Arrays.stream(children)
@@ -167,18 +166,8 @@ public class ApacheCommonsFtpFileSystemPathRepository implements MyPathRepositor
         LOGGER.debug(m -> m.log("Start getting subdirectories \"{}\" for: {}",
                 config.getInfo(), directoryPath));
         try {
-            FileObject directory = fs.resolveFile(directoryPath);
-            FileObject[] directories = directory.findFiles(new FileSelector() {
-                @Override
-                public boolean includeFile(FileSelectInfo fileInfo) throws Exception {
-                    return fileInfo.getFile().isFolder();
-                }
-
-                @Override
-                public boolean traverseDescendents(FileSelectInfo fileInfo) {
-                    return false;
-                }
-            });
+            FileObject directory = fileSystem.resolveFile(directoryPath);
+            FileObject[] directories = directory.findFiles(Selector.of(FileObject::isFolder));
             List<MyDirectory> result = Arrays.stream(directories)
                     .map(directoryConverter::convert)
                     .collect(Collectors.toList());
@@ -200,7 +189,7 @@ public class ApacheCommonsFtpFileSystemPathRepository implements MyPathRepositor
         LOGGER.debug(m -> m.log("Start reading a batch of {} byte(s) \"{}\" for: {}",
                 batchSize, config.getInfo(), filePath));
         try {
-            FileObject file = fs.resolveFile(filePath);
+            FileObject file = fileSystem.resolveFile(filePath);
             InputStream inputStream = file.getContent().getInputStream();
             byte[] buffer = new byte[batchSize];
             int count = inputStream.read(buffer);
@@ -229,7 +218,7 @@ public class ApacheCommonsFtpFileSystemPathRepository implements MyPathRepositor
         LOGGER.debug(m -> m.log("Start reading {} batch(es) of {} byte(s) \"{}\" for: {}",
                 numberOfBatches, batchSize, config.getInfo(), filePath));
         try {
-            FileObject file = fs.resolveFile(filePath);
+            FileObject file = fileSystem.resolveFile(filePath);
             InputStream inputStream = file.getContent().getInputStream();
             Iterator<String> iterator = new InputStreamIterator(inputStream, new byte[batchSize], numberOfBatches);
             Spliterator<String> spliterator = Spliterators.spliteratorUnknownSize(iterator, NONNULL | ORDERED);
@@ -263,6 +252,56 @@ public class ApacheCommonsFtpFileSystemPathRepository implements MyPathRepositor
                     filePath,
                     e);
         }
+    }
+
+    private static class LogAdapter extends LazyLogAdapter {
+
+        private final FTPConnectionConfig config;
+
+        public LogAdapter(FTPConnectionConfig config) {
+            super(LOGGER);
+            this.config = config;
+        }
+
+        @Override
+        protected String format() {
+            return "\"{}\": {}";
+        }
+
+        @Override
+        protected Object[] arguments(Object message) {
+            return new Object[]{config.getInfo(), message};
+        }
+
+        @Override
+        protected Object[] arguments(Object message, Throwable throwable) {
+            return new Object[]{config.getInfo(), message, throwable};
+        }
+
+    }
+
+    private static class Selector implements FileSelector {
+
+        private final ThrowablePredicate<FileObject> predicate;
+
+        private Selector(ThrowablePredicate<FileObject> predicate) {
+            this.predicate = predicate;
+        }
+
+        private static Selector of(ThrowablePredicate<FileObject> predicate) {
+            return new Selector(predicate);
+        }
+
+        @Override
+        public boolean includeFile(FileSelectInfo fileInfo) throws Exception {
+            return predicate.test(fileInfo.getFile());
+        }
+
+        @Override
+        public boolean traverseDescendents(FileSelectInfo fileInfo) {
+            return false;
+        }
+
     }
 
     private static class InputStreamIterator implements Iterator<String> {
