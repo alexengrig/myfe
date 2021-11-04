@@ -16,6 +16,7 @@
 
 package dev.alexengrig.myfe.model;
 
+@Deprecated
 public interface Model {
 
     String toString();

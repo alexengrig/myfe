@@ -18,6 +18,7 @@ package dev.alexengrig.myfe.model;
 
 import java.util.function.UnaryOperator;
 
+@Deprecated
 @FunctionalInterface
 public interface ModelUpdater<M extends Model> {
 
