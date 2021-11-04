@@ -16,23 +16,23 @@
 
 package dev.alexengrig.myfe.converter;
 
-import dev.alexengrig.myfe.model.FeDirectory;
+import dev.alexengrig.myfe.model.FeFile;
 import dev.alexengrig.myfe.util.PathUtil;
 
 import java.nio.file.Path;
 import java.util.Objects;
 
 /**
- * Converter from {@link Path} to {@link FeDirectory}.
+ * Converter from {@link Path} to {@link FeFile}.
  */
-public class Path2MyDirectoryConverter implements Converter<Path, FeDirectory> {
+public class Path2FeFileConverter implements Converter<Path, FeFile> {
 
     @Override
-    public FeDirectory convert(Path source) {
+    public FeFile convert(Path source) {
         Objects.requireNonNull(source, "The source must not be null");
         String path = PathUtil.getAbsolutePath(source);
         String name = PathUtil.getName(source);
-        return new FeDirectory(path, name);
+        return new FeFile(path, name);
     }
 
 }

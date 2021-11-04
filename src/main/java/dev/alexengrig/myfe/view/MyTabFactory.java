@@ -18,9 +18,9 @@ package dev.alexengrig.myfe.view;
 
 import dev.alexengrig.myfe.config.FtpConnectionConfig;
 import dev.alexengrig.myfe.converter.Converter;
-import dev.alexengrig.myfe.converter.Path2MyDirectoryConverter;
-import dev.alexengrig.myfe.converter.Path2MyFileConverter;
-import dev.alexengrig.myfe.converter.Path2MyPathConverter;
+import dev.alexengrig.myfe.converter.Path2FeDirectoryConverter;
+import dev.alexengrig.myfe.converter.Path2FeFileConverter;
+import dev.alexengrig.myfe.converter.Path2FePathConverter;
 import dev.alexengrig.myfe.model.FeDirectory;
 import dev.alexengrig.myfe.model.FeFile;
 import dev.alexengrig.myfe.model.FePath;
@@ -39,9 +39,9 @@ import java.nio.file.Path;
 
 public class MyTabFactory {
 
-    private final Converter<Path, FeDirectory> directoryConverter = new Path2MyDirectoryConverter();
-    private final Converter<Path, FeFile> fileConverter = new Path2MyFileConverter();
-    private final Converter<Path, FePath> pathConverter = new Path2MyPathConverter(directoryConverter, fileConverter);
+    private final Converter<Path, FeDirectory> directoryConverter = new Path2FeDirectoryConverter();
+    private final Converter<Path, FeFile> fileConverter = new Path2FeFileConverter();
+    private final Converter<Path, FePath> pathConverter = new Path2FePathConverter(directoryConverter, fileConverter);
 
     private final BackgroundExecutorService backgroundExecutorService = BackgroundExecutor::execute;
 

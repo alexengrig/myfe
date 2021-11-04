@@ -19,5 +19,4 @@
  *
  * @see dev.alexengrig.myfe.converter.Converter
  */
-//TODO: Add converting library, for example MapStruct?
 package dev.alexengrig.myfe.converter;

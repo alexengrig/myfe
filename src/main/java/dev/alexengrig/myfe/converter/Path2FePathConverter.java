@@ -27,18 +27,18 @@ import java.util.Objects;
 /**
  * Converter from {@link Path} to {@link FePath}.
  */
-public class Path2MyPathConverter implements Converter<Path, FePath> {
+public class Path2FePathConverter implements Converter<Path, FePath> {
 
     private final Converter<Path, FeDirectory> directoryConverter;
     private final Converter<Path, FeFile> fileConverter;
 
-    public Path2MyPathConverter() {
+    public Path2FePathConverter() {
         this(//TODO: Get from context
-                new Path2MyDirectoryConverter(),
-                new Path2MyFileConverter());
+                new Path2FeDirectoryConverter(),
+                new Path2FeFileConverter());
     }
 
-    public Path2MyPathConverter(
+    public Path2FePathConverter(
             Converter<Path, FeDirectory> directoryConverter,
             Converter<Path, FeFile> fileConverter) {
         this.directoryConverter = directoryConverter;
