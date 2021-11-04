@@ -16,27 +16,10 @@
 
 package dev.alexengrig.myfe.view.event;
 
-public class MyPathFilterEvent {
+import java.util.EventListener;
 
-    private final String type;
+public interface FeTabListener extends EventListener {
 
-    private MyPathFilterEvent(String type) {
-        this.type = type;
-    }
-
-    public static MyPathFilterEvent type(String type) {
-        return new MyPathFilterEvent(type);
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    @Override
-    public String toString() {
-        return "MyPathFilterEvent{" +
-                "type='" + type + '\'' +
-                '}';
-    }
+    void openArchive(FeTabEvent event);
 
 }

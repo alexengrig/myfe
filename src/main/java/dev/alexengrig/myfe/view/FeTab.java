@@ -32,14 +32,14 @@ import dev.alexengrig.myfe.util.FePathUtil;
 import dev.alexengrig.myfe.util.logging.LazyLogger;
 import dev.alexengrig.myfe.util.logging.LazyLoggerFactory;
 import dev.alexengrig.myfe.util.swing.BackgroundTask;
-import dev.alexengrig.myfe.view.event.MyDirectoryTreeEvent;
-import dev.alexengrig.myfe.view.event.MyDirectoryTreeListener;
-import dev.alexengrig.myfe.view.event.MyPathFilterEvent;
-import dev.alexengrig.myfe.view.event.MyPathFilterListener;
-import dev.alexengrig.myfe.view.event.MyPathTableEvent;
-import dev.alexengrig.myfe.view.event.MyPathTableListener;
-import dev.alexengrig.myfe.view.event.MyTabEvent;
-import dev.alexengrig.myfe.view.event.MyTabListener;
+import dev.alexengrig.myfe.view.event.FeContentFilterEvent;
+import dev.alexengrig.myfe.view.event.FeContentFilterListener;
+import dev.alexengrig.myfe.view.event.FeContentTableEvent;
+import dev.alexengrig.myfe.view.event.FeContentTableListener;
+import dev.alexengrig.myfe.view.event.FeDirectoryTreeEvent;
+import dev.alexengrig.myfe.view.event.FeDirectoryTreeListener;
+import dev.alexengrig.myfe.view.event.FeTabEvent;
+import dev.alexengrig.myfe.view.event.FeTabListener;
 
 import javax.swing.*;
 import java.awt.*;
@@ -49,11 +49,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
 
-public class MyTab extends JPanel {
+public class FeTab extends JPanel {
 
     private static final LazyLogger LOGGER = LazyLoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final List<MyTabListener> listeners = new LinkedList<>();
+    private final List<FeTabListener> listeners = new LinkedList<>();
 
     private final FePathService service;
     private final BackgroundExecutorService backgroundExecutor;
@@ -70,15 +70,15 @@ public class MyTab extends JPanel {
     private SelectedFePathModel pathModel;
     private FeFooterModel footerModel;
 
-    private MyHeader headerView;
-    private MyDirectoryTree treeView;
-    private MyPathTable tableView;
-    private MyPathDetails detailsView;
-    private MyPathPreview previewView;
-    private MyFooter footerView;
-    private MyPathFilter filterView;
+    private FeHeader headerView;
+    private FeDirectoryTree treeView;
+    private FeContentTable tableView;
+    private FePathDetails detailsView;
+    private FePathPreview previewView;
+    private FeFooter footerView;
+    private FeContentFilter filterView;
 
-    public MyTab(FePathService service, BackgroundExecutorService backgroundExecutor, String title, String tip) {
+    public FeTab(FePathService service, BackgroundExecutorService backgroundExecutor, String title, String tip) {
         super(new BorderLayout());
         this.service = service;
         this.backgroundExecutor = backgroundExecutor;
@@ -119,21 +119,21 @@ public class MyTab extends JPanel {
 
     private void initViews() {
         LOGGER.debug("Start initializing views");
-        headerView = new MyHeader();
-        treeView = new MyDirectoryTree(treeModel, new TreeService());
-        tableView = new MyPathTable(tableModel);
-        filterView = new MyPathFilter(filterModel);
-        detailsView = new MyPathDetails(pathModel);
-        previewView = new MyPathPreview(pathModel, new PreviewService());
-        footerView = new MyFooter(footerModel);
+        headerView = new FeHeader();
+        treeView = new FeDirectoryTree(treeModel, new TreeService());
+        tableView = new FeContentTable(tableModel);
+        filterView = new FeContentFilter(filterModel);
+        detailsView = new FePathDetails(pathModel);
+        previewView = new FePathPreview(pathModel, new PreviewService());
+        footerView = new FeFooter(footerModel);
         LOGGER.debug("Finished initializing views");
     }
 
     private void initListeners() {
         LOGGER.debug("Start initializing listeners");
-        treeView.addMyDirectoryTreeListener(new TreeListener());
-        tableView.addMyPathTableListener(new TableListener());
-        filterView.addMyPathFilterListener(new FilterListener());
+        treeView.addFeDirectoryTreeListener(new TreeListener());
+        tableView.addFeContentTableListener(new TableListener());
+        filterView.addFeContentFilterListener(new FilterListener());
         LOGGER.debug("Finished initializing listeners");
     }
 
@@ -205,17 +205,17 @@ public class MyTab extends JPanel {
         footerModel.setNumberOfElements(numberOfElements);
     }
 
-    public void addMyTabListener(MyTabListener listener) {
+    public void addFeTabListener(FeTabListener listener) {
         listeners.add(listener);
     }
 
-    public void removeMyTabComponentListener(MyTabListener listener) {
+    public void removeFeTabListener(FeTabListener listener) {
         listeners.remove(listener);
     }
 
-    private void fireOpenArchive(MyTabEvent event) {
+    private void fireOpenArchive(FeTabEvent event) {
         LOGGER.debug("Fire open archive: {}", event);
-        for (MyTabListener listener : listeners) {
+        for (FeTabListener listener : listeners) {
             listener.openArchive(event);
         }
     }
@@ -229,18 +229,18 @@ public class MyTab extends JPanel {
     /**
      * Events from Tree.
      *
-     * @see MyTab#handleSelectRoot()
-     * @see MyTab#handleSelectDirectory(FeDirectory)
+     * @see FeTab#handleSelectRoot()
+     * @see FeTab#handleSelectDirectory(FeDirectory)
      */
-    private class TreeListener implements MyDirectoryTreeListener {
+    private class TreeListener implements FeDirectoryTreeListener {
 
         @Override
-        public void selectRoot(MyDirectoryTreeEvent event) {
+        public void selectRoot(FeDirectoryTreeEvent event) {
             handleSelectRoot();
         }
 
         @Override
-        public void selectDirectory(MyDirectoryTreeEvent event) {
+        public void selectDirectory(FeDirectoryTreeEvent event) {
             FeDirectory directory = event.getDirectory();
             handleSelectDirectory(directory);
         }
@@ -250,37 +250,37 @@ public class MyTab extends JPanel {
     /**
      * Events from table.
      *
-     * @see MyTab#handleSelectPath(FePath)
-     * @see MyTab#handleSelectDirectory(FeDirectory)
-     * @see MyTab#handleGoToPreviousDirectory()
-     * @see MyTab#handleChangeNumberOfElements(Integer)
-     * @see MyTab#fireOpenArchive(MyTabEvent)
+     * @see FeTab#handleSelectPath(FePath)
+     * @see FeTab#handleSelectDirectory(FeDirectory)
+     * @see FeTab#handleGoToPreviousDirectory()
+     * @see FeTab#handleChangeNumberOfElements(Integer)
+     * @see FeTab#fireOpenArchive(FeTabEvent)
      */
-    private class TableListener implements MyPathTableListener {
+    private class TableListener implements FeContentTableListener {
 
         @Override
-        public void selectPath(MyPathTableEvent event) {
+        public void selectPath(FeContentTableEvent event) {
             FePath path = event.getPath();
             handleSelectPath(path);
         }
 
         @Override
-        public void doubleClickOnPath(MyPathTableEvent event) {
+        public void doubleClickOnPath(FeContentTableEvent event) {
             FePath path = event.getPath();
             if (path.isDirectory()) {
                 handleSelectDirectory(path.asDirectory());
             } else if (FePathUtil.isArchive(path.asFile())) {
-                fireOpenArchive(new MyTabEvent(path.asFile()));
+                fireOpenArchive(new FeTabEvent(path.asFile()));
             }
         }
 
         @Override
-        public void goBack(MyPathTableEvent event) {
+        public void goBack(FeContentTableEvent event) {
             handleGoToPreviousDirectory();
         }
 
         @Override
-        public void changeRowCount(MyPathTableEvent event) {
+        public void changeRowCount(FeContentTableEvent event) {
             handleChangeNumberOfElements(event.getRowCount());
         }
 
@@ -289,12 +289,12 @@ public class MyTab extends JPanel {
     /**
      * Events from table filter.
      *
-     * @see MyTab#handleFilterType(String)
+     * @see FeTab#handleFilterType(String)
      */
-    private class FilterListener implements MyPathFilterListener {
+    private class FilterListener implements FeContentFilterListener {
 
         @Override
-        public void filterType(MyPathFilterEvent event) {
+        public void filterType(FeContentFilterEvent event) {
             String type = event.getType();
             handleFilterType(type);
         }

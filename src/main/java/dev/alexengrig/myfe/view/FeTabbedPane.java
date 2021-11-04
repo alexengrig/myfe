@@ -19,17 +19,17 @@ package dev.alexengrig.myfe.view;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 
-public class MyTabbedPane extends JTabbedPane {
+public class FeTabbedPane extends JTabbedPane {
 
-    public MyTabbedPane() {
+    public FeTabbedPane() {
         super(TOP, SCROLL_TAB_LAYOUT);
     }
 
-    public void setDefaultMyTab(MyTab defaultTab) {
+    public void setDefaultTab(FeTab defaultTab) {
         insertTab(defaultTab.title(), null, defaultTab, defaultTab.tip(), 0);
     }
 
-    public void addMyTab(MyTab tab) {
+    public void addTab(FeTab tab) {
         super.addTab(tab.title(), null, tab, tab.tip());
         int index = super.getTabCount() - 1;
         super.setTabComponentAt(index, new MyTabComponent(tab));
@@ -37,14 +37,14 @@ public class MyTabbedPane extends JTabbedPane {
 
     private class MyTabComponent extends JPanel {
 
-        private MyTabComponent(MyTab tab) {
+        private MyTabComponent(FeTab tab) {
             String title = tab.title();
             add(new JLabel(title));
             JButton button = new JButton(new AbstractAction() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
-                    int index = MyTabbedPane.super.indexOfTab(title);
-                    MyTabbedPane.super.removeTabAt(index);
+                    int index = FeTabbedPane.super.indexOfTab(title);
+                    FeTabbedPane.super.removeTabAt(index);
                     tab.destroy();
                 }
             });

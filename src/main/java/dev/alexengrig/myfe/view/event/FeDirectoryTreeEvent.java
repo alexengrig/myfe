@@ -16,43 +16,39 @@
 
 package dev.alexengrig.myfe.view.event;
 
-import dev.alexengrig.myfe.model.FePath;
+import dev.alexengrig.myfe.model.FeDirectory;
 
-public class MyPathTableEvent {
+public class FeDirectoryTreeEvent {
 
-    private final FePath path;
-    private final Integer rowCount;
+    private final FeDirectory directory;
+    private final String rootName;
 
-    public MyPathTableEvent(FePath path, Integer rowCount) {
-        this.path = path;
-        this.rowCount = rowCount;
+    public FeDirectoryTreeEvent(FeDirectory directory) {
+        this(directory, null);
     }
 
-    public MyPathTableEvent() {
-        this(null, null);
+    public FeDirectoryTreeEvent(String rootName) {
+        this(null, rootName);
     }
 
-    public MyPathTableEvent(FePath path) {
-        this(path, null);
+    public FeDirectoryTreeEvent(FeDirectory directory, String rootName) {
+        this.directory = directory;
+        this.rootName = rootName;
     }
 
-    public MyPathTableEvent(Integer rowCount) {
-        this(null, rowCount);
+    public FeDirectory getDirectory() {
+        return directory;
     }
 
-    public FePath getPath() {
-        return path;
-    }
-
-    public Integer getRowCount() {
-        return rowCount;
+    public String getRootName() {
+        return rootName;
     }
 
     @Override
     public String toString() {
-        return "MyPathTableEvent{" +
-                "path=" + path +
-                ", rowCount=" + rowCount +
+        return "MyDirectoryTreeEvent{" +
+                "directory=" + directory +
+                ", rootName='" + rootName + '\'' +
                 '}';
     }
 

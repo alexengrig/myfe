@@ -18,11 +18,11 @@ package dev.alexengrig.myfe.view.event;
 
 import dev.alexengrig.myfe.model.FeFile;
 
-public class MyTabEvent {
+public class FeTabEvent {
 
     private final FeFile file;
 
-    public MyTabEvent(FeFile file) {
+    public FeTabEvent(FeFile file) {
         this.file = file;
     }
 

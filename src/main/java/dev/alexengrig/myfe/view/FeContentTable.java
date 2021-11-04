@@ -20,8 +20,8 @@ import dev.alexengrig.myfe.model.FeContentTableModel;
 import dev.alexengrig.myfe.model.FePath;
 import dev.alexengrig.myfe.view.event.DoNothingKeyListener;
 import dev.alexengrig.myfe.view.event.DoNothingMouseListener;
-import dev.alexengrig.myfe.view.event.MyPathTableEvent;
-import dev.alexengrig.myfe.view.event.MyPathTableListener;
+import dev.alexengrig.myfe.view.event.FeContentTableEvent;
+import dev.alexengrig.myfe.view.event.FeContentTableListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,13 +38,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
-public class MyPathTable extends JTable {
+public class FeContentTable extends JTable {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final List<MyPathTableListener> listeners = new LinkedList<>();
+    private final List<FeContentTableListener> listeners = new LinkedList<>();
 
-    public MyPathTable(FeContentTableModel model) {
+    public FeContentTable(FeContentTableModel model) {
         super(model);
         init();
     }
@@ -91,38 +91,38 @@ public class MyPathTable extends JTable {
         return getModel().getPathAt(pathIndex);
     }
 
-    public void addMyPathTableListener(MyPathTableListener listener) {
+    public void addFeContentTableListener(FeContentTableListener listener) {
         listeners.add(listener);
     }
 
-    public void removeMyPathTableListener(MyPathTableListener listener) {
+    public void removeFeContentTableListener(FeContentTableListener listener) {
         listeners.remove(listener);
     }
 
-    private void fireSelectPath(MyPathTableEvent event) {
+    private void fireSelectPath(FeContentTableEvent event) {
         LOGGER.debug("Fire select path: {}", event);
-        for (MyPathTableListener listener : listeners) {
+        for (FeContentTableListener listener : listeners) {
             listener.selectPath(event);
         }
     }
 
-    private void fireDoubleClickOnPath(MyPathTableEvent event) {
+    private void fireDoubleClickOnPath(FeContentTableEvent event) {
         LOGGER.debug("Fire double click on path: {}", event);
-        for (MyPathTableListener listener : listeners) {
+        for (FeContentTableListener listener : listeners) {
             listener.doubleClickOnPath(event);
         }
     }
 
-    private void fireGoBack(MyPathTableEvent event) {
+    private void fireGoBack(FeContentTableEvent event) {
         LOGGER.debug("Fire go back: {}", event);
-        for (MyPathTableListener listener : listeners) {
+        for (FeContentTableListener listener : listeners) {
             listener.goBack(event);
         }
     }
 
-    private void fireChangeRowCount(MyPathTableEvent event) {
+    private void fireChangeRowCount(FeContentTableEvent event) {
         LOGGER.debug("Fire change row count: {}", event);
-        for (MyPathTableListener listener : listeners) {
+        for (FeContentTableListener listener : listeners) {
             listener.changeRowCount(event);
         }
     }
@@ -130,7 +130,7 @@ public class MyPathTable extends JTable {
     /**
      * On select a single row.
      *
-     * @see MyPathTable#fireSelectPath(MyPathTableEvent)
+     * @see FeContentTable#fireSelectPath(FeContentTableEvent)
      */
     private class SelectPathListener implements ListSelectionListener {
 
@@ -145,7 +145,7 @@ public class MyPathTable extends JTable {
                     return;
                 }
                 previousPath = path;
-                fireSelectPath(new MyPathTableEvent(path));
+                fireSelectPath(new FeContentTableEvent(path));
             }
         }
 
@@ -154,7 +154,7 @@ public class MyPathTable extends JTable {
     /**
      * On double-click the left mouse button and press the Enter key on a row.
      *
-     * @see MyPathTable#fireDoubleClickOnPath(MyPathTableEvent)
+     * @see FeContentTable#fireDoubleClickOnPath(FeContentTableEvent)
      */
     private class GoToPathListener implements DoNothingMouseListener, DoNothingKeyListener {
 
@@ -162,7 +162,7 @@ public class MyPathTable extends JTable {
         public void mouseClicked(MouseEvent e) {
             if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() > 1 && getSelectedRowCount() == 1) {
                 FePath path = getSelectedPath();
-                fireDoubleClickOnPath(new MyPathTableEvent(path));
+                fireDoubleClickOnPath(new FeContentTableEvent(path));
             }
         }
 
@@ -170,7 +170,7 @@ public class MyPathTable extends JTable {
         public void keyPressed(KeyEvent e) {
             if (e.getKeyCode() == KeyEvent.VK_ENTER && getSelectedRowCount() == 1) {
                 FePath path = getSelectedPath();
-                fireDoubleClickOnPath(new MyPathTableEvent(path));
+                fireDoubleClickOnPath(new FeContentTableEvent(path));
             }
         }
 
@@ -179,7 +179,7 @@ public class MyPathTable extends JTable {
     /**
      * On press the Backspace key.
      *
-     * @see MyPathTable#fireGoBack(MyPathTableEvent)
+     * @see FeContentTable#fireGoBack(FeContentTableEvent)
      */
     private class GoBackListener implements DoNothingKeyListener {
 
@@ -187,7 +187,7 @@ public class MyPathTable extends JTable {
         public void keyPressed(KeyEvent e) {
             //TODO: As global for tab
             if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
-                fireGoBack(new MyPathTableEvent());
+                fireGoBack(new FeContentTableEvent());
             }
         }
 
@@ -196,7 +196,7 @@ public class MyPathTable extends JTable {
     /**
      * On change number of rows.
      *
-     * @see MyPathTable#fireChangeRowCount(MyPathTableEvent)
+     * @see FeContentTable#fireChangeRowCount(FeContentTableEvent)
      */
     private class RowCountListener implements RowSorterListener {
 
@@ -204,7 +204,7 @@ public class MyPathTable extends JTable {
         public void sorterChanged(RowSorterEvent e) {
             int currentCount = getRowSorter().getViewRowCount();
             if (currentCount == 0 || currentCount != e.getPreviousRowCount()) {
-                fireChangeRowCount(new MyPathTableEvent(currentCount));
+                fireChangeRowCount(new FeContentTableEvent(currentCount));
             }
         }
 

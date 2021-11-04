@@ -16,6 +16,8 @@
 
 package dev.alexengrig.myfe.model;
 
+import dev.alexengrig.myfe.view.FeContentTable;
+
 import javax.swing.table.DefaultTableModel;
 import java.util.List;
 import java.util.Vector;
@@ -24,7 +26,7 @@ import java.util.stream.Collectors;
 /**
  * Model of file explorer content table.
  *
- * @see dev.alexengrig.myfe.view.MyPathTable
+ * @see FeContentTable
  */
 //TODO: Extends AbstractTableModel
 public class FeContentTableModel extends DefaultTableModel {

@@ -26,14 +26,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.lang.invoke.MethodHandles;
 
-public class MyFooter extends JPanel {
+public class FeFooter extends JPanel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final FeFooterModel model;
     private final JPanel contentPane;
 
-    public MyFooter(FeFooterModel model) {
+    public FeFooter(FeFooterModel model) {
         super(new BorderLayout());
         this.model = model;
         this.contentPane = new JPanel(new BorderLayout());

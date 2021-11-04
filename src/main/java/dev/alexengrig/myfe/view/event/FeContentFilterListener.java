@@ -18,8 +18,8 @@ package dev.alexengrig.myfe.view.event;
 
 import java.util.EventListener;
 
-public interface MyTabListener extends EventListener {
+public interface FeContentFilterListener extends EventListener {
 
-    void openArchive(MyTabEvent event);
+    void filterType(FeContentFilterEvent event);
 
 }

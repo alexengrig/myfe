@@ -14,18 +14,14 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.view.event;
+package dev.alexengrig.myfe.view;
 
-import java.util.EventListener;
+import javax.swing.*;
 
-public interface MyPathTableListener extends EventListener {
+public class FeHeader extends JPanel {
 
-    void selectPath(MyPathTableEvent event);
-
-    void doubleClickOnPath(MyPathTableEvent event);
-
-    void goBack(MyPathTableEvent event);
-
-    void changeRowCount(MyPathTableEvent event);
+    public FeHeader() {
+        add(new JLabel("<- -> ^     C:\\Users\\admin     refresh"));
+    }
 
 }

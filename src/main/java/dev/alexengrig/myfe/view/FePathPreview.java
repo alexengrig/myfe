@@ -30,14 +30,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.lang.invoke.MethodHandles;
 
-public class MyPathPreview extends JPanel {
+public class FePathPreview extends JPanel {
 
     private static final LazyLogger LOGGER = LazyLoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final SelectedFePathModel model;
     private final ContentPreviewBackgroundService backgroundService;
 
-    public MyPathPreview(SelectedFePathModel model, ContentPreviewBackgroundService backgroundService) {
+    public FePathPreview(SelectedFePathModel model, ContentPreviewBackgroundService backgroundService) {
         super(new BorderLayout());
         this.model = model;
         this.backgroundService = backgroundService;
@@ -101,7 +101,7 @@ public class MyPathPreview extends JPanel {
     /**
      * Events from model.
      *
-     * @see MyPathPreview#handleChangePath(FePath)
+     * @see FePathPreview#handleChangePath(FePath)
      */
     private class ModelListener implements SelectedFePathModelListener {
 

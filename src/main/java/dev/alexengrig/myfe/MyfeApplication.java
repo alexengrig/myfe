@@ -17,9 +17,9 @@
 package dev.alexengrig.myfe;
 
 import dev.alexengrig.myfe.config.FtpConnectionConfig;
-import dev.alexengrig.myfe.view.MyTab;
-import dev.alexengrig.myfe.view.MyTabFactory;
-import dev.alexengrig.myfe.view.MyTabbedPane;
+import dev.alexengrig.myfe.view.FeTab;
+import dev.alexengrig.myfe.view.FeTabFactory;
+import dev.alexengrig.myfe.view.FeTabbedPane;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -33,8 +33,8 @@ public final class MyfeApplication extends JFrame {
 
     private static final String TITLE = "myfe";
 
-    private final MyTabbedPane tabbedPane = new MyTabbedPane();
-    private final MyTabFactory tabFactory = new MyTabFactory();
+    private final FeTabbedPane tabbedPane = new FeTabbedPane();
+    private final FeTabFactory tabFactory = new FeTabFactory();
 
     public MyfeApplication() {
         super(TITLE);
@@ -65,20 +65,20 @@ public final class MyfeApplication extends JFrame {
     }
 
     private void tabbedPaneInit() {
-        MyTab defaultTab = tabFactory.createDefaultTab();
-        defaultTab.addMyTabListener(event -> handleOpenArchive(Paths.get(event.getFile().getPath())));
-        tabbedPane.setDefaultMyTab(defaultTab);
+        FeTab defaultTab = tabFactory.createDefaultTab();
+        defaultTab.addFeTabListener(event -> handleOpenArchive(Paths.get(event.getFile().getPath())));
+        tabbedPane.setDefaultTab(defaultTab);
         add(tabbedPane);
     }
 
     private void handleOpenArchive(Path path) {
-        MyTab archiveTab = tabFactory.createArchiveTab(path);
-        tabbedPane.addMyTab(archiveTab);
+        FeTab archiveTab = tabFactory.createArchiveTab(path);
+        tabbedPane.addTab(archiveTab);
     }
 
     private void handleConnectToFTPServer(FtpConnectionConfig connectionConfig) {
-        MyTab ftpTab = tabFactory.createFTPTab(connectionConfig);
-        tabbedPane.addMyTab(ftpTab);
+        FeTab ftpTab = tabFactory.createFTPTab(connectionConfig);
+        tabbedPane.addTab(ftpTab);
     }
 
     private class MyMenuBar extends JMenuBar {

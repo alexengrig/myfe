@@ -37,7 +37,7 @@ import dev.alexengrig.myfe.util.swing.BackgroundExecutor;
 import java.net.URI;
 import java.nio.file.Path;
 
-public class MyTabFactory {
+public class FeTabFactory {
 
     private final Converter<Path, FeDirectory> directoryConverter = new Path2FeDirectoryConverter();
     private final Converter<Path, FeFile> fileConverter = new Path2FeFileConverter();
@@ -45,17 +45,17 @@ public class MyTabFactory {
 
     private final BackgroundExecutorService backgroundExecutorService = BackgroundExecutor::execute;
 
-    private MyTab createTab(String title, String tip, String name, FePathRepository repository) {
+    private FeTab createTab(String title, String tip, String name, FePathRepository repository) {
         FePathService service = new SimplePathService(name, repository);
-        return new MyTab(service, backgroundExecutorService, title, tip);
+        return new FeTab(service, backgroundExecutorService, title, tip);
     }
 
-    public MyTab createDefaultTab() {
+    public FeTab createDefaultTab() {
         FePathRepository repository = new LocalFileSystemPathRepository(directoryConverter, pathConverter);
         return createTab("This computer", "Your computer", "This computer", repository);
     }
 
-    public MyTab createArchiveTab(Path path) {
+    public FeTab createArchiveTab(Path path) {
         String archiveName = PathUtil.getName(path);
         String title = "Archive: " + archiveName;
         URI uri = URI.create("jar:" + path.toUri());
@@ -63,7 +63,7 @@ public class MyTabFactory {
         return createTab(title, PathUtil.getAbsolutePath(path), archiveName, repository);
     }
 
-    public MyTab createFTPTab(FtpConnectionConfig connectionConfig) {
+    public FeTab createFTPTab(FtpConnectionConfig connectionConfig) {
         String title = "FTP: " + connectionConfig.getHost();
         String tip = connectionConfig.getHost() + ":" + connectionConfig.getPort();
         FePathRepository repository = new ApacheCommonsFtpFileSystemPathRepository(connectionConfig);

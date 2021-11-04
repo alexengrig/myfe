@@ -17,8 +17,8 @@
 package dev.alexengrig.myfe.view;
 
 import dev.alexengrig.myfe.model.FeContentFilterModel;
-import dev.alexengrig.myfe.view.event.MyPathFilterEvent;
-import dev.alexengrig.myfe.view.event.MyPathFilterListener;
+import dev.alexengrig.myfe.view.event.FeContentFilterEvent;
+import dev.alexengrig.myfe.view.event.FeContentFilterListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,15 +30,15 @@ import java.lang.invoke.MethodHandles;
 import java.util.LinkedList;
 import java.util.List;
 
-public class MyPathFilter extends JPanel {
+public class FeContentFilter extends JPanel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final List<MyPathFilterListener> listeners = new LinkedList<>();
+    private final List<FeContentFilterListener> listeners = new LinkedList<>();
 
     private final FeContentFilterModel filterModel;
 
-    public MyPathFilter(FeContentFilterModel filterModel) {
+    public FeContentFilter(FeContentFilterModel filterModel) {
         super(new BorderLayout());
         this.filterModel = filterModel;
         init();
@@ -51,17 +51,17 @@ public class MyPathFilter extends JPanel {
         add(new JComboBox<>(typeComboBoxModel));
     }
 
-    public void addMyPathFilterListener(MyPathFilterListener listener) {
+    public void addFeContentFilterListener(FeContentFilterListener listener) {
         listeners.add(listener);
     }
 
-    public void removeMyPathFilterListener(MyPathFilterListener listener) {
+    public void removeFeContentFilterListener(FeContentFilterListener listener) {
         listeners.remove(listener);
     }
 
-    private void fireFilterType(MyPathFilterEvent event) {
+    private void fireFilterType(FeContentFilterEvent event) {
         LOGGER.debug("Fire filter type: {}", event);
-        for (MyPathFilterListener listener : listeners) {
+        for (FeContentFilterListener listener : listeners) {
             listener.filterType(event);
         }
     }
@@ -84,7 +84,7 @@ public class MyPathFilter extends JPanel {
             selected = anItem.toString();
             @SuppressWarnings("StringEquality")
             String payload = selected == DEFAULT_ITEM ? null : selected;
-            fireFilterType(MyPathFilterEvent.type(payload));
+            fireFilterType(FeContentFilterEvent.type(payload));
         }
 
         @Override

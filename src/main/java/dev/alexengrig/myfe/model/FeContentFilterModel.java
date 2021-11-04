@@ -18,6 +18,7 @@ package dev.alexengrig.myfe.model;
 
 import dev.alexengrig.myfe.model.event.FeContentFilterModelEvent;
 import dev.alexengrig.myfe.model.event.FeContentFilterModelListener;
+import dev.alexengrig.myfe.view.FeContentFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +30,7 @@ import java.util.stream.Collectors;
 /**
  * Model of file explorer content filter.
  *
- * @see dev.alexengrig.myfe.view.MyPathFilter
+ * @see FeContentFilter
  */
 public class FeContentFilterModel {
 

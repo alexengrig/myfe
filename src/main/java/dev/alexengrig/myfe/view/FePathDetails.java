@@ -23,12 +23,12 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 
-public class MyPathDetails extends JPanel {
+public class FePathDetails extends JPanel {
 
     private final SelectedFePathModel model;
     private final JPanel contentPane;
 
-    public MyPathDetails(SelectedFePathModel model) {
+    public FePathDetails(SelectedFePathModel model) {
         this.model = model;
         this.contentPane = new JPanel(new GridLayout(0, 1));
         init();

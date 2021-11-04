@@ -16,10 +16,27 @@
 
 package dev.alexengrig.myfe.view.event;
 
-import java.util.EventListener;
+public class FeContentFilterEvent {
 
-public interface MyPathFilterListener extends EventListener {
+    private final String type;
 
-    void filterType(MyPathFilterEvent event);
+    private FeContentFilterEvent(String type) {
+        this.type = type;
+    }
+
+    public static FeContentFilterEvent type(String type) {
+        return new FeContentFilterEvent(type);
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    @Override
+    public String toString() {
+        return "MyPathFilterEvent{" +
+                "type='" + type + '\'' +
+                '}';
+    }
 
 }

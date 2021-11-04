@@ -18,6 +18,7 @@ package dev.alexengrig.myfe.model;
 
 import dev.alexengrig.myfe.model.event.FeFooterModelEvent;
 import dev.alexengrig.myfe.model.event.FeFooterModelListener;
+import dev.alexengrig.myfe.view.FeFooter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,7 +30,7 @@ import java.util.Objects;
 /**
  * Model of file explorer footer.
  *
- * @see dev.alexengrig.myfe.view.MyFooter
+ * @see FeFooter
  */
 public class FeFooterModel {
 

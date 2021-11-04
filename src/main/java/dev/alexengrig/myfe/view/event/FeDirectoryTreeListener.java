@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.view;
+package dev.alexengrig.myfe.view.event;
 
-import javax.swing.*;
+import java.util.EventListener;
 
-public class MyHeader extends JPanel {
+public interface FeDirectoryTreeListener extends EventListener {
 
-    public MyHeader() {
-        add(new JLabel("<- -> ^     C:\\Users\\admin     refresh"));
-    }
+    void selectRoot(FeDirectoryTreeEvent event);
+
+    void selectDirectory(FeDirectoryTreeEvent event);
 
 }

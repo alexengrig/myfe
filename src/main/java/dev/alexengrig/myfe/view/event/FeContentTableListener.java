@@ -18,10 +18,14 @@ package dev.alexengrig.myfe.view.event;
 
 import java.util.EventListener;
 
-public interface MyDirectoryTreeListener extends EventListener {
+public interface FeContentTableListener extends EventListener {
 
-    void selectRoot(MyDirectoryTreeEvent event);
+    void selectPath(FeContentTableEvent event);
 
-    void selectDirectory(MyDirectoryTreeEvent event);
+    void doubleClickOnPath(FeContentTableEvent event);
+
+    void goBack(FeContentTableEvent event);
+
+    void changeRowCount(FeContentTableEvent event);
 
 }
