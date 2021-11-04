@@ -16,9 +16,9 @@
 
 package dev.alexengrig.myfe.view;
 
+import dev.alexengrig.myfe.model.DirectoryTreeModel;
+import dev.alexengrig.myfe.model.DirectoryTreeNode;
 import dev.alexengrig.myfe.model.FeDirectory;
-import dev.alexengrig.myfe.model.MyDirectoryTreeModel;
-import dev.alexengrig.myfe.model.MyDirectoryTreeNode;
 import dev.alexengrig.myfe.model.RootDirectoryTreeNode;
 import dev.alexengrig.myfe.service.MyDirectoryTreeBackgroundService;
 import dev.alexengrig.myfe.view.event.DoNothingKeyListener;
@@ -49,7 +49,7 @@ public class MyDirectoryTree extends JTree {
     private final List<MyDirectoryTreeListener> listeners;
 
     public MyDirectoryTree(
-            MyDirectoryTreeModel model,
+            DirectoryTreeModel model,
             MyDirectoryTreeBackgroundService backgroundService) {
         super(model);
         this.backgroundService = backgroundService;
@@ -68,17 +68,17 @@ public class MyDirectoryTree extends JTree {
     }
 
     @Override
-    public MyDirectoryTreeModel getModel() {
-        return (MyDirectoryTreeModel) super.getModel();
+    public DirectoryTreeModel getModel() {
+        return (DirectoryTreeModel) super.getModel();
     }
 
-    private void handleLoadChildDirectories(MyDirectoryTreeNode node) {
+    private void handleLoadChildDirectories(DirectoryTreeNode node) {
         LOGGER.debug("Handle load child directories: {}", node);
         FeDirectory directory = node.getUserObject();
         node.setLoaded(true);
         try {
             backgroundService.loadSubdirectories(directory, children -> {
-                MyDirectoryTreeModel model = getModel();
+                DirectoryTreeModel model = getModel();
                 model.addChildrenInto(node, children);
                 LOGGER.debug("Finished loading child directories for: {}; directories: {}", directory, children);
             });
@@ -114,7 +114,7 @@ public class MyDirectoryTree extends JTree {
     /**
      * On a tree expands a node.
      *
-     * @see MyDirectoryTree#handleLoadChildDirectories(MyDirectoryTreeNode)
+     * @see MyDirectoryTree#handleLoadChildDirectories(DirectoryTreeNode)
      */
     private class LoadChildDirectoriesListener implements DoNothingTreeWillExpandListener {
 
@@ -124,9 +124,9 @@ public class MyDirectoryTree extends JTree {
             Optional.ofNullable(event)
                     .map(TreeExpansionEvent::getPath)
                     .map(TreePath::getLastPathComponent)
-                    .filter(MyDirectoryTreeNode.class::isInstance)
-                    .map(MyDirectoryTreeNode.class::cast)
-                    .filter(Predicate.not(MyDirectoryTreeNode::isLoaded))
+                    .filter(DirectoryTreeNode.class::isInstance)
+                    .map(DirectoryTreeNode.class::cast)
+                    .filter(Predicate.not(DirectoryTreeNode::isLoaded))
                     .ifPresent(MyDirectoryTree.this::handleLoadChildDirectories);
         }
 
@@ -146,8 +146,8 @@ public class MyDirectoryTree extends JTree {
                 //TODO: Add benchmark: vs Plain style
                 Optional.ofNullable(path)
                         .map(TreePath::getLastPathComponent)
-                        .filter(MyDirectoryTreeNode.class::isInstance)
-                        .map(MyDirectoryTreeNode.class::cast)
+                        .filter(DirectoryTreeNode.class::isInstance)
+                        .map(DirectoryTreeNode.class::cast)
                         .ifPresentOrElse(node -> fireSelectDirectory(new MyDirectoryTreeEvent(node.getUserObject())), () ->
                                 Optional.ofNullable(path)
                                         .map(TreePath::getLastPathComponent)
@@ -163,8 +163,8 @@ public class MyDirectoryTree extends JTree {
                 Object lastNode = getLastSelectedPathComponent();
                 //TODO: Add benchmark: vs Plain style
                 Optional.ofNullable(lastNode)
-                        .filter(MyDirectoryTreeNode.class::isInstance)
-                        .map(MyDirectoryTreeNode.class::cast)
+                        .filter(DirectoryTreeNode.class::isInstance)
+                        .map(DirectoryTreeNode.class::cast)
                         .ifPresentOrElse(node -> fireSelectDirectory(new MyDirectoryTreeEvent(node.getUserObject())), () ->
                                 Optional.ofNullable(lastNode)
                                         .filter(RootDirectoryTreeNode.class::isInstance)

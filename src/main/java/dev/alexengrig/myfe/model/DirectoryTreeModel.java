@@ -20,16 +20,19 @@ import javax.swing.tree.DefaultTreeModel;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class MyDirectoryTreeModel extends DefaultTreeModel {
+/**
+ * Tree model of {@link FeDirectory FeDirectories}.
+ */
+public class DirectoryTreeModel extends DefaultTreeModel {
 
-    public MyDirectoryTreeModel(String rootName, List<FeDirectory> rootDirectories) {
+    public DirectoryTreeModel(String rootName, List<FeDirectory> rootDirectories) {
         super(new RootDirectoryTreeNode(rootName), true);
         addChildrenInto(getRoot(), rootDirectories);
     }
 
     public void addChildrenInto(MyTreeNode<?> parent, List<FeDirectory> children) {
-        List<MyDirectoryTreeNode> nodes = children.stream()
-                .map(MyDirectoryTreeNode::new)
+        List<DirectoryTreeNode> nodes = children.stream()
+                .map(DirectoryTreeNode::new)
                 .collect(Collectors.toList());
         parent.addAll(nodes);
         nodeStructureChanged(parent);
