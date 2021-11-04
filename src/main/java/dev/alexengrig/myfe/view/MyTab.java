@@ -28,7 +28,7 @@ import dev.alexengrig.myfe.service.BackgroundExecutorService;
 import dev.alexengrig.myfe.service.ContentPreviewBackgroundService;
 import dev.alexengrig.myfe.service.DirectoryTreeBackgroundService;
 import dev.alexengrig.myfe.service.FePathService;
-import dev.alexengrig.myfe.util.MyPathUtil;
+import dev.alexengrig.myfe.util.FePathUtil;
 import dev.alexengrig.myfe.util.logging.LazyLogger;
 import dev.alexengrig.myfe.util.logging.LazyLoggerFactory;
 import dev.alexengrig.myfe.util.swing.BackgroundTask;
@@ -269,7 +269,7 @@ public class MyTab extends JPanel {
             FePath path = event.getPath();
             if (path.isDirectory()) {
                 handleSelectDirectory(path.asDirectory());
-            } else if (MyPathUtil.isArchive(path.asFile())) {
+            } else if (FePathUtil.isArchive(path.asFile())) {
                 fireOpenArchive(new MyTabEvent(path.asFile()));
             }
         }

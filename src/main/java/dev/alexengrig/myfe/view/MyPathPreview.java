@@ -22,7 +22,7 @@ import dev.alexengrig.myfe.model.SelectedFePathModel;
 import dev.alexengrig.myfe.model.event.SelectedFePathModelEvent;
 import dev.alexengrig.myfe.model.event.SelectedFePathModelListener;
 import dev.alexengrig.myfe.service.ContentPreviewBackgroundService;
-import dev.alexengrig.myfe.util.MyPathUtil;
+import dev.alexengrig.myfe.util.FePathUtil;
 import dev.alexengrig.myfe.util.logging.LazyLogger;
 import dev.alexengrig.myfe.util.logging.LazyLoggerFactory;
 
@@ -67,9 +67,9 @@ public class MyPathPreview extends JPanel {
             return createEmptyPreviewComponent();
         } else {
             if (path.isFile()) {
-                if (MyPathUtil.isImage(path.asFile())) {
+                if (FePathUtil.isImage(path.asFile())) {
                     return createImagePreviewComponent(path.asFile());
-                } else if (MyPathUtil.isText(path.asFile())) {
+                } else if (FePathUtil.isText(path.asFile())) {
                     return createTextPreviewComponent(path.asFile());
                 }
             }

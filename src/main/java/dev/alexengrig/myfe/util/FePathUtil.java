@@ -25,13 +25,13 @@ import java.util.Set;
 /**
  * A utility class for {@link FePath}.
  */
-public class MyPathUtil {
+public class FePathUtil {
 
     private static final Set<String> IMAGE_FILE_EXTENSIONS = Set.of("JPEG", "JPG", "GIF", "XBM");
     private static final Set<String> TEXT_FILE_EXTENSIONS = Set.of("TXT", "LOG");
     private static final Set<String> ARCHIVE_FILE_EXTENSIONS = Set.of("JAR", "ZIP");
 
-    private MyPathUtil() throws IllegalAccessException {
+    private FePathUtil() throws IllegalAccessException {
         throw new IllegalAccessException("This is utility class");
     }
 

@@ -16,7 +16,7 @@
 
 package dev.alexengrig.myfe.model;
 
-import dev.alexengrig.myfe.util.MyPathUtil;
+import dev.alexengrig.myfe.util.FePathUtil;
 
 /**
  * Path of file explorer.
@@ -39,7 +39,7 @@ public abstract class FePath extends AbstractPath {
 
     public String getExtension() {
         if (extension == null) {
-            extension = MyPathUtil.getExtension(this);
+            extension = FePathUtil.getExtension(this);
         }
         return extension;
     }
