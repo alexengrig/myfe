@@ -16,12 +16,16 @@
 
 package dev.alexengrig.myfe.service;
 
-import dev.alexengrig.myfe.model.FeFile;
+import dev.alexengrig.myfe.model.FeDirectory;
 
+import java.util.List;
 import java.util.function.Consumer;
 
-public interface MyPathPreviewBackgroundService {
+/**
+ * Background service of directory tree.
+ */
+public interface DirectoryTreeBackgroundService {
 
-    void loadTextPreview(FeFile file, Consumer<String> handler);
+    void loadSubdirectories(FeDirectory directory, Consumer<List<FeDirectory>> handler);
 
 }

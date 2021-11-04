@@ -16,27 +16,15 @@
 
 package dev.alexengrig.myfe.service;
 
-import dev.alexengrig.myfe.model.FeDirectory;
 import dev.alexengrig.myfe.model.FeFile;
-import dev.alexengrig.myfe.model.FePath;
 
-import java.util.List;
-import java.util.stream.Stream;
+import java.util.function.Consumer;
 
-public interface MyPathService {
+/**
+ * Background service of content preview.
+ */
+public interface ContentPreviewBackgroundService {
 
-    void destroy();
-
-    String getRootName();
-
-    List<FeDirectory> getRootDirectories();
-
-    List<FeDirectory> getSubdirectories(FeDirectory directory);
-
-    List<FePath> getDirectoryContent(FeDirectory directory);
-
-    String getFileContentPreview(FeFile file);
-
-    Stream<String> readFileContent(FeFile file);
+    void loadTextPreview(FeFile file, Consumer<String> handler);
 
 }

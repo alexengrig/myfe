@@ -25,9 +25,9 @@ import dev.alexengrig.myfe.model.FeFooterModel;
 import dev.alexengrig.myfe.model.FePath;
 import dev.alexengrig.myfe.model.SelectedFePathModel;
 import dev.alexengrig.myfe.service.BackgroundExecutorService;
-import dev.alexengrig.myfe.service.MyDirectoryTreeBackgroundService;
-import dev.alexengrig.myfe.service.MyPathPreviewBackgroundService;
-import dev.alexengrig.myfe.service.MyPathService;
+import dev.alexengrig.myfe.service.ContentPreviewBackgroundService;
+import dev.alexengrig.myfe.service.DirectoryTreeBackgroundService;
+import dev.alexengrig.myfe.service.FePathService;
 import dev.alexengrig.myfe.util.MyPathUtil;
 import dev.alexengrig.myfe.util.logging.LazyLogger;
 import dev.alexengrig.myfe.util.logging.LazyLoggerFactory;
@@ -55,7 +55,7 @@ public class MyTab extends JPanel {
 
     private final List<MyTabListener> listeners = new LinkedList<>();
 
-    private final MyPathService service;
+    private final FePathService service;
     private final BackgroundExecutorService backgroundExecutor;
     private final String title;
     private final String tip;
@@ -78,7 +78,7 @@ public class MyTab extends JPanel {
     private MyFooter footerView;
     private MyPathFilter filterView;
 
-    public MyTab(MyPathService service, BackgroundExecutorService backgroundExecutor, String title, String tip) {
+    public MyTab(FePathService service, BackgroundExecutorService backgroundExecutor, String title, String tip) {
         super(new BorderLayout());
         this.service = service;
         this.backgroundExecutor = backgroundExecutor;
@@ -304,7 +304,7 @@ public class MyTab extends JPanel {
     /**
      * Service for tree.
      */
-    private class TreeService implements MyDirectoryTreeBackgroundService {
+    private class TreeService implements DirectoryTreeBackgroundService {
 
         @Override
         public void loadSubdirectories(FeDirectory directory, Consumer<List<FeDirectory>> handler) {
@@ -323,7 +323,7 @@ public class MyTab extends JPanel {
     /**
      * Service for preview.
      */
-    private class PreviewService implements MyPathPreviewBackgroundService {
+    private class PreviewService implements ContentPreviewBackgroundService {
 
         private BackgroundTask previousTask;
 

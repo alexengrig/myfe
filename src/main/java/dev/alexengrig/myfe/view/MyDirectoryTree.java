@@ -20,7 +20,7 @@ import dev.alexengrig.myfe.model.DirectoryTreeModel;
 import dev.alexengrig.myfe.model.DirectoryTreeNode;
 import dev.alexengrig.myfe.model.FeDirectory;
 import dev.alexengrig.myfe.model.RootDirectoryTreeNode;
-import dev.alexengrig.myfe.service.MyDirectoryTreeBackgroundService;
+import dev.alexengrig.myfe.service.DirectoryTreeBackgroundService;
 import dev.alexengrig.myfe.view.event.DoNothingKeyListener;
 import dev.alexengrig.myfe.view.event.DoNothingMouseListener;
 import dev.alexengrig.myfe.view.event.DoNothingTreeWillExpandListener;
@@ -44,13 +44,13 @@ public class MyDirectoryTree extends JTree {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final MyDirectoryTreeBackgroundService backgroundService;
+    private final DirectoryTreeBackgroundService backgroundService;
 
     private final List<MyDirectoryTreeListener> listeners;
 
     public MyDirectoryTree(
             DirectoryTreeModel model,
-            MyDirectoryTreeBackgroundService backgroundService) {
+            DirectoryTreeBackgroundService backgroundService) {
         super(model);
         this.backgroundService = backgroundService;
         this.listeners = new LinkedList<>();

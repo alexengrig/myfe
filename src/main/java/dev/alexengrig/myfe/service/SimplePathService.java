@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-public class SimplePathService implements MyPathService {
+public class SimplePathService implements FePathService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 

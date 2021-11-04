@@ -22,6 +22,9 @@ import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+/**
+ * Service of background executor.
+ */
 public interface BackgroundExecutorService {
 
     <T> BackgroundTask execute(Supplier<String> descriptionSupplier, Callable<T> backgroundTask, Consumer<T> resultHandler);

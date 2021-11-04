@@ -29,7 +29,7 @@ import dev.alexengrig.myfe.repository.FePathRepository;
 import dev.alexengrig.myfe.repository.LocalFileSystemPathRepository;
 import dev.alexengrig.myfe.repository.URIFileSystemPathRepository;
 import dev.alexengrig.myfe.service.BackgroundExecutorService;
-import dev.alexengrig.myfe.service.MyPathService;
+import dev.alexengrig.myfe.service.FePathService;
 import dev.alexengrig.myfe.service.SimplePathService;
 import dev.alexengrig.myfe.util.PathUtil;
 import dev.alexengrig.myfe.util.swing.BackgroundExecutor;
@@ -46,7 +46,7 @@ public class MyTabFactory {
     private final BackgroundExecutorService backgroundExecutorService = BackgroundExecutor::execute;
 
     private MyTab createTab(String title, String tip, String name, FePathRepository repository) {
-        MyPathService service = new SimplePathService(name, repository);
+        FePathService service = new SimplePathService(name, repository);
         return new MyTab(service, backgroundExecutorService, title, tip);
     }
 
