@@ -50,7 +50,7 @@ import static java.util.Spliterator.ORDERED;
 /**
  * {@link FileSystem}-based implementation.
  */
-public class FileSystemPathRepository implements MyPathRepository {
+public class FileSystemPathRepository implements FePathRepository {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 

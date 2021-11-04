@@ -25,8 +25,8 @@ import dev.alexengrig.myfe.model.FeDirectory;
 import dev.alexengrig.myfe.model.FeFile;
 import dev.alexengrig.myfe.model.FePath;
 import dev.alexengrig.myfe.repository.ApacheCommonsFtpFileSystemPathRepository;
+import dev.alexengrig.myfe.repository.FePathRepository;
 import dev.alexengrig.myfe.repository.LocalFileSystemPathRepository;
-import dev.alexengrig.myfe.repository.MyPathRepository;
 import dev.alexengrig.myfe.repository.URIFileSystemPathRepository;
 import dev.alexengrig.myfe.service.BackgroundExecutorService;
 import dev.alexengrig.myfe.service.MyPathService;
@@ -45,13 +45,13 @@ public class MyTabFactory {
 
     private final BackgroundExecutorService backgroundExecutorService = BackgroundExecutor::execute;
 
-    private MyTab createTab(String title, String tip, String name, MyPathRepository repository) {
+    private MyTab createTab(String title, String tip, String name, FePathRepository repository) {
         MyPathService service = new SimplePathService(name, repository);
         return new MyTab(service, backgroundExecutorService, title, tip);
     }
 
     public MyTab createDefaultTab() {
-        MyPathRepository repository = new LocalFileSystemPathRepository(directoryConverter, pathConverter);
+        FePathRepository repository = new LocalFileSystemPathRepository(directoryConverter, pathConverter);
         return createTab("This computer", "Your computer", "This computer", repository);
     }
 
@@ -59,14 +59,14 @@ public class MyTabFactory {
         String archiveName = PathUtil.getName(path);
         String title = "Archive: " + archiveName;
         URI uri = URI.create("jar:" + path.toUri());
-        MyPathRepository repository = new URIFileSystemPathRepository(uri, directoryConverter, pathConverter);
+        FePathRepository repository = new URIFileSystemPathRepository(uri, directoryConverter, pathConverter);
         return createTab(title, PathUtil.getAbsolutePath(path), archiveName, repository);
     }
 
     public MyTab createFTPTab(FtpConnectionConfig connectionConfig) {
         String title = "FTP: " + connectionConfig.getHost();
         String tip = connectionConfig.getHost() + ":" + connectionConfig.getPort();
-        MyPathRepository repository = new ApacheCommonsFtpFileSystemPathRepository(connectionConfig);
+        FePathRepository repository = new ApacheCommonsFtpFileSystemPathRepository(connectionConfig);
         return createTab(title, tip, connectionConfig.getHost(), repository);
     }
 

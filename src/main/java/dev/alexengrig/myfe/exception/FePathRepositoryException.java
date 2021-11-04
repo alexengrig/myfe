@@ -16,23 +16,25 @@
 
 package dev.alexengrig.myfe.exception;
 
-/**
- * {@link InternalException} of {@link dev.alexengrig.myfe.repository.MyPathRepository}.
- */
-public class MyPathRepositoryException extends InternalException {
+import dev.alexengrig.myfe.repository.FePathRepository;
 
-    public MyPathRepositoryException() {
+/**
+ * {@link InternalException} of {@link FePathRepository}.
+ */
+public class FePathRepositoryException extends InternalException {
+
+    public FePathRepositoryException() {
     }
 
-    public MyPathRepositoryException(String message) {
+    public FePathRepositoryException(String message) {
         super(message);
     }
 
-    public MyPathRepositoryException(String message, Throwable cause) {
+    public FePathRepositoryException(String message, Throwable cause) {
         super(message, cause);
     }
 
-    public MyPathRepositoryException(Throwable cause) {
+    public FePathRepositoryException(Throwable cause) {
         super(cause);
     }
 

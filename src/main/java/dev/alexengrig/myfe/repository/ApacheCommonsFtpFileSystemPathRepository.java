@@ -20,7 +20,7 @@ import dev.alexengrig.myfe.config.FtpConnectionConfig;
 import dev.alexengrig.myfe.converter.Converter;
 import dev.alexengrig.myfe.converter.FileObject2MyDirectoryConverter;
 import dev.alexengrig.myfe.converter.FileObject2MyPathConverter;
-import dev.alexengrig.myfe.exception.MyPathRepositoryException;
+import dev.alexengrig.myfe.exception.FePathRepositoryException;
 import dev.alexengrig.myfe.model.FeDirectory;
 import dev.alexengrig.myfe.model.FePath;
 import dev.alexengrig.myfe.util.CloseOnTerminalOperationStreams;
@@ -59,7 +59,7 @@ import static java.util.Spliterator.ORDERED;
 /**
  * {@link FtpFileSystem}-based implementation.
  */
-public class ApacheCommonsFtpFileSystemPathRepository implements MyPathRepository {
+public class ApacheCommonsFtpFileSystemPathRepository implements FePathRepository {
 
     private static final LazyLogger LOGGER = LazyLoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -105,7 +105,7 @@ public class ApacheCommonsFtpFileSystemPathRepository implements MyPathRepositor
         } catch (FileSystemException e) {
             LOGGER.error(m -> m.log("Exception of creating FTP file system: {}",
                     config.getInfo(), e));
-            throw new MyPathRepositoryException("Exception of creating FTP file system: " +
+            throw new FePathRepositoryException("Exception of creating FTP file system: " +
                     config.getInfo(),
                     e);
         }
@@ -131,7 +131,7 @@ public class ApacheCommonsFtpFileSystemPathRepository implements MyPathRepositor
         } catch (Exception e) {
             LOGGER.error(m -> m.log("Exception of getting root directories \"{}\"",
                     config.getInfo(), e));
-            throw new MyPathRepositoryException("Exception of getting root directories \"" +
+            throw new FePathRepositoryException("Exception of getting root directories \"" +
                     config.getInfo() + "\"",
                     e);
         }
@@ -154,7 +154,7 @@ public class ApacheCommonsFtpFileSystemPathRepository implements MyPathRepositor
         } catch (Exception e) {
             LOGGER.error(m -> m.log("Exception of getting children \"{}\" for: {}",
                     config.getInfo(), directoryPath, e));
-            throw new MyPathRepositoryException("Exception of getting children \"" +
+            throw new FePathRepositoryException("Exception of getting children \"" +
                     config.getInfo() + "\" for: " +
                     directoryPath,
                     e);
@@ -177,7 +177,7 @@ public class ApacheCommonsFtpFileSystemPathRepository implements MyPathRepositor
         } catch (Exception e) {
             LOGGER.error(m -> m.log("Exception of getting subdirectories \"{}\" for: {}",
                     config.getInfo(), directoryPath, e));
-            throw new MyPathRepositoryException("Exception of getting subdirectories \"" +
+            throw new FePathRepositoryException("Exception of getting subdirectories \"" +
                     config.getInfo() + "\" for: " +
                     directoryPath,
                     e);
@@ -205,7 +205,7 @@ public class ApacheCommonsFtpFileSystemPathRepository implements MyPathRepositor
         } catch (Exception e) {
             LOGGER.error(m -> m.log("Exception of reading a batch of {} byte(s) \"{}\" for: {}",
                     batchSize, config.getInfo(), filePath, e));
-            throw new MyPathRepositoryException("Exception of reading a batch of " +
+            throw new FePathRepositoryException("Exception of reading a batch of " +
                     batchSize + " byte(s) \"" +
                     config.getInfo() + "\" for: " +
                     filePath,
@@ -245,7 +245,7 @@ public class ApacheCommonsFtpFileSystemPathRepository implements MyPathRepositor
         } catch (Exception e) {
             LOGGER.error(m -> m.log("Exception of reading {} batch(es) of {} byte(s) \"{}\" for: {}",
                     numberOfBatches, batchSize, config.getInfo(), filePath, e));
-            throw new MyPathRepositoryException("Exception of reading " +
+            throw new FePathRepositoryException("Exception of reading " +
                     numberOfBatches + " batch(es) of " +
                     batchSize + " byte(s) \"" +
                     config.getInfo() + "\" for: " +

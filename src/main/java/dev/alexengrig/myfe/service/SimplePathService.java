@@ -19,7 +19,7 @@ package dev.alexengrig.myfe.service;
 import dev.alexengrig.myfe.model.FeDirectory;
 import dev.alexengrig.myfe.model.FeFile;
 import dev.alexengrig.myfe.model.FePath;
-import dev.alexengrig.myfe.repository.MyPathRepository;
+import dev.alexengrig.myfe.repository.FePathRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,9 +38,9 @@ public class SimplePathService implements MyPathService {
     private static final int FILE_PREVIEW_CONTENT_SIZE = 1_048_576; // 1Mb
 
     private final String rootName;
-    private final MyPathRepository repository;
+    private final FePathRepository repository;
 
-    public SimplePathService(String rootName, MyPathRepository repository) {
+    public SimplePathService(String rootName, FePathRepository repository) {
         this.rootName = rootName;
         this.repository = repository;
     }

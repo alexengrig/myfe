@@ -22,7 +22,10 @@ import dev.alexengrig.myfe.model.FePath;
 import java.util.List;
 import java.util.stream.Stream;
 
-public interface MyPathRepository extends AutoCloseable {
+/**
+ * Repository of {@link FePath}.
+ */
+public interface FePathRepository extends AutoCloseable {
 
     List<FeDirectory> getRootDirectories();
 
