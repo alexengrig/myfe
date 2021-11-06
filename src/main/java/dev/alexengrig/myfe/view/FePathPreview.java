@@ -18,7 +18,7 @@ package dev.alexengrig.myfe.view;
 
 import dev.alexengrig.myfe.model.FeFile;
 import dev.alexengrig.myfe.model.FePath;
-import dev.alexengrig.myfe.model.SelectedFePathModel;
+import dev.alexengrig.myfe.model.FeSelectedPathModel;
 import dev.alexengrig.myfe.model.event.SelectedFePathModelEvent;
 import dev.alexengrig.myfe.model.event.SelectedFePathModelListener;
 import dev.alexengrig.myfe.service.ContentPreviewBackgroundService;
@@ -34,10 +34,10 @@ public class FePathPreview extends JPanel {
 
     private static final LazyLogger LOGGER = LazyLoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final SelectedFePathModel model;
+    private final FeSelectedPathModel model;
     private final ContentPreviewBackgroundService backgroundService;
 
-    public FePathPreview(SelectedFePathModel model, ContentPreviewBackgroundService backgroundService) {
+    public FePathPreview(FeSelectedPathModel model, ContentPreviewBackgroundService backgroundService) {
         super(new BorderLayout());
         this.model = model;
         this.backgroundService = backgroundService;

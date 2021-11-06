@@ -16,14 +16,14 @@
 
 package dev.alexengrig.myfe.view;
 
-import dev.alexengrig.myfe.model.DirectoryTreeModel;
 import dev.alexengrig.myfe.model.FeContentFilterModel;
 import dev.alexengrig.myfe.model.FeContentTableModel;
 import dev.alexengrig.myfe.model.FeDirectory;
+import dev.alexengrig.myfe.model.FeDirectoryTreeModel;
 import dev.alexengrig.myfe.model.FeFile;
 import dev.alexengrig.myfe.model.FeFooterModel;
 import dev.alexengrig.myfe.model.FePath;
-import dev.alexengrig.myfe.model.SelectedFePathModel;
+import dev.alexengrig.myfe.model.FeSelectedPathModel;
 import dev.alexengrig.myfe.service.BackgroundExecutorService;
 import dev.alexengrig.myfe.service.ContentPreviewBackgroundService;
 import dev.alexengrig.myfe.service.DirectoryTreeBackgroundService;
@@ -64,10 +64,10 @@ public class FeTab extends JPanel {
      */
     private final Deque<FeDirectory> directoryStack;
 
-    private DirectoryTreeModel treeModel;
+    private FeDirectoryTreeModel treeModel;
     private FeContentTableModel tableModel;
     private FeContentFilterModel filterModel;
-    private SelectedFePathModel pathModel;
+    private FeSelectedPathModel pathModel;
     private FeFooterModel footerModel;
 
     private FeHeader headerView;
@@ -109,10 +109,10 @@ public class FeTab extends JPanel {
         LOGGER.debug("Start initializing models");
         //TODO: Getting root directories is slow - add spinner and background task
         List<FeDirectory> rootDirectories = service.getRootDirectories();
-        treeModel = new DirectoryTreeModel(service.getRootName(), rootDirectories);
+        treeModel = new FeDirectoryTreeModel(service.getRootName(), rootDirectories);
         tableModel = new FeContentTableModel(rootDirectories);
         filterModel = new FeContentFilterModel(rootDirectories);
-        pathModel = new SelectedFePathModel();
+        pathModel = new FeSelectedPathModel();
         footerModel = new FeFooterModel(rootDirectories.size());
         LOGGER.debug("Finished initializing models");
     }

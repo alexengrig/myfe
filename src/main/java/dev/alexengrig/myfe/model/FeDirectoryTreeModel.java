@@ -23,9 +23,9 @@ import java.util.stream.Collectors;
 /**
  * Tree model of {@link FeDirectory FeDirectories}.
  */
-public class DirectoryTreeModel extends DefaultTreeModel {
+public class FeDirectoryTreeModel extends DefaultTreeModel {
 
-    public DirectoryTreeModel(String rootName, List<FeDirectory> rootDirectories) {
+    public FeDirectoryTreeModel(String rootName, List<FeDirectory> rootDirectories) {
         super(new RootDirectoryTreeNode(rootName), true);
         addChildrenInto(getRoot(), rootDirectories);
     }

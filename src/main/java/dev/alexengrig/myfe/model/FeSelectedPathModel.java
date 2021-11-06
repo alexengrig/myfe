@@ -29,7 +29,7 @@ import java.util.Objects;
 /**
  * Model of selected {@link FePath}.
  */
-public class SelectedFePathModel {
+public class FeSelectedPathModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 

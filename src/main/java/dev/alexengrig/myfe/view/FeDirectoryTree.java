@@ -16,9 +16,9 @@
 
 package dev.alexengrig.myfe.view;
 
-import dev.alexengrig.myfe.model.DirectoryTreeModel;
 import dev.alexengrig.myfe.model.DirectoryTreeNode;
 import dev.alexengrig.myfe.model.FeDirectory;
+import dev.alexengrig.myfe.model.FeDirectoryTreeModel;
 import dev.alexengrig.myfe.model.RootDirectoryTreeNode;
 import dev.alexengrig.myfe.service.DirectoryTreeBackgroundService;
 import dev.alexengrig.myfe.view.event.DoNothingKeyListener;
@@ -49,7 +49,7 @@ public class FeDirectoryTree extends JTree {
     private final List<FeDirectoryTreeListener> listeners;
 
     public FeDirectoryTree(
-            DirectoryTreeModel model,
+            FeDirectoryTreeModel model,
             DirectoryTreeBackgroundService backgroundService) {
         super(model);
         this.backgroundService = backgroundService;
@@ -68,8 +68,8 @@ public class FeDirectoryTree extends JTree {
     }
 
     @Override
-    public DirectoryTreeModel getModel() {
-        return (DirectoryTreeModel) super.getModel();
+    public FeDirectoryTreeModel getModel() {
+        return (FeDirectoryTreeModel) super.getModel();
     }
 
     private void handleLoadChildDirectories(DirectoryTreeNode node) {
@@ -78,7 +78,7 @@ public class FeDirectoryTree extends JTree {
         node.setLoaded(true);
         try {
             backgroundService.loadSubdirectories(directory, children -> {
-                DirectoryTreeModel model = getModel();
+                FeDirectoryTreeModel model = getModel();
                 model.addChildrenInto(node, children);
                 LOGGER.debug("Finished loading child directories for: {}; directories: {}", directory, children);
             });

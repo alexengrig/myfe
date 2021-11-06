@@ -16,10 +16,12 @@
 
 package dev.alexengrig.myfe.model.event;
 
+import dev.alexengrig.myfe.model.FeSelectedPathModel;
+
 import java.util.EventListener;
 
 /**
- * Event listener of {@link dev.alexengrig.myfe.model.SelectedFePathModel}.
+ * Event listener of {@link FeSelectedPathModel}.
  */
 public interface SelectedFePathModelListener extends EventListener {
 
