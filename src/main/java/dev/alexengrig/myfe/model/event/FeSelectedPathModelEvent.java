@@ -19,13 +19,13 @@ package dev.alexengrig.myfe.model.event;
 import dev.alexengrig.myfe.model.FePath;
 
 /**
- * Event of {@link SelectedFePathModelListener}.
+ * Event of {@link FeSelectedPathModelListener}.
  */
-public class SelectedFePathModelEvent {
+public class FeSelectedPathModelEvent {
 
     private final FePath path;
 
-    public SelectedFePathModelEvent(FePath path) {
+    public FeSelectedPathModelEvent(FePath path) {
         this.path = path;
     }
 

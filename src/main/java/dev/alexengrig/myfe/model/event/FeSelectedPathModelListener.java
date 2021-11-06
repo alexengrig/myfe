@@ -23,8 +23,8 @@ import java.util.EventListener;
 /**
  * Event listener of {@link FeSelectedPathModel}.
  */
-public interface SelectedFePathModelListener extends EventListener {
+public interface FeSelectedPathModelListener extends EventListener {
 
-    void changePath(SelectedFePathModelEvent event);
+    void changePath(FeSelectedPathModelEvent event);
 
 }

@@ -16,8 +16,8 @@
 
 package dev.alexengrig.myfe.model;
 
-import dev.alexengrig.myfe.model.event.SelectedFePathModelEvent;
-import dev.alexengrig.myfe.model.event.SelectedFePathModelListener;
+import dev.alexengrig.myfe.model.event.FeSelectedPathModelEvent;
+import dev.alexengrig.myfe.model.event.FeSelectedPathModelListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,7 +33,7 @@ public class FeSelectedPathModel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final List<SelectedFePathModelListener> listeners = new LinkedList<>();
+    private final List<FeSelectedPathModelListener> listeners = new LinkedList<>();
 
     private FePath path;
 
@@ -48,21 +48,21 @@ public class FeSelectedPathModel {
     public void setPath(FePath path) {
         if (!Objects.equals(this.path, path)) {
             this.path = path;
-            fireChangePath(new SelectedFePathModelEvent(path));
+            fireChangePath(new FeSelectedPathModelEvent(path));
         }
     }
 
-    public void addSelectedFePathModelListener(SelectedFePathModelListener listener) {
+    public void addSelectedFePathModelListener(FeSelectedPathModelListener listener) {
         listeners.add(listener);
     }
 
-    public void removeSelectedFePathModelListener(SelectedFePathModelListener listener) {
+    public void removeSelectedFePathModelListener(FeSelectedPathModelListener listener) {
         listeners.remove(listener);
     }
 
-    private void fireChangePath(SelectedFePathModelEvent event) {
+    private void fireChangePath(FeSelectedPathModelEvent event) {
         LOGGER.debug("Fire change path: {}", event);
-        for (SelectedFePathModelListener listener : listeners) {
+        for (FeSelectedPathModelListener listener : listeners) {
             listener.changePath(event);
         }
     }

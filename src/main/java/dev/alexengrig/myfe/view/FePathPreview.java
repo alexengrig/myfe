@@ -19,8 +19,8 @@ package dev.alexengrig.myfe.view;
 import dev.alexengrig.myfe.model.FeFile;
 import dev.alexengrig.myfe.model.FePath;
 import dev.alexengrig.myfe.model.FeSelectedPathModel;
-import dev.alexengrig.myfe.model.event.SelectedFePathModelEvent;
-import dev.alexengrig.myfe.model.event.SelectedFePathModelListener;
+import dev.alexengrig.myfe.model.event.FeSelectedPathModelEvent;
+import dev.alexengrig.myfe.model.event.FeSelectedPathModelListener;
 import dev.alexengrig.myfe.service.ContentPreviewBackgroundService;
 import dev.alexengrig.myfe.util.FePathUtil;
 import dev.alexengrig.myfe.util.logging.LazyLogger;
@@ -103,10 +103,10 @@ public class FePathPreview extends JPanel {
      *
      * @see FePathPreview#handleChangePath(FePath)
      */
-    private class ModelListener implements SelectedFePathModelListener {
+    private class ModelListener implements FeSelectedPathModelListener {
 
         @Override
-        public void changePath(SelectedFePathModelEvent event) {
+        public void changePath(FeSelectedPathModelEvent event) {
             handleChangePath(event.getPath());
         }
 
