@@ -36,6 +36,7 @@ import dev.alexengrig.myfe.util.swing.BackgroundExecutor;
 
 import java.net.URI;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class FeTabFactory {
 
@@ -55,12 +56,13 @@ public class FeTabFactory {
         return createTab("This computer", "Your computer", "This computer", repository);
     }
 
-    public FeTab createArchiveTab(Path path) {
-        String archiveName = PathUtil.getName(path);
+    public FeTab createArchiveTab(String path) {
+        Path archive = Paths.get(path);
+        String archiveName = PathUtil.getName(archive);
         String title = "Archive: " + archiveName;
-        URI uri = URI.create("jar:" + path.toUri());
+        URI uri = URI.create("jar:" + archive.toUri());
         FePathRepository repository = new URIFileSystemPathRepository(uri, directoryConverter, pathConverter);
-        return createTab(title, PathUtil.getAbsolutePath(path), archiveName, repository);
+        return createTab(title, PathUtil.getAbsolutePath(archive), archiveName, repository);
     }
 
     public FeTab createFTPTab(FtpConnectionConfig connectionConfig) {

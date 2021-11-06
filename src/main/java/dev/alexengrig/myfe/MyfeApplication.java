@@ -20,14 +20,13 @@ import dev.alexengrig.myfe.config.FtpConnectionConfig;
 import dev.alexengrig.myfe.view.FeTab;
 import dev.alexengrig.myfe.view.FeTabFactory;
 import dev.alexengrig.myfe.view.FeTabbedPane;
+import dev.alexengrig.myfe.view.event.FeMenuBarEvent;
+import dev.alexengrig.myfe.view.event.FeMenuBarListener;
+import dev.alexengrig.myfe.view.event.FeTabEvent;
+import dev.alexengrig.myfe.view.event.FeTabListener;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.io.File;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public final class MyfeApplication extends JFrame {
 
@@ -61,17 +60,29 @@ public final class MyfeApplication extends JFrame {
     }
 
     private void menuBarInit() {
-        setJMenuBar(new MyMenuBar());
+        MyfeMenuBar menuBar = new MyfeMenuBar(this);
+        menuBar.addFeMenuBarListener(new MenuBarListener());
+        setJMenuBar(menuBar);
     }
 
     private void tabbedPaneInit() {
         FeTab defaultTab = tabFactory.createDefaultTab();
-        defaultTab.addFeTabListener(event -> handleOpenArchive(Paths.get(event.getFile().getPath())));
+        defaultTab.addFeTabListener(new TabListener());
         tabbedPane.setDefaultTab(defaultTab);
         add(tabbedPane);
     }
 
-    private void handleOpenArchive(Path path) {
+    private void handleChangeLookAndFeel(String lafClassName) {
+        try {
+            UIManager.setLookAndFeel(lafClassName);
+            SwingUtilities.updateComponentTreeUI(this);
+            pack();
+        } catch (ReflectiveOperationException | UnsupportedLookAndFeelException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void handleOpenArchive(String path) {
         FeTab archiveTab = tabFactory.createArchiveTab(path);
         tabbedPane.addTab(archiveTab);
     }
@@ -81,106 +92,30 @@ public final class MyfeApplication extends JFrame {
         tabbedPane.addTab(ftpTab);
     }
 
-    private class MyMenuBar extends JMenuBar {
+    private class MenuBarListener implements FeMenuBarListener {
 
-        public MyMenuBar() {
-            JMenu menu = createFileMenu();
-            add(menu);
+        @Override
+        public void changeLookAndFeel(FeMenuBarEvent event) {
+            handleChangeLookAndFeel(event.getLookAndFeelClassName());
         }
 
-        private JMenu createFileMenu() {
-            JMenu menu = new JMenu("File");
-            JMenuItem openArchiveMenuItem = createOpenArchiveMenuItem();
-            menu.add(openArchiveMenuItem);
-            JMenuItem connectToFTPServerMenuItem = createConnectToFTPServerMenuItem();
-            menu.add(connectToFTPServerMenuItem);
-            return menu;
+        @Override
+        public void openArchive(FeMenuBarEvent event) {
+            handleOpenArchive(event.getArchivePath());
         }
 
-        private JMenuItem createOpenArchiveMenuItem() {
-            JMenuItem openArchiveMenuItem = new JMenuItem(new AbstractAction() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    //TODO: Create new view of chooser
-                    JFileChooser chooser = new JFileChooser();
-                    chooser.setDialogTitle("Open archive");
-                    chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                    chooser.setAcceptAllFileFilterUsed(false);
-                    chooser.setMultiSelectionEnabled(false);
-                    chooser.setFileFilter(new FileNameExtensionFilter("Archive", "JAR", "ZIP"));
-                    int result = chooser.showOpenDialog(MyfeApplication.this);
-                    if (result != JFileChooser.APPROVE_OPTION) {
-                        return;
-                    }
-                    File file = chooser.getSelectedFile();
-                    if (!file.exists()) {
-                        JOptionPane.showMessageDialog(
-                                MyfeApplication.this,
-                                "Archive doesn't exist: " + file,
-                                "Open archive",
-                                JOptionPane.ERROR_MESSAGE);
-                        return;
-                    }
-                    handleOpenArchive(file.toPath());
-                }
-            });
-            openArchiveMenuItem.setMnemonic('O');
-            openArchiveMenuItem.setText("Open archive...");
-            return openArchiveMenuItem;
+        @Override
+        public void connectToFtpServer(FeMenuBarEvent event) {
+            handleConnectToFTPServer(event.getFtpConnectionConfig());
         }
 
-        private JMenuItem createConnectToFTPServerMenuItem() {
-            JMenuItem connectToFTPServerMenuItem = new JMenuItem(new AbstractAction() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    //TODO: Create new view of dialog
-                    JDialog dialog = new JDialog(MyfeApplication.this, "Connect to FTP server", true);
-                    dialog.setLocationRelativeTo(MyfeApplication.this);
-                    dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-                    JPanel content = new JPanel(new GridLayout(0, 2));
-                    // host
-                    content.add(new JLabel("Host:"));
-                    JTextField hostField = new JTextField();
-                    content.add(hostField);
-                    // port
-                    content.add(new JLabel("Port:"));
-                    JTextField portField = new JTextField();
-                    content.add(portField);
-                    // username
-                    content.add(new JLabel("Username:"));
-                    JTextField usernameField = new JTextField();
-                    content.add(usernameField);
-                    // password
-                    content.add(new JLabel("Password:"));
-                    JPasswordField passwordField = new JPasswordField();
-                    content.add(passwordField);
-                    // button
-                    JButton button = new JButton(new AbstractAction() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            FtpConnectionConfig ftpConnectionConfig = FtpConnectionConfig.user(
-                                    hostField.getText(),
-                                    Integer.parseInt(portField.getText()),
-                                    usernameField.getText(),
-                                    passwordField.getPassword()
-                            );
-                            dialog.setVisible(false);
-                            //TODO: Add spinner
-                            handleConnectToFTPServer(ftpConnectionConfig);
-                            dialog.dispose();
-                        }
-                    });
-                    button.setText("Connect");
-                    content.add(button);
-                    // dialog
-                    dialog.getContentPane().add(content);
-                    dialog.pack();
-                    dialog.setVisible(true);
-                }
-            });
-            connectToFTPServerMenuItem.setMnemonic('C');
-            connectToFTPServerMenuItem.setText("Connect to FTP server...");
-            return connectToFTPServerMenuItem;
+    }
+
+    private class TabListener implements FeTabListener {
+
+        @Override
+        public void openArchive(FeTabEvent event) {
+            handleOpenArchive(event.getFile().getPath());
         }
 
     }
