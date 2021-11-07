@@ -23,6 +23,7 @@ public class MySplitPane extends JSplitPane {
 
     public MySplitPane(int newOrientation, Component newLeftComponent, Component newRightComponent) {
         super(newOrientation, true, newLeftComponent, newRightComponent);
+        setDividerSize(4);
     }
 
     public static class Horizontal extends MySplitPane {

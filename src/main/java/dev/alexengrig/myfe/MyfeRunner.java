@@ -20,6 +20,15 @@ import javax.swing.*;
 
 public class MyfeRunner {
 
+    static {
+        String className = UIManager.getSystemLookAndFeelClassName();
+        try {
+            UIManager.setLookAndFeel(className);
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static void main(String[] args) {
         SwingUtilities.invokeLater(MyfeApplication::new);
     }

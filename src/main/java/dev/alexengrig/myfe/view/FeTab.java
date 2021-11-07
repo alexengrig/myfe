@@ -141,11 +141,15 @@ public class FeTab extends JPanel {
         LOGGER.debug("Start adding components");
         add(headerView, BorderLayout.NORTH);
         MySplitPane info = new MySplitPane.Vertical(new MyScrollPane(detailsView), new MyScrollPane(previewView));
+        info.setDividerLocation(50);
         JPanel filteredTable = new JPanel(new BorderLayout());
         filteredTable.add(new MyScrollPane(tableView), BorderLayout.CENTER);
         filteredTable.add(filterView, BorderLayout.SOUTH);
         MySplitPane content = new MySplitPane.Horizontal(filteredTable, info);
+        content.setDividerLocation(content.getPreferredSize().width / 2);
+        content.setResizeWeight(.5);
         MySplitPane center = new MySplitPane.Horizontal(new MyScrollPane(treeView), content);
+        center.setDividerLocation(100);
         add(center, BorderLayout.CENTER);
         add(footerView, BorderLayout.SOUTH);
         LOGGER.debug("Finished adding components");

@@ -42,7 +42,7 @@ public class LookAndFeelModel {
     private String currentName;
 
     public LookAndFeelModel() {
-        this(UIManager.getSystemLookAndFeelClassName());
+        this(UIManager.getLookAndFeel().getClass().getName());
     }
 
     public LookAndFeelModel(String className) {

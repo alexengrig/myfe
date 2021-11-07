@@ -200,7 +200,7 @@ public class MyfeMenuBar extends JMenuBar {
 
     }
 
-    private class LookAndFeelMenuItem extends JMenuItem {
+    private class LookAndFeelMenuItem extends JMenu {
 
         public LookAndFeelMenuItem() {
             super("Look & Feel");
