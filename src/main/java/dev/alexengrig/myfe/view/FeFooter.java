@@ -44,6 +44,7 @@ public class FeFooter extends JPanel {
         add(contentPane);
         model.addFeFooterModelListener(new ModelListener());
         handleChangeNumberOfElements(model.getNumberOfElements());
+        setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
     }
 
     private void addCounterComponent() {
