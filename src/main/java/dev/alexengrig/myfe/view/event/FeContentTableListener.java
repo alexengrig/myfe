@@ -22,7 +22,7 @@ public interface FeContentTableListener extends EventListener {
 
     void selectPath(FeContentTableEvent event);
 
-    void doubleClickOnPath(FeContentTableEvent event);
+    void goToPath(FeContentTableEvent event);
 
     void goBack(FeContentTableEvent event);
 

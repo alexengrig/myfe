@@ -269,7 +269,7 @@ public class FeTab extends JPanel {
         }
 
         @Override
-        public void doubleClickOnPath(FeContentTableEvent event) {
+        public void goToPath(FeContentTableEvent event) {
             FePath path = event.getPath();
             if (path.isDirectory()) {
                 handleSelectDirectory(path.asDirectory());

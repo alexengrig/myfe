@@ -51,6 +51,10 @@ public class FeContentTable extends JTable {
 
     private void init() {
         getTableHeader().setReorderingAllowed(false);
+        // Remove default action on press Enter
+        getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .getParent()
+                .remove(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
         initSorter();
         initListeners();
     }
@@ -106,10 +110,10 @@ public class FeContentTable extends JTable {
         }
     }
 
-    private void fireDoubleClickOnPath(FeContentTableEvent event) {
-        LOGGER.debug("Fire double click on path: {}", event);
+    private void fireGoToPath(FeContentTableEvent event) {
+        LOGGER.debug("Fire go to path: {}", event);
         for (FeContentTableListener listener : listeners) {
-            listener.doubleClickOnPath(event);
+            listener.goToPath(event);
         }
     }
 
@@ -154,7 +158,7 @@ public class FeContentTable extends JTable {
     /**
      * On double-click the left mouse button and press the Enter key on a row.
      *
-     * @see FeContentTable#fireDoubleClickOnPath(FeContentTableEvent)
+     * @see FeContentTable#fireGoToPath(FeContentTableEvent)
      */
     private class GoToPathListener implements DoNothingMouseListener, DoNothingKeyListener {
 
@@ -162,7 +166,7 @@ public class FeContentTable extends JTable {
         public void mouseClicked(MouseEvent e) {
             if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() > 1 && getSelectedRowCount() == 1) {
                 FePath path = getSelectedPath();
-                fireDoubleClickOnPath(new FeContentTableEvent(path));
+                fireGoToPath(new FeContentTableEvent(path));
             }
         }
 
@@ -170,7 +174,7 @@ public class FeContentTable extends JTable {
         public void keyPressed(KeyEvent e) {
             if (e.getKeyCode() == KeyEvent.VK_ENTER && getSelectedRowCount() == 1) {
                 FePath path = getSelectedPath();
-                fireDoubleClickOnPath(new FeContentTableEvent(path));
+                fireGoToPath(new FeContentTableEvent(path));
             }
         }
 
