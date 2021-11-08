@@ -18,6 +18,7 @@ package dev.alexengrig.myfe.view;
 
 import dev.alexengrig.myfe.model.FeContentTableModel;
 import dev.alexengrig.myfe.model.FePath;
+import dev.alexengrig.myfe.util.swing.DelayedSingleTaskExecutor;
 import dev.alexengrig.myfe.view.event.DoNothingKeyListener;
 import dev.alexengrig.myfe.view.event.DoNothingMouseListener;
 import dev.alexengrig.myfe.view.event.FeContentTableEvent;
@@ -138,18 +139,22 @@ public class FeContentTable extends JTable {
      */
     private class SelectPathListener implements ListSelectionListener {
 
+        private final DelayedSingleTaskExecutor timer = new DelayedSingleTaskExecutor(400);
+
         private transient FePath previousPath;
 
         @Override
-        public void valueChanged(ListSelectionEvent event) {
+        public void valueChanged(ListSelectionEvent ignore) {
+            timer.execute(this::handleSelect);
+        }
+
+        private void handleSelect() {
             if (getSelectedRowCount() == 1) {
                 FePath path = getSelectedPath();
-                //FIXME: Don't handle same path
-                if (Objects.equals(previousPath, path)) {
-                    return;
+                if (!Objects.equals(previousPath, path)) {
+                    previousPath = path;
+                    fireSelectPath(new FeContentTableEvent(path));
                 }
-                previousPath = path;
-                fireSelectPath(new FeContentTableEvent(path));
             }
         }
 
