@@ -298,7 +298,7 @@ public class FeTab extends JPanel {
     private class FilterListener implements FeContentFilterListener {
 
         @Override
-        public void filterType(FeContentFilterEvent event) {
+        public void changeType(FeContentFilterEvent event) {
             String type = event.getType();
             handleFilterType(type);
         }

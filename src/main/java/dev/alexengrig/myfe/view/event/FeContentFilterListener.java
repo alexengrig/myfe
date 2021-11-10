@@ -20,6 +20,6 @@ import java.util.EventListener;
 
 public interface FeContentFilterListener extends EventListener {
 
-    void filterType(FeContentFilterEvent event);
+    void changeType(FeContentFilterEvent event);
 
 }
