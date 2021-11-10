@@ -22,8 +22,10 @@ public interface KnownExtensions {
 
     Set<String> IMAGE_FILE_EXTENSIONS = Set.of("JPEG", "JPG", "GIF", "XBM");
 
+    //FIXME: Add other extensions
     Set<String> TEXT_FILE_EXTENSIONS = Set.of("TXT", "LOG");
 
+    //FIXME: Add other extensions
     Set<String> ARCHIVE_FILE_EXTENSIONS = Set.of("JAR", "ZIP");
 
 }
