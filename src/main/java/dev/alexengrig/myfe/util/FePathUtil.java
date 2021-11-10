@@ -16,20 +16,16 @@
 
 package dev.alexengrig.myfe.util;
 
+import dev.alexengrig.myfe.config.KnownExtensions;
 import dev.alexengrig.myfe.model.FeFile;
 import dev.alexengrig.myfe.model.FePath;
 
 import java.util.Objects;
-import java.util.Set;
 
 /**
  * A utility class for {@link FePath}.
  */
 public class FePathUtil {
-
-    private static final Set<String> IMAGE_FILE_EXTENSIONS = Set.of("JPEG", "JPG", "GIF", "XBM");
-    private static final Set<String> TEXT_FILE_EXTENSIONS = Set.of("TXT", "LOG");
-    private static final Set<String> ARCHIVE_FILE_EXTENSIONS = Set.of("JAR", "ZIP");
 
     private FePathUtil() throws IllegalAccessException {
         throw new IllegalAccessException("This is utility class");
@@ -50,15 +46,15 @@ public class FePathUtil {
     }
 
     public static boolean isImage(FeFile file) {
-        return IMAGE_FILE_EXTENSIONS.contains(requireNonNullFile(file).getExtension());
+        return KnownExtensions.IMAGE_FILE_EXTENSIONS.contains(requireNonNullFile(file).getExtension());
     }
 
     public static boolean isText(FeFile file) {
-        return TEXT_FILE_EXTENSIONS.contains(requireNonNullFile(file).getExtension());
+        return KnownExtensions.TEXT_FILE_EXTENSIONS.contains(requireNonNullFile(file).getExtension());
     }
 
     public static boolean isArchive(FeFile file) {
-        return ARCHIVE_FILE_EXTENSIONS.contains(requireNonNullFile(file).getExtension());
+        return KnownExtensions.ARCHIVE_FILE_EXTENSIONS.contains(requireNonNullFile(file).getExtension());
     }
 
     private static FePath requireNonNullPath(FePath path) {

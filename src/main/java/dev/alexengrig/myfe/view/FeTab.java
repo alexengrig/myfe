@@ -43,6 +43,8 @@ import dev.alexengrig.myfe.view.event.FeTabListener;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.File;
+import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -183,6 +185,16 @@ public class FeTab extends JPanel {
         directoryStack.push(directory);
     }
 
+    private void handleOpenFile(FeFile file) {
+        LOGGER.debug("Handle open file: {}", file);
+        try {
+            //TODO: Check Desktop.isDesktopSupported()
+            Desktop.getDesktop().open(new File(file.getPath()));
+        } catch (IOException e) {
+            LOGGER.error("Exception of opening file: {}", file, e);
+        }
+    }
+
     private void handleSelectPath(FePath path) {
         LOGGER.debug("Handle select path: {}", path);
         pathModel.setPath(path);
@@ -275,6 +287,8 @@ public class FeTab extends JPanel {
                 handleSelectDirectory(path.asDirectory());
             } else if (FePathUtil.isArchive(path.asFile())) {
                 fireOpenArchive(new FeTabEvent(path.asFile()));
+            } else {
+                handleOpenFile(path.asFile());
             }
         }
 
