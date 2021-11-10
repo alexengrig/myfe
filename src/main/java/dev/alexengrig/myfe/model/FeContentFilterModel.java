@@ -18,6 +18,7 @@ package dev.alexengrig.myfe.model;
 
 import dev.alexengrig.myfe.model.event.FeContentFilterModelEvent;
 import dev.alexengrig.myfe.model.event.FeContentFilterModelListener;
+import dev.alexengrig.myfe.util.FePathUtil;
 import dev.alexengrig.myfe.view.FeContentFilter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -45,8 +46,11 @@ public class FeContentFilterModel {
     }
 
     private List<String> createTypes(List<? extends FePath> paths) {
-        //FIXME: Improve it
-        return paths.stream().map(FePath::getExtension).distinct().sorted().collect(Collectors.toList());
+        return paths.stream()
+                .map(FePathUtil::getType)
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList());
     }
 
     public void setPaths(List<? extends FePath> paths) {

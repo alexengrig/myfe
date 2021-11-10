@@ -21,6 +21,7 @@ import dev.alexengrig.myfe.model.FeFile;
 import dev.alexengrig.myfe.model.FePath;
 
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * A utility class for {@link FePath}.
@@ -31,9 +32,34 @@ public class FePathUtil {
         throw new IllegalAccessException("This is utility class");
     }
 
-    public static String getExtension(FePath path) {
+    public static String getType(FePath path) {
         if (requireNonNullPath(path).isDirectory()) {
             return "File folder";
+        } else {
+            Optional<String> fileExtension = doGetFileExtension(path.asFile());
+            return fileExtension
+                    .map(extension -> extension.concat(" file"))
+                    .orElse("File");
+        }
+    }
+
+    public static Optional<String> getFileExtension(FeFile file) {
+        return doGetFileExtension(requireNonNullFile(file));
+    }
+
+    private static Optional<String> doGetFileExtension(FeFile file) {
+        String name = file.getName();
+        int indexOfDot = name.lastIndexOf('.');
+        if (indexOfDot >= 0) {
+            return Optional.of(name.substring(indexOfDot + 1).toUpperCase());
+        } else {
+            return Optional.empty();
+        }
+    }
+
+    public static String getExtension(FePath path) {
+        if (requireNonNullPath(path).isDirectory()) {
+            return "Folder";
         } else {
             String name = path.getName();
             int indexOfDot = name.lastIndexOf('.');
@@ -46,15 +72,24 @@ public class FePathUtil {
     }
 
     public static boolean isImage(FeFile file) {
-        return KnownExtensions.IMAGE_FILE_EXTENSIONS.contains(requireNonNullFile(file).getExtension());
+        Optional<String> fileExtension = getFileExtension(file);
+        return fileExtension
+                .filter(KnownExtensions.IMAGE_FILE_EXTENSIONS::contains)
+                .isPresent();
     }
 
     public static boolean isText(FeFile file) {
-        return KnownExtensions.TEXT_FILE_EXTENSIONS.contains(requireNonNullFile(file).getExtension());
+        Optional<String> fileExtension = getFileExtension(file);
+        return fileExtension
+                .filter(KnownExtensions.TEXT_FILE_EXTENSIONS::contains)
+                .isPresent();
     }
 
     public static boolean isArchive(FeFile file) {
-        return KnownExtensions.ARCHIVE_FILE_EXTENSIONS.contains(requireNonNullFile(file).getExtension());
+        Optional<String> fileExtension = getFileExtension(file);
+        return fileExtension
+                .filter(KnownExtensions.ARCHIVE_FILE_EXTENSIONS::contains)
+                .isPresent();
     }
 
     private static FePath requireNonNullPath(FePath path) {

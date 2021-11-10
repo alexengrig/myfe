@@ -16,6 +16,7 @@
 
 package dev.alexengrig.myfe.model;
 
+import dev.alexengrig.myfe.util.FePathUtil;
 import dev.alexengrig.myfe.view.FeContentTable;
 
 import javax.swing.table.DefaultTableModel;
@@ -41,7 +42,7 @@ public class FeContentTableModel extends DefaultTableModel {
 
     private static Vector<Vector<?>> convertToVector(List<? extends FePath> data) {
         return data.stream()
-                .map(path -> new Vector<>(List.of(path.getName(), path.getExtension())))
+                .map(path -> new Vector<>(List.of(path.getName(), FePathUtil.getType(path))))
                 .collect(Collectors.toCollection(Vector::new));
     }
 

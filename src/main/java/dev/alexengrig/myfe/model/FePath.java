@@ -16,14 +16,10 @@
 
 package dev.alexengrig.myfe.model;
 
-import dev.alexengrig.myfe.util.FePathUtil;
-
 /**
  * Path of file explorer.
  */
 public abstract class FePath extends AbstractPath {
-
-    private transient String extension;
 
     protected FePath(String path, String name) {
         super(path, name);
@@ -35,13 +31,6 @@ public abstract class FePath extends AbstractPath {
 
     public FeFile asFile() {
         return (FeFile) this;
-    }
-
-    public String getExtension() {
-        if (extension == null) {
-            extension = FePathUtil.getExtension(this);
-        }
-        return extension;
     }
 
 }

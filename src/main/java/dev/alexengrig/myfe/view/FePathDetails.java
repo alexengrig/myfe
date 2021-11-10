@@ -18,6 +18,7 @@ package dev.alexengrig.myfe.view;
 
 import dev.alexengrig.myfe.model.FePath;
 import dev.alexengrig.myfe.model.FeSelectedPathModel;
+import dev.alexengrig.myfe.util.FePathUtil;
 
 import javax.swing.*;
 import java.awt.*;
@@ -66,7 +67,7 @@ public class FePathDetails extends JPanel {
         FePath path = model.getPath();
         return List.of(
                 new JLabel("Name: " + path.getName()),
-                new JLabel("Type: " + path.getExtension())
+                new JLabel("Type: " + FePathUtil.getType(path))
         );
     }
 
