@@ -49,6 +49,7 @@ public class FeTabbedPane extends JTabbedPane {
                 }
             });
             button.setText("x"); //TODO: Make it beautiful
+            button.setBorder(null);
             add(button);
         }
 
