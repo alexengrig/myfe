@@ -17,12 +17,22 @@
 package dev.alexengrig.myfe.view;
 
 import javax.swing.*;
+import javax.swing.text.DefaultCaret;
 import javax.swing.text.Document;
+import java.awt.*;
 
 public class MyText extends JTextArea {
 
     public MyText(Document document) {
         super(document);
+        init();
+    }
+
+    private void init() {
+        setEnabled(false);
+        setDisabledTextColor(Color.BLACK);
+        // Disable auto-scroll down after inserting text
+        ((DefaultCaret) getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
     }
 
 }
