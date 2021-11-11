@@ -17,13 +17,41 @@
 package dev.alexengrig.myfe.view;
 
 import dev.alexengrig.myfe.model.FeFile;
+import dev.alexengrig.myfe.model.FeFileImageModel;
+import dev.alexengrig.myfe.model.event.FeFileImageModelEvent;
+import dev.alexengrig.myfe.model.event.FeFileImageModelListener;
 
 import javax.swing.*;
 
 public class MyImage extends JLabel {
 
-    public MyImage(FeFile file) {
-        super(new ImageIcon(file.getPath()));
+    private final FeFileImageModel model;
+
+    public MyImage(FeFileImageModel model) {
+        super(null, null, CENTER);
+        this.model = model;
+        init();
+    }
+
+    private void init() {
+        initListeners();
+    }
+
+    private void initListeners() {
+        model.addFeFileImageModelListener(new ModelListener());
+    }
+
+    private void handleChangeFile(FeFile file) {
+        setIcon(new ImageIcon(file.getPath()));
+    }
+
+    private class ModelListener implements FeFileImageModelListener {
+
+        @Override
+        public void changeFile(FeFileImageModelEvent event) {
+            handleChangeFile(event.getFile());
+        }
+
     }
 
 }

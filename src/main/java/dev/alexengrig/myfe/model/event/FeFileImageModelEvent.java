@@ -14,15 +14,20 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.view;
+package dev.alexengrig.myfe.model.event;
 
-import javax.swing.*;
-import javax.swing.text.Document;
+import dev.alexengrig.myfe.model.FeFile;
 
-public class MyText extends JTextArea {
+public class FeFileImageModelEvent {
 
-    public MyText(Document document) {
-        super(document);
+    private final FeFile file;
+
+    public FeFileImageModelEvent(FeFile file) {
+        this.file = file;
+    }
+
+    public FeFile getFile() {
+        return file;
     }
 
 }

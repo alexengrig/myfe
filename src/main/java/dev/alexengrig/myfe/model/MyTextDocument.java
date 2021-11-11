@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.view;
+package dev.alexengrig.myfe.model;
 
-import javax.swing.*;
-import javax.swing.text.Document;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.PlainDocument;
 
-public class MyText extends JTextArea {
+public class MyTextDocument extends PlainDocument {
 
-    public MyText(Document document) {
-        super(document);
+    public void setText(String text) {
+        try {
+            replace(0, getLength(), text, null);
+        } catch (BadLocationException e) {
+            throw new IllegalStateException(e);
+        }
     }
 
 }

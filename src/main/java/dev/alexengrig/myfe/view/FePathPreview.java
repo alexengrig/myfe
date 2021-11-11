@@ -17,8 +17,10 @@
 package dev.alexengrig.myfe.view;
 
 import dev.alexengrig.myfe.model.FeFile;
+import dev.alexengrig.myfe.model.FeFileImageModel;
 import dev.alexengrig.myfe.model.FePath;
 import dev.alexengrig.myfe.model.FeSelectedPathModel;
+import dev.alexengrig.myfe.model.MyTextDocument;
 import dev.alexengrig.myfe.model.event.FeSelectedPathModelEvent;
 import dev.alexengrig.myfe.model.event.FeSelectedPathModelListener;
 import dev.alexengrig.myfe.service.ContentPreviewBackgroundService;
@@ -30,6 +32,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.lang.invoke.MethodHandles;
 
+/**
+ * Preview of {@link FePath}.
+ */
 public class FePathPreview extends JPanel {
 
     private static final LazyLogger LOGGER = LazyLoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -37,65 +42,86 @@ public class FePathPreview extends JPanel {
     private final FeSelectedPathModel model;
     private final ContentPreviewBackgroundService backgroundService;
 
+    private final MyTextDocument textModel;
+    private final FeFileImageModel imageModel;
+
+    private final MyText textView;
+    private final MyImage imageView;
+
     public FePathPreview(FeSelectedPathModel model, ContentPreviewBackgroundService backgroundService) {
-        super(new BorderLayout());
+        super(new GridBagLayout());
         this.model = model;
         this.backgroundService = backgroundService;
+        this.textModel = new MyTextDocument();
+        this.imageModel = new FeFileImageModel();
+        this.textView = new MyText(textModel);
+        this.imageView = new MyImage(imageModel);
         init();
     }
 
     private void init() {
-        addPreviewComponent(model.getPath());
+        initListeners();
+        addComponents();
+        handleChangePath(model.getPath());
+    }
+
+    private void initListeners() {
         model.addSelectedFePathModelListener(new ModelListener());
+    }
+
+    private void addComponents() {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.weightx = gbc.weighty = 1.0;
+        add(textView, gbc);
+        imageView.setVisible(false);
+        add(imageView, gbc);
     }
 
     private void handleChangePath(FePath path) {
         LOGGER.debug("Handle change path: {}", path);
-        removeAll();
-        addPreviewComponent(path);
-        revalidate(); //FIXME: It's slow
-        repaint();
-    }
-
-    private void addPreviewComponent(FePath path) {
-        JComponent component = createPreviewComponent(path);
-        add(component);
-    }
-
-    private JComponent createPreviewComponent(FePath path) {
         if (path == null) {
-            return createEmptyPreviewComponent();
+            setNotSelectedFilePreviewText();
         } else {
             if (path.isFile()) {
-                if (FePathUtil.isImage(path.asFile())) {
-                    return createImagePreviewComponent(path.asFile());
-                } else if (FePathUtil.isText(path.asFile())) {
-                    return createTextPreviewComponent(path.asFile());
+                FeFile file = path.asFile();
+                if (FePathUtil.isImage(file)) {
+                    setFileImage(file);
+                    return;
+                } else if (FePathUtil.isText(file)) {
+                    setFilePreviewText(file);
+                    return;
                 }
             }
-            return createAvailablePreviewComponent();
+            setAvailablePreviewText();
         }
     }
 
-    private JComponent createEmptyPreviewComponent() {
-        return new JTextArea("Select an element to preview");
+    private void setNotSelectedFilePreviewText() {
+        imageView.setVisible(false);
+        textModel.setText("Select an element to preview");
+        textView.setVisible(true);
     }
 
-    private JComponent createAvailablePreviewComponent() {
-        return new JTextArea("No preview available");
+    private void setFileImage(FeFile file) {
+        textView.setVisible(false);
+        imageModel.setFile(file);
+        imageView.setVisible(true);
     }
 
-    private JComponent createImagePreviewComponent(FeFile file) {
-        return new MyImage(file);
-    }
-
-    private JComponent createTextPreviewComponent(FeFile file) {
-        MyText component = new MyText();
-        backgroundService.loadTextPreview(file, str -> {
+    private void setFilePreviewText(FeFile file) {
+        backgroundService.loadTextPreview(file, text -> {
             LOGGER.debug("Got preview text for: {}", file);
-            component.append(str);
+            imageView.setVisible(false);
+            textModel.setText(text);
+            textView.setVisible(true);
         });
-        return component;
+    }
+
+    private void setAvailablePreviewText() {
+        imageView.setVisible(false);
+        textModel.setText("No preview available");
+        textView.setVisible(true);
     }
 
     /**
