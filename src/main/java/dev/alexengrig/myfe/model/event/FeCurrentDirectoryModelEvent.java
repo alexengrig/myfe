@@ -34,6 +34,10 @@ public class FeCurrentDirectoryModelEvent {
         return new FeCurrentDirectoryModelEvent(directory);
     }
 
+    public static FeCurrentDirectoryModelEvent refreshing() {
+        return new FeCurrentDirectoryModelEvent(null);
+    }
+
     public FeDirectory getDirectory() {
         return directory;
     }

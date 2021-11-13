@@ -45,6 +45,7 @@ public class FeHeader extends JPanel {
     private final JButton backButton;
     private final JButton forwardButton;
     private final JButton upButton;
+    private final JButton updateButton;
 
     public FeHeader(FeCurrentDirectoryModel directoryModel) {
         super(new BorderLayout());
@@ -53,7 +54,7 @@ public class FeHeader extends JPanel {
         this.backButton = new JButton();
         this.forwardButton = new JButton();
         this.upButton = new JButton();
-        //FIXME: Refresh button
+        this.updateButton = new JButton();
         init();
     }
 
@@ -64,26 +65,29 @@ public class FeHeader extends JPanel {
     }
 
     private void addComponents() {
-        addNavigations();
+        ButtonActions actions = new ButtonActions();
+        addNavigations(actions);
         pathField.setEnabled(false);
         pathField.setDisabledTextColor(Color.BLACK);
         pathField.setBackground(Color.WHITE);
         add(pathField, BorderLayout.CENTER);
+        updateButton.setText("Update");
+        updateButton.addActionListener(actions::update);
+        add(updateButton, BorderLayout.EAST);
     }
 
-    private void addNavigations() {
+    private void addNavigations(ButtonActions actions) {
         toggleNavigations();
         JPanel actionPanel = new JPanel(new GridLayout(1, 3));
         actionPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 2));
-        NavigationActions navigation = new NavigationActions();
         backButton.setText("<");
-        backButton.addActionListener(navigation::back);
+        backButton.addActionListener(actions::back);
         actionPanel.add(backButton);
         forwardButton.setText(">");
-        forwardButton.addActionListener(navigation::forward);
+        forwardButton.addActionListener(actions::forward);
         actionPanel.add(forwardButton);
         upButton.setText("^");
-        upButton.addActionListener(navigation::up);
+        upButton.addActionListener(actions::up);
         actionPanel.add(upButton);
         add(actionPanel, BorderLayout.WEST);
     }
@@ -116,6 +120,11 @@ public class FeHeader extends JPanel {
         fireMoveToDirectory(FeHeaderEvent.directory(directory));
     }
 
+    private void handleRefresh() {
+        LOGGER.debug("Handle refresh");
+        fireRefreshContent(FeHeaderEvent.refreshing());
+    }
+
     public void addFeHeaderListener(FeHeaderListener listener) {
         listeners.add(listener);
     }
@@ -138,7 +147,14 @@ public class FeHeader extends JPanel {
         }
     }
 
-    private class NavigationActions {
+    private void fireRefreshContent(FeHeaderEvent event) {
+        LOGGER.debug("Fire refresh content");
+        for (FeHeaderListener listener : listeners) {
+            listener.refreshContent(event);
+        }
+    }
+
+    private class ButtonActions {
 
         public void back(ActionEvent ignore) {
             directoryModel.goBack();
@@ -150,6 +166,10 @@ public class FeHeader extends JPanel {
 
         public void up(ActionEvent ignore) {
             directoryModel.goUp();
+        }
+
+        public void update(ActionEvent ignore) {
+            directoryModel.update();
         }
 
     }
@@ -167,6 +187,10 @@ public class FeHeader extends JPanel {
             handleSetDirectory(directory);
         }
 
+        @Override
+        public void refresh(FeCurrentDirectoryModelEvent event) {
+            handleRefresh();
+        }
     }
 
 }

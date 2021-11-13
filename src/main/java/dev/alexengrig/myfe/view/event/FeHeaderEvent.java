@@ -34,6 +34,10 @@ public class FeHeaderEvent {
         return new FeHeaderEvent(directory);
     }
 
+    public static FeHeaderEvent refreshing() {
+        return new FeHeaderEvent(null);
+    }
+
     public FeDirectory getDirectory() {
         return directory;
     }

@@ -24,4 +24,6 @@ public interface FeCurrentDirectoryModelListener extends EventListener {
 
     void goToDirectory(FeCurrentDirectoryModelEvent event);
 
+    void refresh(FeCurrentDirectoryModelEvent event);
+
 }

@@ -119,6 +119,10 @@ public class FeCurrentDirectoryModel {
         //FIXME: Implement
     }
 
+    public void update() {
+        fireRefresh(FeCurrentDirectoryModelEvent.refreshing());
+    }
+
     public void addFeCurrentDirectoryModelListener(FeCurrentDirectoryModelListener listener) {
         listeners.add(listener);
     }
@@ -138,6 +142,13 @@ public class FeCurrentDirectoryModel {
         LOGGER.debug("Fire go to directory: {}", event);
         for (FeCurrentDirectoryModelListener listener : listeners) {
             listener.goToDirectory(event);
+        }
+    }
+
+    private void fireRefresh(FeCurrentDirectoryModelEvent event) {
+        LOGGER.debug("Fire refresh: {}", event);
+        for (FeCurrentDirectoryModelListener listener : listeners) {
+            listener.refresh(event);
         }
     }
 

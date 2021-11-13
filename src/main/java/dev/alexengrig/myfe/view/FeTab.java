@@ -165,7 +165,7 @@ public class FeTab extends JPanel {
         //TODO: Spinner to table
         directoryModel.goToRoot();
         backgroundExecutor.execute(
-                () -> "Getting root directories",
+                "Getting root directories",
                 service::getRootDirectories,
                 paths -> {
                     tableModel.setPaths(paths);
@@ -186,6 +186,27 @@ public class FeTab extends JPanel {
                     filterModel.setPaths(paths);
                 });
         pathModel.setPath(null);
+    }
+
+    private void handleRefreshDirectoryContent() {
+        FeDirectory directory = directoryModel.getDirectory();
+        if (directory == null) {
+            backgroundExecutor.execute(
+                    "Getting root directories",
+                    service::getRootDirectories,
+                    paths -> {
+                        tableModel.setPaths(paths);
+                        filterModel.setPaths(paths);
+                    });
+        } else {
+            backgroundExecutor.execute(
+                    "Getting directory content:",
+                    () -> service.getDirectoryContent(directory),
+                    paths -> {
+                        tableModel.setPaths(paths);
+                        filterModel.setPaths(paths);
+                    });
+        }
     }
 
     private void handleOpenFile(FeFile file) {
@@ -264,6 +285,11 @@ public class FeTab extends JPanel {
         public void moveToDirectory(FeHeaderEvent event) {
             FeDirectory directory = event.getDirectory();
             handleOpenDirectory(directory);
+        }
+
+        @Override
+        public void refreshContent(FeHeaderEvent event) {
+            handleRefreshDirectoryContent();
         }
 
     }
