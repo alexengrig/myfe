@@ -16,14 +16,33 @@
 
 package dev.alexengrig.myfe.view.event;
 
-import java.util.EventListener;
+import dev.alexengrig.myfe.model.FeDirectory;
 
-public interface FeContentTableListener extends EventListener {
+public class FeHeaderEvent {
 
-    void selectPath(FeContentTableEvent event);
+    private final FeDirectory directory;
 
-    void goToPath(FeContentTableEvent event);
+    private FeHeaderEvent(FeDirectory directory) {
+        this.directory = directory;
+    }
 
-    void changeRowCount(FeContentTableEvent event);
+    public static FeHeaderEvent root() {
+        return new FeHeaderEvent(null);
+    }
+
+    public static FeHeaderEvent directory(FeDirectory directory) {
+        return new FeHeaderEvent(directory);
+    }
+
+    public FeDirectory getDirectory() {
+        return directory;
+    }
+
+    @Override
+    public String toString() {
+        return "FeHeaderEvent{" +
+                "directory=" + directory +
+                '}';
+    }
 
 }

@@ -18,6 +18,7 @@ package dev.alexengrig.myfe.view;
 
 import dev.alexengrig.myfe.model.FeContentFilterModel;
 import dev.alexengrig.myfe.model.FeContentTableModel;
+import dev.alexengrig.myfe.model.FeCurrentDirectoryModel;
 import dev.alexengrig.myfe.model.FeDirectory;
 import dev.alexengrig.myfe.model.FeDirectoryTreeModel;
 import dev.alexengrig.myfe.model.FeFile;
@@ -32,21 +33,24 @@ import dev.alexengrig.myfe.util.FePathUtil;
 import dev.alexengrig.myfe.util.logging.LazyLogger;
 import dev.alexengrig.myfe.util.logging.LazyLoggerFactory;
 import dev.alexengrig.myfe.util.swing.BackgroundTask;
+import dev.alexengrig.myfe.view.event.DoNothingKeyListener;
 import dev.alexengrig.myfe.view.event.FeContentFilterEvent;
 import dev.alexengrig.myfe.view.event.FeContentFilterListener;
 import dev.alexengrig.myfe.view.event.FeContentTableEvent;
 import dev.alexengrig.myfe.view.event.FeContentTableListener;
 import dev.alexengrig.myfe.view.event.FeDirectoryTreeEvent;
 import dev.alexengrig.myfe.view.event.FeDirectoryTreeListener;
+import dev.alexengrig.myfe.view.event.FeHeaderEvent;
+import dev.alexengrig.myfe.view.event.FeHeaderListener;
 import dev.alexengrig.myfe.view.event.FeTabEvent;
 import dev.alexengrig.myfe.view.event.FeTabListener;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
 import java.lang.invoke.MethodHandles;
-import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -61,15 +65,12 @@ public class FeTab extends JPanel {
     private final BackgroundExecutorService backgroundExecutor;
     private final String title;
     private final String tip;
-    /**
-     * Current directory on the top; {@code null} - the root.
-     */
-    private final Deque<FeDirectory> directoryStack;
 
     private FeDirectoryTreeModel treeModel;
     private FeContentTableModel tableModel;
     private FeContentFilterModel filterModel;
     private FeSelectedPathModel pathModel;
+    private FeCurrentDirectoryModel directoryModel;
     private FeFooterModel footerModel;
 
     private FeHeader headerView;
@@ -86,7 +87,6 @@ public class FeTab extends JPanel {
         this.backgroundExecutor = backgroundExecutor;
         this.title = title;
         this.tip = tip;
-        this.directoryStack = new LinkedList<>();
         init();
         addComponents();
     }
@@ -115,13 +115,14 @@ public class FeTab extends JPanel {
         tableModel = new FeContentTableModel(rootDirectories);
         filterModel = new FeContentFilterModel(rootDirectories);
         pathModel = new FeSelectedPathModel();
+        directoryModel = new FeCurrentDirectoryModel(service.getRootName());
         footerModel = new FeFooterModel(rootDirectories.size());
         LOGGER.debug("Finished initializing models");
     }
 
     private void initViews() {
         LOGGER.debug("Start initializing views");
-        headerView = new FeHeader();
+        headerView = new FeHeader(directoryModel);
         treeView = new FeDirectoryTree(treeModel, new TreeService());
         tableView = new FeContentTable(tableModel);
         filterView = new FeContentFilter(filterModel);
@@ -133,6 +134,8 @@ public class FeTab extends JPanel {
 
     private void initListeners() {
         LOGGER.debug("Start initializing listeners");
+        addKeyListener(new KeyboardListener());
+        headerView.addFeHeaderListener(new HeaderListener());
         treeView.addFeDirectoryTreeListener(new TreeListener());
         tableView.addFeContentTableListener(new TableListener());
         filterView.addFeContentFilterListener(new FilterListener());
@@ -157,9 +160,10 @@ public class FeTab extends JPanel {
         LOGGER.debug("Finished adding components");
     }
 
-    private void handleSelectRoot() {
+    private void handleOpenRoot() {
         LOGGER.debug("Handle select root");
         //TODO: Spinner to table
+        directoryModel.goToRoot();
         backgroundExecutor.execute(
                 () -> "Getting root directories",
                 service::getRootDirectories,
@@ -168,12 +172,12 @@ public class FeTab extends JPanel {
                     filterModel.setPaths(paths);
                 });
         pathModel.setPath(null);
-        directoryStack.push(null);
     }
 
-    private void handleSelectDirectory(FeDirectory directory) {
-        LOGGER.debug("Handle select directory: {}", directory);
+    private void handleOpenDirectory(FeDirectory directory) {
+        LOGGER.debug("Handle open directory: {}", directory);
         //TODO: Spinner to table
+        directoryModel.goToDirectory(directory);
         backgroundExecutor.execute(
                 "Getting directory content:",
                 () -> service.getDirectoryContent(directory),
@@ -182,7 +186,6 @@ public class FeTab extends JPanel {
                     filterModel.setPaths(paths);
                 });
         pathModel.setPath(null);
-        directoryStack.push(directory);
     }
 
     private void handleOpenFile(FeFile file) {
@@ -201,14 +204,8 @@ public class FeTab extends JPanel {
     }
 
     private void handleGoToPreviousDirectory() {
-        FeDirectory currentDirectory = directoryStack.poll();
-        FeDirectory previousDirectory = directoryStack.poll();
-        LOGGER.debug("Handle go to previous directory: {}", previousDirectory);
-        if (previousDirectory == null) {
-            handleSelectRoot();
-        } else {
-            handleSelectDirectory(previousDirectory);
-        }
+        LOGGER.debug("Handle go to previous directory");
+        directoryModel.goBack();
     }
 
     private void handleFilterType(String type) {
@@ -243,22 +240,51 @@ public class FeTab extends JPanel {
     }
 
     /**
+     * On press the Backspace key.
+     */
+    private class KeyboardListener implements DoNothingKeyListener {
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
+                handleGoToPreviousDirectory();
+            }
+        }
+
+    }
+
+    private class HeaderListener implements FeHeaderListener {
+
+        @Override
+        public void moveToRoot(FeHeaderEvent event) {
+            handleOpenRoot();
+        }
+
+        @Override
+        public void moveToDirectory(FeHeaderEvent event) {
+            FeDirectory directory = event.getDirectory();
+            handleOpenDirectory(directory);
+        }
+
+    }
+
+    /**
      * Events from Tree.
      *
-     * @see FeTab#handleSelectRoot()
-     * @see FeTab#handleSelectDirectory(FeDirectory)
+     * @see FeTab#handleOpenRoot()
+     * @see FeTab#handleOpenDirectory(FeDirectory)
      */
     private class TreeListener implements FeDirectoryTreeListener {
 
         @Override
         public void selectRoot(FeDirectoryTreeEvent event) {
-            handleSelectRoot();
+            handleOpenRoot();
         }
 
         @Override
         public void selectDirectory(FeDirectoryTreeEvent event) {
             FeDirectory directory = event.getDirectory();
-            handleSelectDirectory(directory);
+            handleOpenDirectory(directory);
         }
 
     }
@@ -267,7 +293,7 @@ public class FeTab extends JPanel {
      * Events from table.
      *
      * @see FeTab#handleSelectPath(FePath)
-     * @see FeTab#handleSelectDirectory(FeDirectory)
+     * @see FeTab#handleOpenDirectory(FeDirectory)
      * @see FeTab#handleGoToPreviousDirectory()
      * @see FeTab#handleChangeNumberOfElements(Integer)
      * @see FeTab#fireOpenArchive(FeTabEvent)
@@ -284,17 +310,12 @@ public class FeTab extends JPanel {
         public void goToPath(FeContentTableEvent event) {
             FePath path = event.getPath();
             if (path.isDirectory()) {
-                handleSelectDirectory(path.asDirectory());
+                handleOpenDirectory(path.asDirectory());
             } else if (FePathUtil.isArchive(path.asFile())) {
                 fireOpenArchive(new FeTabEvent(path.asFile()));
             } else {
                 handleOpenFile(path.asFile());
             }
-        }
-
-        @Override
-        public void goBack(FeContentTableEvent event) {
-            handleGoToPreviousDirectory();
         }
 
         @Override

@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.view.event;
+package dev.alexengrig.myfe.model.event;
 
 import java.util.EventListener;
 
-public interface FeContentTableListener extends EventListener {
+public interface FeCurrentDirectoryModelListener extends EventListener {
 
-    void selectPath(FeContentTableEvent event);
+    void goToRoot(FeCurrentDirectoryModelEvent event);
 
-    void goToPath(FeContentTableEvent event);
-
-    void changeRowCount(FeContentTableEvent event);
+    void goToDirectory(FeCurrentDirectoryModelEvent event);
 
 }

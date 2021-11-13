@@ -81,7 +81,6 @@ public class FeContentTable extends JTable {
         GoToPathListener goToPathListener = new GoToPathListener();
         addMouseListener(goToPathListener);
         addKeyListener(goToPathListener);
-        addKeyListener(new GoBackListener());
         getRowSorter().addRowSorterListener(new RowCountListener());
     }
 
@@ -115,13 +114,6 @@ public class FeContentTable extends JTable {
         LOGGER.debug("Fire go to path: {}", event);
         for (FeContentTableListener listener : listeners) {
             listener.goToPath(event);
-        }
-    }
-
-    private void fireGoBack(FeContentTableEvent event) {
-        LOGGER.debug("Fire go back: {}", event);
-        for (FeContentTableListener listener : listeners) {
-            listener.goBack(event);
         }
     }
 
@@ -180,23 +172,6 @@ public class FeContentTable extends JTable {
             if (e.getKeyCode() == KeyEvent.VK_ENTER && getSelectedRowCount() == 1) {
                 FePath path = getSelectedPath();
                 fireGoToPath(new FeContentTableEvent(path));
-            }
-        }
-
-    }
-
-    /**
-     * On press the Backspace key.
-     *
-     * @see FeContentTable#fireGoBack(FeContentTableEvent)
-     */
-    private class GoBackListener implements DoNothingKeyListener {
-
-        @Override
-        public void keyPressed(KeyEvent e) {
-            //TODO: As global for tab
-            if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
-                fireGoBack(new FeContentTableEvent());
             }
         }
 

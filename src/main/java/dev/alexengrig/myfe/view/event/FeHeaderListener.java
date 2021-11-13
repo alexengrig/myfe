@@ -18,12 +18,10 @@ package dev.alexengrig.myfe.view.event;
 
 import java.util.EventListener;
 
-public interface FeContentTableListener extends EventListener {
+public interface FeHeaderListener extends EventListener {
 
-    void selectPath(FeContentTableEvent event);
+    void moveToRoot(FeHeaderEvent event);
 
-    void goToPath(FeContentTableEvent event);
-
-    void changeRowCount(FeContentTableEvent event);
+    void moveToDirectory(FeHeaderEvent event);
 
 }
