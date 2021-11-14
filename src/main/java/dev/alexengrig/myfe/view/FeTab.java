@@ -189,7 +189,7 @@ public class FeTab extends JPanel {
     }
 
     private void handleRefreshDirectoryContent() {
-        FeDirectory directory = directoryModel.getDirectory();
+        FeDirectory directory = directoryModel.getCurrentDirectory();
         if (directory == null) {
             backgroundExecutor.execute(
                     "Getting root directories",

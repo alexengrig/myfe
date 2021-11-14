@@ -17,6 +17,7 @@
 package dev.alexengrig.myfe.util;
 
 import dev.alexengrig.myfe.config.KnownExtensions;
+import dev.alexengrig.myfe.model.FeDirectory;
 import dev.alexengrig.myfe.model.FeFile;
 import dev.alexengrig.myfe.model.FePath;
 
@@ -26,7 +27,7 @@ import java.util.Optional;
 /**
  * A utility class for {@link FePath}.
  */
-public class FePathUtil {
+public final class FePathUtil {
 
     private FePathUtil() throws IllegalAccessException {
         throw new IllegalAccessException("This is utility class");
@@ -57,18 +58,26 @@ public class FePathUtil {
         }
     }
 
-    public static String getExtension(FePath path) {
-        if (requireNonNullPath(path).isDirectory()) {
-            return "Folder";
-        } else {
-            String name = path.getName();
-            int indexOfDot = name.lastIndexOf('.');
-            if (indexOfDot >= 0) {
-                return name.substring(indexOfDot + 1).toUpperCase();
-            } else {
-                return "File";
-            }
+    public static Optional<FeDirectory> getParent(FeDirectory directory) {
+        if (isRoot(directory)) {
+            return Optional.empty();
         }
+        String path = requireNonNullPath(directory).getPath();
+        int lastIndexOfPathSeparator = lastIndexOfPathSeparator(path);
+        if (lastIndexOfPathSeparator < 0) {
+            throw new IllegalArgumentException("No path separator: " + path);
+        }
+        int nextLastIndexOfPathSeparator = lastIndexOfPathSeparator(path, lastIndexOfPathSeparator - 1);
+        String parentPath;
+        String parentName;
+        if (nextLastIndexOfPathSeparator >= 0) {
+            parentPath = path.substring(0, lastIndexOfPathSeparator);
+            parentName = getNameByPath(parentPath);
+        } else {
+            parentPath = path.substring(0, lastIndexOfPathSeparator + 1);
+            parentName = parentPath;
+        }
+        return Optional.of(new FeDirectory(parentPath, parentName));
     }
 
     public static boolean isImage(FeFile file) {
@@ -90,6 +99,37 @@ public class FePathUtil {
         return fileExtension
                 .filter(KnownExtensions.ARCHIVE_FILE_EXTENSIONS::contains)
                 .isPresent();
+    }
+
+    private static boolean isRoot(FeDirectory directory) {
+        return directory.getPath().equals(directory.getName());
+    }
+
+    private static int lastIndexOfPathSeparator(String path) {
+        int lastIndexOfSlash = path.lastIndexOf('/');
+        if (lastIndexOfSlash >= 0) {
+            return lastIndexOfSlash;
+        }
+        return path.lastIndexOf('\\');
+    }
+
+    private static int lastIndexOfPathSeparator(String path, int fromIndex) {
+        int lastIndexOfSlash = path.lastIndexOf('/', fromIndex);
+        if (lastIndexOfSlash >= 0) {
+            return lastIndexOfSlash;
+        }
+        return path.lastIndexOf('\\', fromIndex);
+    }
+
+    private static String getNameByPath(String path) {
+        int lastIndexOfPathSeparator = lastIndexOfPathSeparator(path);
+        if (lastIndexOfPathSeparator < 0) {
+            throw new IllegalArgumentException("No path separator: " + path);
+        }
+        if (lastIndexOfPathSeparator == path.length() - 1) {
+            return path;
+        }
+        return path.substring(lastIndexOfPathSeparator + 1);
     }
 
     private static FePath requireNonNullPath(FePath path) {

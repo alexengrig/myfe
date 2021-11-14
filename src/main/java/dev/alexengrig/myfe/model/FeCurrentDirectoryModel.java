@@ -18,6 +18,7 @@ package dev.alexengrig.myfe.model;
 
 import dev.alexengrig.myfe.model.event.FeCurrentDirectoryModelEvent;
 import dev.alexengrig.myfe.model.event.FeCurrentDirectoryModelListener;
+import dev.alexengrig.myfe.util.FePathUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,7 +50,7 @@ public class FeCurrentDirectoryModel {
         return rootName;
     }
 
-    public FeDirectory getDirectory() {
+    public FeDirectory getCurrentDirectory() {
         return backStack.peek();
     }
 
@@ -62,11 +63,11 @@ public class FeCurrentDirectoryModel {
     }
 
     public boolean canGoUp() {
-        return false;
+        return getCurrentDirectory() != null;
     }
 
     public void goToDirectory(FeDirectory directory) {
-        if (!Objects.equals(getDirectory(), directory)) {
+        if (!Objects.equals(getCurrentDirectory(), directory)) {
             backStack.push(directory);
             if (!forwardStack.isEmpty()) {
                 forwardStack.clear();
@@ -76,7 +77,7 @@ public class FeCurrentDirectoryModel {
     }
 
     public void goToRoot() {
-        if (getDirectory() != null) {
+        if (getCurrentDirectory() != null) {
             backStack.push(null);
             if (!forwardStack.isEmpty()) {
                 forwardStack.clear();
@@ -91,7 +92,7 @@ public class FeCurrentDirectoryModel {
         }
         FeDirectory currentDirectory = backStack.poll();
         forwardStack.push(currentDirectory);
-        FeDirectory previousDirectory = getDirectory();
+        FeDirectory previousDirectory = getCurrentDirectory();
         if (previousDirectory == null) {
             fireGoToRoot(FeCurrentDirectoryModelEvent.root());
         } else {
@@ -116,7 +117,17 @@ public class FeCurrentDirectoryModel {
         if (!canGoUp()) {
             return;
         }
-        //FIXME: Implement
+        FeDirectory currentDirectory = getCurrentDirectory();
+        FeDirectory parentDirectory = FePathUtil.getParent(currentDirectory).orElse(null);
+        backStack.push(parentDirectory);
+        if (!forwardStack.isEmpty()) {
+            forwardStack.clear();
+        }
+        if (parentDirectory == null) {
+            fireGoToRoot(FeCurrentDirectoryModelEvent.root());
+        } else {
+            fireGoToDirectory(FeCurrentDirectoryModelEvent.directory(parentDirectory));
+        }
     }
 
     public void update() {
