@@ -29,6 +29,7 @@ public abstract class AbstractPath {
     protected AbstractPath(String path, String name) {
         this.path = Objects.requireNonNull(path, "The path must not be null");
         this.name = Objects.requireNonNull(name, "The name must not be null");
+        assert path.endsWith(name) : "Invalid name=" + name + " for path=" + path;
     }
 
     public String getPath() {
