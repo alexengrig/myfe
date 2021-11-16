@@ -23,11 +23,18 @@ import dev.alexengrig.myfe.model.FePath;
 
 import java.util.Objects;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * A utility class for {@link FePath}.
  */
 public final class FePathUtil {
+
+    private static final char SLASH_SEPARATOR = '/';
+    private static final char BACKSLASH_SEPARATOR = '\\';
+
+    private static final Pattern SEPARATOR_PATTERN = Pattern.compile("([/\\\\])");
 
     private FePathUtil() throws IllegalAccessException {
         throw new IllegalAccessException("This is utility class");
@@ -63,21 +70,62 @@ public final class FePathUtil {
             return Optional.empty();
         }
         String path = requireNonNullPath(directory).getPath();
-        int lastIndexOfPathSeparator = lastIndexOfPathSeparator(path);
-        if (lastIndexOfPathSeparator < 0) {
+        int lastIndexOfSeparator = lastIndexOfSeparator(path);
+        if (lastIndexOfSeparator < 0) {
             throw new IllegalArgumentException("No path separator: " + path);
         }
-        int nextLastIndexOfPathSeparator = lastIndexOfPathSeparator(path, lastIndexOfPathSeparator - 1);
+        int nextLastIndexOfSeparator = lastIndexOfSeparator(path, lastIndexOfSeparator - 1);
         String parentPath;
         String parentName;
-        if (nextLastIndexOfPathSeparator >= 0) {
-            parentPath = path.substring(0, lastIndexOfPathSeparator);
+        if (nextLastIndexOfSeparator >= 0) {
+            parentPath = path.substring(0, lastIndexOfSeparator);
             parentName = getNameByPath(parentPath);
         } else {
-            parentPath = path.substring(0, lastIndexOfPathSeparator + 1);
+            parentPath = path.substring(0, lastIndexOfSeparator + 1);
             parentName = parentPath;
         }
         return Optional.of(new FeDirectory(parentPath, parentName));
+    }
+
+    public static int getLevelCount(FeDirectory directory) {
+        if (isRoot(directory)) {
+            return 0;
+        }
+        String path = requireNonNullDirectory(directory).getPath();
+        Matcher matcher = SEPARATOR_PATTERN.matcher(path);
+        if (!matcher.find()) {
+            throw new IllegalArgumentException("No separator matches: " + directory);
+        }
+        int count = 1;
+        while (matcher.find()) {
+            count++;
+        }
+        return count;
+    }
+
+    public static String getNameByLevel(FeDirectory directory, int level) {
+        requireNonNullDirectory(directory);
+        requirePositiveLevel(level);
+        String path = directory.getPath();
+        Matcher matcher = SEPARATOR_PATTERN.matcher(path);
+        if (!matcher.find()) {
+            throw new IllegalArgumentException("No separator matches: " + directory);
+        }
+        if (level == 0) {
+            // Get left part with separator as root directory name, for example, "/" and "C:\"
+            return path.substring(0, matcher.end());
+        }
+        int count = 1;
+        while (count < level && matcher.find()) {
+            count++;
+        }
+        int begin = matcher.end();
+        if (matcher.find()) {
+            int end = matcher.start();
+            return path.substring(begin, end);
+        } else {
+            return path.substring(begin);
+        }
     }
 
     public static boolean isImage(FeFile file) {
@@ -105,31 +153,31 @@ public final class FePathUtil {
         return directory.getPath().equals(directory.getName());
     }
 
-    private static int lastIndexOfPathSeparator(String path) {
-        int lastIndexOfSlash = path.lastIndexOf('/');
+    private static int lastIndexOfSeparator(String path) {
+        int lastIndexOfSlash = path.lastIndexOf(SLASH_SEPARATOR);
         if (lastIndexOfSlash >= 0) {
             return lastIndexOfSlash;
         }
-        return path.lastIndexOf('\\');
+        return path.lastIndexOf(BACKSLASH_SEPARATOR);
     }
 
-    private static int lastIndexOfPathSeparator(String path, int fromIndex) {
-        int lastIndexOfSlash = path.lastIndexOf('/', fromIndex);
+    private static int lastIndexOfSeparator(String path, int fromIndex) {
+        int lastIndexOfSlash = path.lastIndexOf(SLASH_SEPARATOR, fromIndex);
         if (lastIndexOfSlash >= 0) {
             return lastIndexOfSlash;
         }
-        return path.lastIndexOf('\\', fromIndex);
+        return path.lastIndexOf(BACKSLASH_SEPARATOR, fromIndex);
     }
 
     private static String getNameByPath(String path) {
-        int lastIndexOfPathSeparator = lastIndexOfPathSeparator(path);
-        if (lastIndexOfPathSeparator < 0) {
+        int lastIndexOfSeparator = lastIndexOfSeparator(path);
+        if (lastIndexOfSeparator < 0) {
             throw new IllegalArgumentException("No path separator: " + path);
         }
-        if (lastIndexOfPathSeparator == path.length() - 1) {
+        if (lastIndexOfSeparator == path.length() - 1) {
             return path;
         }
-        return path.substring(lastIndexOfPathSeparator + 1);
+        return path.substring(lastIndexOfSeparator + 1);
     }
 
     private static FePath requireNonNullPath(FePath path) {
@@ -138,6 +186,16 @@ public final class FePathUtil {
 
     private static FeFile requireNonNullFile(FeFile file) {
         return Objects.requireNonNull(file, "The file must not be null");
+    }
+
+    private static FeDirectory requireNonNullDirectory(FeDirectory directory) {
+        return Objects.requireNonNull(directory, "The directory must not be null");
+    }
+
+    private static void requirePositiveLevel(int level) {
+        if (level < 0) {
+            throw new IllegalArgumentException("The level must not be negative: " + level);
+        }
     }
 
 }

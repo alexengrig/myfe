@@ -17,7 +17,6 @@
 package dev.alexengrig.myfe.util;
 
 import dev.alexengrig.myfe.model.FeDirectory;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -27,7 +26,6 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FePathUtilTest {
@@ -56,6 +54,36 @@ class FePathUtilTest {
         );
     }
 
+    static Stream<Arguments> provide_directory_expectedLevelCount() {
+        return Stream.of(
+                Arguments.of(new FeDirectory("/", "/"), 0),
+                Arguments.of(new FeDirectory("/pub", "pub"), 1),
+                Arguments.of(new FeDirectory("/pub/path", "path"), 2),
+                Arguments.of(new FeDirectory("/pub/path/folder", "folder"), 3),
+                Arguments.of(new FeDirectory("/pub/path/folder/subfolder", "subfolder"), 4),
+                Arguments.of(new FeDirectory("C:\\", "C:\\"), 0),
+                Arguments.of(new FeDirectory("C:\\path", "path"), 1),
+                Arguments.of(new FeDirectory("C:\\path\\folder", "folder"), 2),
+                Arguments.of(new FeDirectory("C:\\path\\folder\\subfolder", "subfolder"), 3)
+        );
+    }
+
+    static Stream<Arguments> provide_directory_level_expectedName() {
+        FeDirectory first = new FeDirectory("/pub/path/folder/subfolder", "subfolder");
+        FeDirectory second = new FeDirectory("C:\\path\\folder\\subfolder", "subfolder");
+        return Stream.of(
+                Arguments.of(first, 0, "/"),
+                Arguments.of(first, 1, "pub"),
+                Arguments.of(first, 2, "path"),
+                Arguments.of(first, 3, "folder"),
+                Arguments.of(first, 4, "subfolder"),
+                Arguments.of(second, 0, "C:\\"),
+                Arguments.of(second, 1, "path"),
+                Arguments.of(second, 2, "folder"),
+                Arguments.of(second, 3, "subfolder")
+        );
+    }
+
     @ParameterizedTest
     @MethodSource("provide_childDirectory_expectedDirectory")
     void should_return_parent(FeDirectory childDirectory, FeDirectory expectedDirectory) {
@@ -66,18 +94,25 @@ class FePathUtilTest {
         assertEquals(expectedDirectory.getName(), parentDirectory.getName(), "Name");
     }
 
-    @Test
-    void should_throw_IAE_for_gettingParent() {
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class, () ->
-                FePathUtil.getParent(new FeDirectory("invalid-path", "invalid-name")));
-        assertEquals("No path separator: invalid-path", exception.getMessage(), "Exception message");
-    }
-
     @ParameterizedTest
     @MethodSource("provide_rootDirectory")
     void shouldNot_return_parent(FeDirectory rootDirectory) {
         Optional<FeDirectory> optionalParentDirectory = FePathUtil.getParent(rootDirectory);
         assertFalse(optionalParentDirectory.isPresent(), "Is present");
+    }
+
+    @ParameterizedTest
+    @MethodSource("provide_directory_expectedLevelCount")
+    void should_return_levelCount(FeDirectory directory, int expectedLevelCount) {
+        assertEquals(expectedLevelCount, FePathUtil.getLevelCount(directory), () ->
+                "Level count for directory: " + directory);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provide_directory_level_expectedName")
+    void should_return_nameByLevel(FeDirectory directory, int level, String expectedName) {
+        assertEquals(expectedName, FePathUtil.getNameByLevel(directory, level), () ->
+                "Name by level: " + level);
     }
 
 }
