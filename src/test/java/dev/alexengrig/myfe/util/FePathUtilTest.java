@@ -24,6 +24,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -84,6 +85,19 @@ class FePathUtilTest {
         );
     }
 
+    static Stream<Arguments> provide_directory_expectedNames() {
+        return Stream.of(
+                Arguments.of(
+                        new FeDirectory("/pub/path/folder/subfolder", "subfolder"),
+                        new String[]{"/", "pub", "path", "folder", "subfolder"}
+                ),
+                Arguments.of(
+                        new FeDirectory("C:\\path\\folder\\subfolder", "subfolder"),
+                        new String[]{"C:\\", "path", "folder", "subfolder"}
+                )
+        );
+    }
+
     @ParameterizedTest
     @MethodSource("provide_childDirectory_expectedDirectory")
     void should_return_parent(FeDirectory childDirectory, FeDirectory expectedDirectory) {
@@ -113,6 +127,14 @@ class FePathUtilTest {
     void should_return_nameByLevel(FeDirectory directory, int level, String expectedName) {
         assertEquals(expectedName, FePathUtil.getNameByLevel(directory, level), () ->
                 "Name by level: " + level);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provide_directory_expectedNames")
+    void should_split_byNames(FeDirectory directory, String[] expectedNames) {
+        assertArrayEquals(expectedNames, FePathUtil.splitByNames(directory), () ->
+                "Names for: " + directory);
+
     }
 
 }

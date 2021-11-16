@@ -21,6 +21,8 @@ import dev.alexengrig.myfe.model.FeDirectory;
 import dev.alexengrig.myfe.model.FeFile;
 import dev.alexengrig.myfe.model.FePath;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -126,6 +128,23 @@ public final class FePathUtil {
         } else {
             return path.substring(begin);
         }
+    }
+
+    public static String[] splitByNames(FeDirectory directory) {
+        String path = requireNonNullDirectory(directory).getPath();
+        Matcher matcher = SEPARATOR_PATTERN.matcher(path);
+        if (!matcher.find()) {
+            throw new IllegalArgumentException("No separator matches: " + directory);
+        }
+        List<String> names = new LinkedList<>();
+        int begin;
+        names.add(path.substring(0, (begin = matcher.end())));
+        while (matcher.find()) {
+            names.add(path.substring(begin, matcher.start()));
+            begin = matcher.end();
+        }
+        names.add(path.substring(begin));
+        return names.toArray(String[]::new);
     }
 
     public static boolean isImage(FeFile file) {
