@@ -16,6 +16,9 @@
 
 package dev.alexengrig.myfe.model;
 
+import com.formdev.flatlaf.intellijthemes.FlatDarkFlatIJTheme;
+import com.formdev.flatlaf.intellijthemes.FlatDraculaIJTheme;
+import com.formdev.flatlaf.intellijthemes.FlatLightFlatIJTheme;
 import dev.alexengrig.myfe.model.event.LookAndFeelModelEvent;
 import dev.alexengrig.myfe.model.event.LookAndFeelModelListener;
 
@@ -25,15 +28,21 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.SortedSet;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 public class LookAndFeelModel {
 
-    private static final Map<String, String> LAF_CLASS_NAME_BY_NAME;
+    private static final TreeMap<String, String> LAF_CLASS_NAME_BY_NAME;
 
     static {
-        LAF_CLASS_NAME_BY_NAME = Arrays.stream(UIManager.getInstalledLookAndFeels())
+        Map<String, String> laf = Arrays.stream(UIManager.getInstalledLookAndFeels())
                 .collect(Collectors.toMap(UIManager.LookAndFeelInfo::getName, UIManager.LookAndFeelInfo::getClassName));
+        laf.put(FlatDraculaIJTheme.NAME, FlatDraculaIJTheme.class.getName());
+        laf.put(FlatDarkFlatIJTheme.NAME, FlatDarkFlatIJTheme.class.getName());
+        laf.put(FlatLightFlatIJTheme.NAME, FlatLightFlatIJTheme.class.getName());
+        LAF_CLASS_NAME_BY_NAME = new TreeMap<>(laf);
     }
 
     private final List<LookAndFeelModelListener> listeners = new LinkedList<>();
@@ -54,10 +63,8 @@ public class LookAndFeelModel {
                 .orElseThrow(() -> new IllegalArgumentException("No Look and Feel: " + className));
     }
 
-    public List<String> getAllNames() {
-        return LAF_CLASS_NAME_BY_NAME.keySet().stream()
-                .sorted()
-                .collect(Collectors.toList());
+    public SortedSet<String> getAllNames() {
+        return LAF_CLASS_NAME_BY_NAME.navigableKeySet();
     }
 
     public String getCurrentName() {
