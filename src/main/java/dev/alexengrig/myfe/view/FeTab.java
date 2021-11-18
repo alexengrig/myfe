@@ -33,7 +33,6 @@ import dev.alexengrig.myfe.util.FePathUtil;
 import dev.alexengrig.myfe.util.logging.LazyLogger;
 import dev.alexengrig.myfe.util.logging.LazyLoggerFactory;
 import dev.alexengrig.myfe.util.swing.BackgroundTask;
-import dev.alexengrig.myfe.view.event.DoNothingKeyListener;
 import dev.alexengrig.myfe.view.event.FeContentFilterEvent;
 import dev.alexengrig.myfe.view.event.FeContentFilterListener;
 import dev.alexengrig.myfe.view.event.FeContentTableEvent;
@@ -47,6 +46,7 @@ import dev.alexengrig.myfe.view.event.FeTabListener;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.io.IOException;
@@ -101,6 +101,10 @@ public class FeTab extends JPanel {
 
     private void init() {
         LOGGER.debug("Start initializing");
+        getInputMap(JComponent.WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
+                .put(KeyStroke.getKeyStroke(KeyEvent.VK_BACK_SPACE, 0), BackspacePressedAction.ACTION_NAME);
+        getActionMap()
+                .put(BackspacePressedAction.ACTION_NAME, new BackspacePressedAction());
         initModels();
         initViews();
         initListeners();
@@ -134,7 +138,6 @@ public class FeTab extends JPanel {
 
     private void initListeners() {
         LOGGER.debug("Start initializing listeners");
-        addKeyListener(new KeyboardListener());
         headerView.addFeHeaderListener(new HeaderListener());
         treeView.addFeDirectoryTreeListener(new TreeListener());
         tableView.addFeContentTableListener(new TableListener());
@@ -268,14 +271,16 @@ public class FeTab extends JPanel {
 
     /**
      * On press the Backspace key.
+     *
+     * @see FeTab#handleGoToPreviousDirectory()
      */
-    private class KeyboardListener implements DoNothingKeyListener {
+    private class BackspacePressedAction extends AbstractAction {
+
+        public static final String ACTION_NAME = "pressed BACKSPACE";
 
         @Override
-        public void keyPressed(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_BACK_SPACE) {
-                handleGoToPreviousDirectory();
-            }
+        public void actionPerformed(ActionEvent e) {
+            handleGoToPreviousDirectory();
         }
 
     }
