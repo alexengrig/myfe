@@ -83,13 +83,18 @@ public final class MyfeApplication extends JFrame {
     }
 
     private void handleOpenArchive(String path) {
-        FeTab archiveTab = tabFactory.createArchiveTab(path);
-        tabbedPane.addTab(archiveTab);
+        String tabTitle = tabFactory.getArchiveTabTitle(path);
+        if (tabbedPane.hasTab(tabTitle)) {
+            tabbedPane.openTab(tabTitle);
+        } else {
+            FeTab archiveTab = tabFactory.createArchiveTab(path);
+            tabbedPane.openTab(archiveTab);
+        }
     }
 
     private void handleConnectToFTPServer(FtpConnectionConfig connectionConfig) {
         FeTab ftpTab = tabFactory.createFTPTab(connectionConfig);
-        tabbedPane.addTab(ftpTab);
+        tabbedPane.openTab(ftpTab);
     }
 
     private class MenuBarListener implements FeMenuBarListener {

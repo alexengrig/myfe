@@ -29,10 +29,20 @@ public class FeTabbedPane extends JTabbedPane {
         insertTab(defaultTab.title(), null, defaultTab, defaultTab.tip(), 0);
     }
 
-    public void addTab(FeTab tab) {
+    public void openTab(FeTab tab) {
         super.addTab(tab.title(), null, tab, tab.tip());
         int index = super.getTabCount() - 1;
         super.setTabComponentAt(index, new MyTabComponent(tab));
+        setSelectedIndex(index);
+    }
+
+    public boolean hasTab(String title) {
+        return indexOfTab(title) >= 0;
+    }
+
+    public void openTab(String title) {
+        int index = indexOfTab(title);
+        setSelectedIndex(index);
     }
 
     private class MyTabComponent extends JPanel {

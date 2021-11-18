@@ -58,11 +58,20 @@ public class FeTabFactory {
 
     public FeTab createArchiveTab(String path) {
         Path archive = Paths.get(path);
-        String archiveName = PathUtil.getName(archive);
-        String title = "Archive: " + archiveName;
+        String title = getArchiveTabTitle(archive);
         URI uri = URI.create("jar:" + archive.toUri());
         FePathRepository repository = new URIFileSystemPathRepository(uri, directoryConverter, pathConverter);
-        return createTab(title, PathUtil.getAbsolutePath(archive), archiveName, repository);
+        return createTab(title, PathUtil.getAbsolutePath(archive), PathUtil.getName(archive), repository);
+    }
+
+    private String getArchiveTabTitle(Path path) {
+        String archiveName = PathUtil.getName(path);
+        return "Archive: " + archiveName;
+    }
+
+    public String getArchiveTabTitle(String path) {
+        Path archive = Paths.get(path);
+        return getArchiveTabTitle(archive);
     }
 
     public FeTab createFTPTab(FtpConnectionConfig connectionConfig) {
