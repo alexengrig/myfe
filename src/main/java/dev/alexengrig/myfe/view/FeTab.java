@@ -194,9 +194,10 @@ public class FeTab extends JPanel {
             backgroundExecutor.execute(
                     "Getting root directories",
                     service::getRootDirectories,
-                    paths -> {
-                        tableModel.setPaths(paths);
-                        filterModel.setPaths(paths);
+                    directories -> {
+                        tableModel.setPaths(directories);
+                        filterModel.setPaths(directories);
+                        treeModel.setRootDirectories(directories);
                     });
         } else {
             backgroundExecutor.execute(
@@ -206,6 +207,11 @@ public class FeTab extends JPanel {
                         tableModel.setPaths(paths);
                         filterModel.setPaths(paths);
                     });
+            backgroundExecutor.execute(
+                    "Getting subdirectories",
+                    () -> service.getSubdirectories(directory),
+                    directories -> treeModel.setSubdirectories(directory, directories)
+            );
         }
     }
 

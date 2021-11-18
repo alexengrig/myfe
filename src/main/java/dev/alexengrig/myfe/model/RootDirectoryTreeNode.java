@@ -16,20 +16,25 @@
 
 package dev.alexengrig.myfe.model;
 
-public class RootDirectoryTreeNode extends MyTreeNode<String> {
+import javax.swing.tree.TreeNode;
+import java.util.function.Function;
 
-    public RootDirectoryTreeNode(String name) {
-        super(name, true);
+public class RootDirectoryTreeNode extends FeDirectoryTreeNode {
+
+    private final RootTreeNode parent;
+
+    public RootDirectoryTreeNode(RootTreeNode parent, FeDirectory directory) {
+        super(directory);
+        this.parent = parent;
+    }
+
+    public static Function<FeDirectory, RootDirectoryTreeNode> factory(RootTreeNode parent) {
+        return directory -> new RootDirectoryTreeNode(parent, directory);
     }
 
     @Override
-    public boolean isLeaf() {
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        return getUserObject();
+    public TreeNode getParent() {
+        return parent;
     }
 
 }

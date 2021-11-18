@@ -16,38 +16,25 @@
 
 package dev.alexengrig.myfe.model;
 
-import java.util.Objects;
+import javax.swing.tree.TreeNode;
+import java.util.function.Function;
 
-/**
- * Tree node of {@link FeDirectory}.
- */
-public class DirectoryTreeNode extends MyTreeNode<FeDirectory> {
+public class SubdirectoryTreeNode extends FeDirectoryTreeNode {
 
-    /**
-     * Are the children of this node loaded?
-     */
-    private boolean loaded;
+    private final FeDirectoryTreeNode parent;
 
-    public DirectoryTreeNode(FeDirectory directory) {
-        super(Objects.requireNonNull(directory, "The directory must not be null"), true);
+    public SubdirectoryTreeNode(FeDirectoryTreeNode parent, FeDirectory directory) {
+        super(directory);
+        this.parent = parent;
     }
 
-    public boolean isLoaded() {
-        return loaded;
-    }
-
-    public void setLoaded(boolean loaded) {
-        this.loaded = loaded;
+    public static Function<FeDirectory, SubdirectoryTreeNode> factory(FeDirectoryTreeNode parent) {
+        return directory -> new SubdirectoryTreeNode(parent, directory);
     }
 
     @Override
-    public boolean isLeaf() {
-        return false;
-    }
-
-    @Override
-    public String toString() {
-        return getUserObject().getName();
+    public TreeNode getParent() {
+        return parent;
     }
 
 }
