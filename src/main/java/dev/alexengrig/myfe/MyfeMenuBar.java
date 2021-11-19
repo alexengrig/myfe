@@ -20,6 +20,7 @@ import dev.alexengrig.myfe.config.FtpConnectionConfig;
 import dev.alexengrig.myfe.model.LookAndFeelModel;
 import dev.alexengrig.myfe.model.event.LookAndFeelModelEvent;
 import dev.alexengrig.myfe.model.event.LookAndFeelModelListener;
+import dev.alexengrig.myfe.view.FtpConnectDialog;
 import dev.alexengrig.myfe.view.event.FeMenuBarEvent;
 import dev.alexengrig.myfe.view.event.FeMenuBarListener;
 import org.slf4j.Logger;
@@ -27,7 +28,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.lang.invoke.MethodHandles;
@@ -138,55 +138,23 @@ public class MyfeMenuBar extends JMenuBar {
     private class ConnectToFtpServerMenuItem extends JMenuItem {
 
         public ConnectToFtpServerMenuItem() {
-            setAction(new AbstractAction() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    JDialog dialog = new JDialog(parentFrame, "Connect to FTP server", true);
-                    dialog.setLocationRelativeTo(parentFrame);
-                    dialog.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
-                    JPanel content = new JPanel(new GridLayout(0, 2));
-                    // host
-                    content.add(new JLabel("Host:"));
-                    JTextField hostField = new JTextField();
-                    content.add(hostField);
-                    // port
-                    content.add(new JLabel("Port:"));
-                    JTextField portField = new JTextField();
-                    content.add(portField);
-                    // username
-                    content.add(new JLabel("Username:"));
-                    JTextField usernameField = new JTextField();
-                    content.add(usernameField);
-                    // password
-                    content.add(new JLabel("Password:"));
-                    JPasswordField passwordField = new JPasswordField();
-                    content.add(passwordField);
-                    // button
-                    JButton button = new JButton(new AbstractAction() {
-                        @Override
-                        public void actionPerformed(ActionEvent e) {
-                            FtpConnectionConfig ftpConnectionConfig = FtpConnectionConfig.user(
-                                    hostField.getText(),
-                                    Integer.parseInt(portField.getText()),
-                                    usernameField.getText(),
-                                    passwordField.getPassword()
-                            );
-                            dialog.setVisible(false);
-                            //FIXME: Add spinner
-                            fireConnectToFtpServer(FeMenuBarEvent.ftpConnectionConfig(ftpConnectionConfig));
-                            dialog.dispose();
-                        }
-                    });
-                    button.setText("Connect");
-                    content.add(button);
-                    // dialog
-                    dialog.getContentPane().add(content);
-                    dialog.pack();
-                    dialog.setVisible(true);
-                }
-            });
+            setAction(new ConnectToFtpServerAction());
             setMnemonic('C');
             setText("Connect to FTP server...");
+        }
+
+        private void handleConnect(FtpConnectionConfig config) {
+            fireConnectToFtpServer(FeMenuBarEvent.ftpConnectionConfig(config));
+        }
+
+        private class ConnectToFtpServerAction extends AbstractAction {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                FtpConnectDialog dialog = new FtpConnectDialog(parentFrame, "Connect to FTP server", ConnectToFtpServerMenuItem.this::handleConnect);
+                dialog.setVisible(true);
+            }
+
         }
 
     }

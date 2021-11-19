@@ -18,12 +18,33 @@ package dev.alexengrig.myfe.model;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.PlainDocument;
+import javax.swing.text.Segment;
+import java.util.Arrays;
 
 public class MyTextDocument extends PlainDocument {
+
+    public String getText() {
+        try {
+            return getText(0, getLength());
+        } catch (BadLocationException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
     public void setText(String text) {
         try {
             replace(0, getLength(), text, null);
+        } catch (BadLocationException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public char[] getChars() {
+        try {
+            Segment segment = new Segment();
+            int length = getLength();
+            getText(0, length, segment);
+            return Arrays.copyOf(segment.array, length);
         } catch (BadLocationException e) {
             throw new IllegalStateException(e);
         }
