@@ -46,8 +46,8 @@ class AbstractPathTest {
 
     @Test
     void should_return_values() {
-        String path = "path";
-        String name = "name";
+        String path = "path/to/file";
+        String name = "file";
         AbstractPath instance = createInstance(path, name);
         assertEquals(path, instance.getPath(), "Path");
         assertEquals(name, instance.getName(), "Name");
@@ -55,8 +55,8 @@ class AbstractPathTest {
 
     @Test
     void should_return_toString() {
-        String path = "path";
-        String name = "name";
+        String path = "path/to/file";
+        String name = "file";
         AbstractPath instance = createInstance(path, name);
         assertEquals(path, instance.toString(), "To string");
     }
