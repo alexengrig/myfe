@@ -32,6 +32,8 @@ repositories {
 }
 
 dependencies {
+    implementation "com.github.robtimus:ftp-fs:${ftpFsVersion}"
+
     implementation "com.formdev:flatlaf-intellij-themes:${flatlafVersion}"
 
     implementation "org.slf4j:slf4j-api:${slf4jVersion}"
