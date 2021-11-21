@@ -20,33 +20,25 @@ import dev.alexengrig.myfe.converter.Converter;
 import dev.alexengrig.myfe.model.FeDirectory;
 import dev.alexengrig.myfe.model.FePath;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.net.URI;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
 import java.nio.file.Path;
-import java.util.Map;
+import java.nio.file.Paths;
+import java.util.Collections;
 
 /**
- * {@link FileSystems#newFileSystem(URI, Map)}-based implementation.
+ * {@code jar}-based implementation.
  */
-public class URIFileSystemPathRepository extends FileSystemPathRepository {
+public class ArchiveFileSystemPathRepository extends URIFileSystemPathRepository {
 
-    public URIFileSystemPathRepository(
-            URI uri,
-            Map<String, Object> environment,
+    public ArchiveFileSystemPathRepository(
+            String path,
             Converter<Path, FeDirectory> directoryConverter,
             Converter<Path, FePath> pathConverter) {
-        super(createFileSystem(uri, environment), directoryConverter, pathConverter);
+        super(createUri(path), Collections.emptyMap(), directoryConverter, pathConverter);
     }
 
-    private static FileSystem createFileSystem(URI uri, Map<String, Object> environment) {
-        try {
-            return FileSystems.newFileSystem(uri, environment);
-        } catch (IOException e) {
-            throw new UncheckedIOException("Exception of creating file system for URI: " + uri, e);
-        }
+    private static URI createUri(String path) {
+        return URI.create("jar:" + Paths.get(path).toUri());
     }
 
 }
