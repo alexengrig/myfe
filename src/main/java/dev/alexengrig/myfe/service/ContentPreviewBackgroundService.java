@@ -27,4 +27,6 @@ public interface ContentPreviewBackgroundService {
 
     void loadTextPreview(FeFile file, Consumer<String> handler);
 
+    void loadImageData(FeFile file, Consumer<byte[]> handler);
+
 }

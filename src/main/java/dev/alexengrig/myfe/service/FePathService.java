@@ -42,4 +42,6 @@ public interface FePathService {
 
     Stream<String> readFileContent(FeFile file);
 
+    byte[] getFileData(FeFile file);
+
 }

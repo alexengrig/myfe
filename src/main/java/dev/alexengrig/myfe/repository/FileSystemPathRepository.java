@@ -119,7 +119,7 @@ public class FileSystemPathRepository implements FePathRepository {
         } catch (IOException e) {
             LOGGER.error("Exception of reading a batch: {} - {} bytes", filePath, batchSize, e);
             throw new UncheckedIOException("Exception of reading a batch: " +
-                                           filePath + " - " + batchSize + " bytes", e);
+                    filePath + " - " + batchSize + " bytes", e);
         }
     }
 
@@ -149,6 +149,20 @@ public class FileSystemPathRepository implements FePathRepository {
         } catch (IOException e) {
             LOGGER.error("Exception of reading in batches: {}", filePath, e);
             throw new UncheckedIOException("Exception of reading in batches: " + filePath, e);
+        }
+    }
+
+    @Override
+    public byte[] readAllBytes(String filePath) {
+        LOGGER.debug("Start reading all bytes: {}", filePath);
+        try {
+            Path path = fileSystem.getPath(requireNonNullPath(filePath));
+            byte[] result = Files.readAllBytes(path);
+            LOGGER.debug("Finished reading all bytes: {} - {} bytes", filePath, result.length);
+            return result;
+        } catch (IOException e) {
+            LOGGER.error("Exception of reading all bytes: {}", filePath, e);
+            throw new UncheckedIOException("Exception of reading all bytes: " + filePath, e);
         }
     }
 

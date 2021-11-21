@@ -41,15 +41,15 @@ public class MyImage extends JLabel {
         model.addFeFileImageModelListener(new ModelListener());
     }
 
-    private void handleChangeFile(FeFile file) {
-        setIcon(new ImageIcon(file.getPath()));
+    private void handleChangeFile(FeFile file, byte[] data) {
+        setIcon(new ImageIcon(data, file.getName()));
     }
 
     private class ModelListener implements FeFileImageModelListener {
 
         @Override
         public void changeFile(FeFileImageModelEvent event) {
-            handleChangeFile(event.getFile());
+            handleChangeFile(event.getFile(), event.getData());
         }
 
     }

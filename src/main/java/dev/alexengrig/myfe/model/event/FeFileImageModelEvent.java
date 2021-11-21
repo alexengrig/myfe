@@ -21,13 +21,19 @@ import dev.alexengrig.myfe.model.FeFile;
 public class FeFileImageModelEvent {
 
     private final FeFile file;
+    private final byte[] data;
 
-    public FeFileImageModelEvent(FeFile file) {
+    public FeFileImageModelEvent(FeFile file, byte[] data) {
         this.file = file;
+        this.data = data;
     }
 
     public FeFile getFile() {
         return file;
+    }
+
+    public byte[] getData() {
+        return data;
     }
 
 }

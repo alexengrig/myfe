@@ -407,10 +407,26 @@ public class FeTab extends JPanel {
         public void loadTextPreview(FeFile file, Consumer<String> handler) {
             LOGGER.debug("Start loading text preview for: {}", file);
             cancelPreviousTaskIfNeed();
-            previousTask = backgroundExecutor.execute(() -> "Loading text preview for: " + file, () -> service.getFileContentPreview(file), result -> {
-                handler.accept(result);
-                LOGGER.debug("Finished loading text preview for: {}", file);
-            });
+            previousTask = backgroundExecutor.execute(
+                    () -> "Loading text preview for: " + file,
+                    () -> service.getFileContentPreview(file),
+                    result -> {
+                        handler.accept(result);
+                        LOGGER.debug("Finished loading text preview for: {}", file);
+                    });
+        }
+
+        @Override
+        public void loadImageData(FeFile file, Consumer<byte[]> handler) {
+            LOGGER.debug("Start loading image data for: {}", file);
+            cancelPreviousTaskIfNeed();
+            previousTask = backgroundExecutor.execute(
+                    () -> "Loading image data for: " + file,
+                    () -> service.getFileData(file),
+                    result -> {
+                        handler.accept(result);
+                        LOGGER.debug("Finished loading image data for: {}", file);
+                    });
         }
 
         private void cancelPreviousTaskIfNeed() {

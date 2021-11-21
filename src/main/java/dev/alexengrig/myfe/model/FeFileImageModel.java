@@ -29,10 +29,10 @@ public class FeFileImageModel {
 
     private FeFile file;
 
-    public void setFile(FeFile file) {
+    public void setFileData(FeFile file, byte[] data) {
         if (!Objects.equals(this.file, file)) {
             this.file = file;
-            fireChangeFile(new FeFileImageModelEvent(file));
+            fireChangeFile(new FeFileImageModelEvent(file, data));
         }
     }
 

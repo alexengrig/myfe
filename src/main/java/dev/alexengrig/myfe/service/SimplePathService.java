@@ -84,6 +84,11 @@ public class SimplePathService implements FePathService {
         return repository.readInBatches(requireNonNullFile(file).getPath(), FILE_PREVIEW_CONTENT_SIZE, 1);
     }
 
+    @Override
+    public byte[] getFileData(FeFile file) {
+        return repository.readAllBytes(requireNonNullFile(file).getPath());
+    }
+
     private FeDirectory requireNonNullDirectory(FeDirectory directory) {
         return Objects.requireNonNull(directory, "The directory must not be null");
     }

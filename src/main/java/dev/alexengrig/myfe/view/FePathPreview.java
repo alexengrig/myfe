@@ -104,9 +104,11 @@ public class FePathPreview extends JPanel {
     }
 
     private void setFileImage(FeFile file) {
-        textView.setVisible(false);
-        imageModel.setFile(file);
-        imageView.setVisible(true);
+        backgroundService.loadImageData(file, imageData -> {
+            textView.setVisible(false);
+            imageModel.setFileData(file, imageData);
+            imageView.setVisible(true);
+        });
     }
 
     private void setFilePreviewText(FeFile file) {
