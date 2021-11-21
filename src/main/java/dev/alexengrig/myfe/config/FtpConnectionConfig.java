@@ -87,6 +87,10 @@ public class FtpConnectionConfig {
         return info;
     }
 
+    public String getHostAndPort() {
+        return host + ":" + port;
+    }
+
     @Override
     public String toString() {
         return "FtpConnectionConfig{" +
