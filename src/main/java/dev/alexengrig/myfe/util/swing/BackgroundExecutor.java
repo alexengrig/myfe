@@ -33,26 +33,26 @@ public class BackgroundExecutor<T> extends SwingWorker<T, T> {
 
     private static final LazyLogger LOGGER = LazyLoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
+    private static final Supplier<String> WITHOUT_DESCRIPTION = () -> "Without description";
+
     private final Supplier<String> descriptionSupplier;
     private final Callable<T> backgroundTask;
     private final Consumer<T> resultHandler;
+    private final Consumer<Throwable> errorHandler;
 
     protected BackgroundExecutor(
             Supplier<String> descriptionSupplier,
             Callable<T> backgroundTask,
-            Consumer<T> resultHandler) {
+            Consumer<T> resultHandler,
+            Consumer<Throwable> handler) {
         this.descriptionSupplier = descriptionSupplier;
         this.backgroundTask = backgroundTask;
         this.resultHandler = resultHandler;
+        this.errorHandler = handler;
     }
 
-    public static <T> BackgroundTask execute(
-            Supplier<String> description,
-            Callable<T> task,
-            Consumer<T> handler) {
-        BackgroundExecutor<T> worker = new BackgroundExecutor<>(description, task, handler);
-        worker.execute();
-        return BackgroundTask.of(worker);
+    public static <T> Builder<T> builder(Callable<T> task) {
+        return new Builder<>(task);
     }
 
     @Override
@@ -73,23 +73,69 @@ public class BackgroundExecutor<T> extends SwingWorker<T, T> {
         try {
             result = get();
         } catch (InterruptedException e) {
-            LOGGER.warn(m -> m.log("Interrupted exception of waiting result",
+            LOGGER.warn(m -> m.log("Interrupted exception of waiting result - {}",
                     descriptionSupplier.get(), e));
-            throw new InterruptedBackgroundTaskException("Interrupted exception of waiting result" +
+            throw new InterruptedBackgroundTaskException("Interrupted exception of waiting result - " +
                     descriptionSupplier.get(),
                     e);
         } catch (ExecutionException e) {
-            LOGGER.warn(m -> m.log("Execution exception of waiting result",
+            LOGGER.warn(m -> m.log("Execution exception of waiting result - {}",
                     descriptionSupplier.get(), e));
+            if (errorHandler != null && e.getCause() != null) {
+                errorHandler.accept(e.getCause());
+                return;
+            }
             throw new ExecutionBackgroundTaskException(e.getCause());
         } catch (CancellationException ignore) {
-            LOGGER.warn(m -> m.log("Cancellation exception of waiting result",
+            LOGGER.debug(m -> m.log("Cancellation exception of waiting result - {}",
                     descriptionSupplier.get()));
             return;
         }
         LOGGER.debug(m -> m.log("Finished waiting result - {}",
                 descriptionSupplier.get()));
-        resultHandler.accept(result); // don't catch handler's exceptions
+        if (resultHandler != null) {
+            resultHandler.accept(result); // don't catch handler's exceptions
+        }
+    }
+
+    public static final class Builder<T> {
+
+        private final Callable<T> backgroundTask;
+
+        private Supplier<String> descriptionSupplier = WITHOUT_DESCRIPTION;
+        private Consumer<T> resultHandler;
+        private Consumer<Throwable> errorHandler;
+
+        public Builder(Callable<T> backgroundTask) {
+            this.backgroundTask = backgroundTask;
+        }
+
+        public Builder<T> withDescription(String description) {
+            return withDescription(() -> description);
+        }
+
+        public Builder<T> withDescription(Supplier<String> descriptionSupplier) {
+            this.descriptionSupplier = descriptionSupplier;
+            return this;
+        }
+
+        public Builder<T> withResultHandler(Consumer<T> handler) {
+            this.resultHandler = handler;
+            return this;
+        }
+
+        public Builder<T> withErrorHandler(Consumer<Throwable> handler) {
+            this.errorHandler = handler;
+            return this;
+        }
+
+        public BackgroundTask execute() {
+            BackgroundExecutor<T> worker = new BackgroundExecutor<>(
+                    descriptionSupplier, backgroundTask, resultHandler, errorHandler);
+            worker.execute();
+            return BackgroundTask.of(worker);
+        }
+
     }
 
 }

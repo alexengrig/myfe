@@ -182,7 +182,7 @@ public class FeTab extends JPanel {
         //TODO: Spinner to table
         directoryModel.goToDirectory(directory);
         backgroundExecutor.execute(
-                "Getting directory content:",
+                "Getting directory content",
                 () -> service.getDirectoryContent(directory),
                 paths -> {
                     tableModel.setPaths(paths);
@@ -204,7 +204,7 @@ public class FeTab extends JPanel {
                     });
         } else {
             backgroundExecutor.execute(
-                    "Getting directory content:",
+                    "Getting directory content",
                     () -> service.getDirectoryContent(directory),
                     paths -> {
                         tableModel.setPaths(paths);
