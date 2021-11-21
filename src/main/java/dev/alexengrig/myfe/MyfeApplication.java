@@ -93,7 +93,7 @@ public final class MyfeApplication extends JFrame {
     }
 
     private void handleConnectToFTPServer(FtpConnectionConfig connectionConfig) {
-        FeTab ftpTab = tabFactory.createFTPTab(connectionConfig);
+        FeTab ftpTab = tabFactory.createFtpTab(connectionConfig);
         tabbedPane.openTab(ftpTab);
     }
 

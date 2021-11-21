@@ -24,19 +24,17 @@ import dev.alexengrig.myfe.converter.Path2FePathConverter;
 import dev.alexengrig.myfe.model.FeDirectory;
 import dev.alexengrig.myfe.model.FeFile;
 import dev.alexengrig.myfe.model.FePath;
-import dev.alexengrig.myfe.repository.ApacheCommonsFtpFileSystemPathRepository;
+import dev.alexengrig.myfe.repository.ArchiveFileSystemPathRepository;
 import dev.alexengrig.myfe.repository.FePathRepository;
+import dev.alexengrig.myfe.repository.FtpFileSystemPathRepository;
 import dev.alexengrig.myfe.repository.LocalFileSystemPathRepository;
-import dev.alexengrig.myfe.repository.URIFileSystemPathRepository;
 import dev.alexengrig.myfe.service.BackgroundExecutorService;
 import dev.alexengrig.myfe.service.FePathService;
 import dev.alexengrig.myfe.service.SimplePathService;
-import dev.alexengrig.myfe.util.PathUtil;
+import dev.alexengrig.myfe.util.FePathUtil;
 import dev.alexengrig.myfe.util.swing.BackgroundExecutor;
 
-import java.net.URI;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 public class FeTabFactory {
 
@@ -57,28 +55,25 @@ public class FeTabFactory {
     }
 
     public FeTab createArchiveTab(String path) {
-        Path archive = Paths.get(path);
-        String title = getArchiveTabTitle(archive);
-        URI uri = URI.create("jar:" + archive.toUri());
-        FePathRepository repository = new URIFileSystemPathRepository(uri, directoryConverter, pathConverter);
-        return createTab(title, PathUtil.getAbsolutePath(archive), PathUtil.getName(archive), repository);
-    }
-
-    private String getArchiveTabTitle(Path path) {
-        String archiveName = PathUtil.getName(path);
-        return "Archive: " + archiveName;
+        String title = getArchiveTabTitle(path);
+        String name = FePathUtil.getNameByPath(path);
+        FePathRepository repository = new ArchiveFileSystemPathRepository(path, directoryConverter, pathConverter);
+        return createTab(title, path, name, repository);
     }
 
     public String getArchiveTabTitle(String path) {
-        Path archive = Paths.get(path);
-        return getArchiveTabTitle(archive);
+        String archiveName = FePathUtil.getNameByPath(path);
+        return "Archive: " + archiveName;
     }
 
-    public FeTab createFTPTab(FtpConnectionConfig connectionConfig) {
-        String title = "FTP: " + connectionConfig.getHost();
-        String tip = connectionConfig.getHost() + ":" + connectionConfig.getPort();
-        FePathRepository repository = new ApacheCommonsFtpFileSystemPathRepository(connectionConfig);
-        return createTab(title, tip, connectionConfig.getHost(), repository);
+    public FeTab createFtpTab(FtpConnectionConfig config) {
+        String title = getFtpTabTitle(config);
+        FePathRepository repository = new FtpFileSystemPathRepository(config, directoryConverter, pathConverter);
+        return createTab(title, config.getInfo(), config.getHostAndPort(), repository);
+    }
+
+    private String getFtpTabTitle(FtpConnectionConfig config) {
+        return "FTP: " + config.getHostAndPort();
     }
 
 }
