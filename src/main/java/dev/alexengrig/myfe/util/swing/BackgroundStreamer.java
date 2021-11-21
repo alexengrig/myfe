@@ -35,7 +35,9 @@ import java.util.stream.Stream;
  * uses {@link Stream} that closes at the end.
  *
  * @param <T> the type of result
+ * @deprecated Unused.
  */
+@Deprecated
 public class BackgroundStreamer<T> extends SwingWorker<T, T> {
 
     /**
