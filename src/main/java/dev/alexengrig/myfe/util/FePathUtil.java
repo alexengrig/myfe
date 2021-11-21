@@ -147,6 +147,17 @@ public final class FePathUtil {
         return names.toArray(String[]::new);
     }
 
+    public static String getNameByPath(String path) {
+        int lastIndexOfSeparator = lastIndexOfSeparator(path);
+        if (lastIndexOfSeparator < 0) {
+            throw new IllegalArgumentException("No path separator: " + path);
+        }
+        if (lastIndexOfSeparator == path.length() - 1) {
+            return path;
+        }
+        return path.substring(lastIndexOfSeparator + 1);
+    }
+
     public static boolean isImage(FeFile file) {
         Optional<String> fileExtension = getFileExtension(file);
         return fileExtension
@@ -186,17 +197,6 @@ public final class FePathUtil {
             return lastIndexOfSlash;
         }
         return path.lastIndexOf(BACKSLASH_SEPARATOR, fromIndex);
-    }
-
-    private static String getNameByPath(String path) {
-        int lastIndexOfSeparator = lastIndexOfSeparator(path);
-        if (lastIndexOfSeparator < 0) {
-            throw new IllegalArgumentException("No path separator: " + path);
-        }
-        if (lastIndexOfSeparator == path.length() - 1) {
-            return path;
-        }
-        return path.substring(lastIndexOfSeparator + 1);
     }
 
     private static FePath requireNonNullPath(FePath path) {

@@ -98,6 +98,19 @@ class FePathUtilTest {
         );
     }
 
+    static Stream<Arguments> provide_path_expectedName() {
+        return Stream.of(
+                Arguments.of("/", "/"),
+                Arguments.of("/pub", "pub"),
+                Arguments.of("/pub/folder", "folder"),
+                Arguments.of("/pub/file.this", "file.this"),
+                Arguments.of("C:\\", "C:\\"),
+                Arguments.of("C:\\folder", "folder"),
+                Arguments.of("C:\\folder\\subfolder", "subfolder"),
+                Arguments.of("C:\\folder\\file.this", "file.this")
+        );
+    }
+
     @ParameterizedTest
     @MethodSource("provide_childDirectory_expectedDirectory")
     void should_return_parent(FeDirectory childDirectory, FeDirectory expectedDirectory) {
@@ -135,6 +148,13 @@ class FePathUtilTest {
         assertArrayEquals(expectedNames, FePathUtil.splitByNames(directory), () ->
                 "Names for: " + directory);
 
+    }
+
+    @ParameterizedTest
+    @MethodSource("provide_path_expectedName")
+    void should_return_nameByPath(String path, String expectedName) {
+        assertEquals(expectedName, FePathUtil.getNameByPath(path), () ->
+                "Child name for: " + path);
     }
 
 }
