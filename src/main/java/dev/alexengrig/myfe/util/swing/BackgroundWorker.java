@@ -34,7 +34,9 @@ import java.util.function.Consumer;
  * or inherit from {@link WithExceptionType}.
  *
  * @param <X> the type of expected exception
+ * @deprecated Unused.
  */
+@Deprecated
 public class BackgroundWorker<T, V, X extends Throwable> extends SwingWorker<T, V> {
 
     /**
@@ -73,8 +75,8 @@ public class BackgroundWorker<T, V, X extends Throwable> extends SwingWorker<T, 
         if (!(genericType instanceof Class)) {
             throw new IllegalStateException(
                     "The X must be a particular type, not generic - " + genericType + "; " +
-                    "otherwise inherit from: " +
-                    BackgroundWorker.class.getName() + "." + WithExceptionType.class.getSimpleName());
+                            "otherwise inherit from: " +
+                            BackgroundWorker.class.getName() + "." + WithExceptionType.class.getSimpleName());
         }
     }
 
