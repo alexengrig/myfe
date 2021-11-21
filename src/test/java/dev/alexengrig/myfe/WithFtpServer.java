@@ -23,7 +23,7 @@ import org.mockftpserver.fake.filesystem.FileEntry;
 import org.mockftpserver.fake.filesystem.FileSystem;
 import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
 
-public abstract class WithFtpServer {
+public class WithFtpServer {
 
     protected final String host = "localhost";
     protected final int port = 21;
@@ -33,16 +33,13 @@ public abstract class WithFtpServer {
     protected FakeFtpServer ftpServer;
 
     public static void main(String[] args) throws Exception {
-        WithFtpServer instance = new WithFtpServer() {
-        };
+        WithFtpServer instance = new WithFtpServer();
         instance.setup();
         FileSystem fs = instance.ftpServer.getFileSystem();
         fs.add(new FileEntry("/pub/text.txt", "This is text.txt"));
         fs.add(new FileEntry("/pub/other.txt", "This is other.txt"));
-        int read;
-        do {
-            read = System.in.read();
-        } while (read != 1);
+        System.out.println("Press enter for stop.");
+        int ignore = System.in.read();
         instance.tearDown();
     }
 
@@ -61,7 +58,7 @@ public abstract class WithFtpServer {
         ftpServer.start();
     }
 
-    protected void tearDown() throws Exception {
+    protected void tearDown() {
         ftpServer.stop();
     }
 
