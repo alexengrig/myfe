@@ -32,6 +32,7 @@ import dev.alexengrig.myfe.service.FePathService;
 import dev.alexengrig.myfe.util.FePathUtil;
 import dev.alexengrig.myfe.util.logging.LazyLogger;
 import dev.alexengrig.myfe.util.logging.LazyLoggerFactory;
+import dev.alexengrig.myfe.util.swing.BackgroundExecutor;
 import dev.alexengrig.myfe.util.swing.BackgroundTask;
 import dev.alexengrig.myfe.view.event.FeContentFilterEvent;
 import dev.alexengrig.myfe.view.event.FeContentFilterListener;
@@ -53,7 +54,9 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Callable;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class FeTab extends JPanel {
 
@@ -61,10 +64,11 @@ public class FeTab extends JPanel {
 
     private final List<FeTabListener> listeners = new LinkedList<>();
 
-    private final FePathService service;
-    private final BackgroundExecutorService backgroundExecutor;
     private final String title;
     private final String tip;
+    private final FePathService service;
+
+    private BackgroundExecutorService backgroundExecutor;
 
     private FeDirectoryTreeModel treeModel;
     private FeContentTableModel tableModel;
@@ -81,10 +85,9 @@ public class FeTab extends JPanel {
     private FeFooter footerView;
     private FeContentFilter filterView;
 
-    public FeTab(FePathService service, BackgroundExecutorService backgroundExecutor, String title, String tip) {
+    public FeTab(String title, String tip, FePathService service) {
         super(new BorderLayout());
         this.service = service;
-        this.backgroundExecutor = backgroundExecutor;
         this.title = title;
         this.tip = tip;
         init();
@@ -106,6 +109,7 @@ public class FeTab extends JPanel {
         getActionMap()
                 .put(BackspacePressedAction.ACTION_NAME, new BackspacePressedAction());
         initModels();
+        initServices();
         initViews();
         initListeners();
         LOGGER.debug("Finished initializing");
@@ -122,6 +126,30 @@ public class FeTab extends JPanel {
         directoryModel = new FeCurrentDirectoryModel(service.getRootName());
         footerModel = new FeFooterModel(rootDirectories.size());
         LOGGER.debug("Finished initializing models");
+    }
+
+    private void initServices() {
+        backgroundExecutor = new BackgroundExecutorService() {
+
+            @Override
+            public <T> BackgroundTask execute(
+                    Supplier<String> descriptionSupplier,
+                    Callable<T> backgroundTask,
+                    Consumer<T> resultHandler) {
+                return BackgroundExecutor.builder(backgroundTask)
+                        .withDescription(descriptionSupplier)
+                        .withBeforeHook(() -> footerModel.addTask(descriptionSupplier))
+                        .withResultHandler(resultHandler)
+                        .withErrorHandler(error -> JOptionPane.showMessageDialog(
+                                null,
+                                error.getMessage(),
+                                descriptionSupplier.get(),
+                                JOptionPane.ERROR_MESSAGE))
+                        .withAfterHook(() -> footerModel.removeTask(descriptionSupplier))
+                        .execute();
+            }
+
+        };
     }
 
     private void initViews() {
@@ -165,30 +193,28 @@ public class FeTab extends JPanel {
 
     private void handleOpenRoot() {
         LOGGER.debug("Handle select root");
-        //TODO: Spinner to table
-        directoryModel.goToRoot();
         backgroundExecutor.execute(
                 "Getting root directories",
                 service::getRootDirectories,
                 paths -> {
-                    tableModel.setPaths(paths);
+                    pathModel.setPath(null);
+                    directoryModel.goToRoot();
                     filterModel.setPaths(paths);
+                    tableModel.setPaths(paths);
                 });
-        pathModel.setPath(null);
     }
 
     private void handleOpenDirectory(FeDirectory directory) {
         LOGGER.debug("Handle open directory: {}", directory);
-        //TODO: Spinner to table
-        directoryModel.goToDirectory(directory);
         backgroundExecutor.execute(
-                "Getting directory content",
+                () -> "Getting directory content: " + directory,
                 () -> service.getDirectoryContent(directory),
                 paths -> {
-                    tableModel.setPaths(paths);
+                    pathModel.setPath(null);
+                    directoryModel.goToDirectory(directory);
                     filterModel.setPaths(paths);
+                    tableModel.setPaths(paths);
                 });
-        pathModel.setPath(null);
     }
 
     private void handleRefreshDirectoryContent() {
@@ -198,20 +224,20 @@ public class FeTab extends JPanel {
                     "Getting root directories",
                     service::getRootDirectories,
                     directories -> {
-                        tableModel.setPaths(directories);
                         filterModel.setPaths(directories);
+                        tableModel.setPaths(directories);
                         treeModel.setRootDirectories(directories);
                     });
         } else {
             backgroundExecutor.execute(
-                    "Getting directory content",
+                    () -> "Getting directory content: " + directory,
                     () -> service.getDirectoryContent(directory),
                     paths -> {
                         tableModel.setPaths(paths);
                         filterModel.setPaths(paths);
                     });
             backgroundExecutor.execute(
-                    "Getting subdirectories",
+                    () -> "Getting subdirectories: " + directory,
                     () -> service.getSubdirectories(directory),
                     directories -> treeModel.setSubdirectories(directory, directories)
             );
@@ -225,6 +251,11 @@ public class FeTab extends JPanel {
             Desktop.getDesktop().open(new File(file.getPath()));
         } catch (IOException e) {
             LOGGER.error("Exception of opening file: {}", file, e);
+            JOptionPane.showMessageDialog(
+                    this,
+                    "Exception of opening file: " + e.getMessage(),
+                    "Open file: " + file,
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -386,7 +417,7 @@ public class FeTab extends JPanel {
         public void loadSubdirectories(FeDirectory directory, Consumer<List<FeDirectory>> handler) {
             LOGGER.debug("Start loading subdirectories for: {}", directory);
             backgroundExecutor.execute(
-                    () -> "Loading subdirectories for: " + directory,
+                    () -> "Loading subdirectories: " + directory,
                     () -> service.getSubdirectories(directory),
                     result -> {
                         handler.accept(result);
@@ -408,7 +439,7 @@ public class FeTab extends JPanel {
             LOGGER.debug("Start loading text preview for: {}", file);
             cancelPreviousTaskIfNeed();
             previousTask = backgroundExecutor.execute(
-                    () -> "Loading text preview for: " + file,
+                    () -> "Loading text preview: " + file,
                     () -> service.getFileContentPreview(file),
                     result -> {
                         handler.accept(result);
@@ -421,7 +452,7 @@ public class FeTab extends JPanel {
             LOGGER.debug("Start loading image data for: {}", file);
             cancelPreviousTaskIfNeed();
             previousTask = backgroundExecutor.execute(
-                    () -> "Loading image data for: " + file,
+                    () -> "Loading image data: " + file,
                     () -> service.getFileData(file),
                     result -> {
                         handler.accept(result);

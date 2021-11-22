@@ -23,6 +23,8 @@ import java.util.EventListener;
  */
 public interface FeFooterModelListener extends EventListener {
 
+    void changeTasks(FeFooterModelEvent event);
+
     void changeNumberOfElements(FeFooterModelEvent event);
 
 }

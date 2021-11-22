@@ -28,18 +28,11 @@ import dev.alexengrig.myfe.repository.ArchiveFileSystemPathRepository;
 import dev.alexengrig.myfe.repository.FePathRepository;
 import dev.alexengrig.myfe.repository.FtpFileSystemPathRepository;
 import dev.alexengrig.myfe.repository.LocalFileSystemPathRepository;
-import dev.alexengrig.myfe.service.BackgroundExecutorService;
 import dev.alexengrig.myfe.service.FePathService;
 import dev.alexengrig.myfe.service.SimplePathService;
 import dev.alexengrig.myfe.util.FePathUtil;
-import dev.alexengrig.myfe.util.swing.BackgroundExecutor;
-import dev.alexengrig.myfe.util.swing.BackgroundTask;
 
-import javax.swing.*;
 import java.nio.file.Path;
-import java.util.concurrent.Callable;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class FeTabFactory {
 
@@ -47,28 +40,9 @@ public class FeTabFactory {
     private final Converter<Path, FeFile> fileConverter = new Path2FeFileConverter();
     private final Converter<Path, FePath> pathConverter = new Path2FePathConverter(directoryConverter, fileConverter);
 
-    private final BackgroundExecutorService backgroundExecutorService = new BackgroundExecutorService() {
-        @Override
-        public <T> BackgroundTask execute(
-                Supplier<String> descriptionSupplier,
-                Callable<T> backgroundTask,
-                Consumer<T> resultHandler) {
-            return BackgroundExecutor.builder(backgroundTask)
-                    .withDescription(descriptionSupplier)
-                    .withResultHandler(resultHandler)
-                    .withErrorHandler(e -> JOptionPane.showMessageDialog(
-                            null,
-                            e.getMessage(),
-                            descriptionSupplier.get(),
-                            JOptionPane.ERROR_MESSAGE
-                    ))
-                    .execute();
-        }
-    };
-
     private FeTab createTab(String title, String tip, String name, FePathRepository repository) {
         FePathService service = new SimplePathService(name, repository);
-        return new FeTab(service, backgroundExecutorService, title, tip);
+        return new FeTab(title, tip, service);
     }
 
     public FeTab createDefaultTab() {

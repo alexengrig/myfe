@@ -25,31 +25,53 @@ import org.slf4j.LoggerFactory;
 import javax.swing.*;
 import java.awt.*;
 import java.lang.invoke.MethodHandles;
+import java.util.List;
 
 public class FeFooter extends JPanel {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final FeFooterModel model;
-    private final JPanel contentPane;
+
+    private final JLabel counterView = new JLabel();
+    private final JLabel tasksView = new JLabel();
+    private final JProgressBar progressView = new JProgressBar();
 
     public FeFooter(FeFooterModel model) {
         super(new BorderLayout());
         this.model = model;
-        this.contentPane = new JPanel(new BorderLayout());
         init();
     }
 
     private void init() {
-        add(contentPane);
-        model.addFeFooterModelListener(new ModelListener());
-        handleChangeNumberOfElements(model.getNumberOfElements());
         setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+        initListeners();
+        initComponents();
+        handleChangeNumberOfElements(model.getNumberOfElements());
     }
 
-    private void addCounterComponent() {
-        int numberOfElements = model.getNumberOfElements();
-        contentPane.add(new JLabel(createCounterText(numberOfElements)), BorderLayout.WEST);
+    private void initListeners() {
+        model.addFeFooterModelListener(new ModelListener());
+    }
+
+    private void initComponents() {
+        add(counterView, BorderLayout.WEST);
+        JPanel taskPanel = createTasksPanel();
+        add(taskPanel, BorderLayout.EAST);
+    }
+
+    private JPanel createTasksPanel() {
+        JPanel tasksPanel = new JPanel();
+        tasksPanel.setLayout(new BoxLayout(tasksPanel, BoxLayout.X_AXIS));
+        progressView.setIndeterminate(true);
+        tasksPanel.add(tasksView);
+        tasksPanel.add(Box.createHorizontalStrut(4));
+        Dimension barSize = progressView.getPreferredSize();
+        barSize.width = 50;
+        progressView.setPreferredSize(barSize);
+        progressView.setVisible(false);
+        tasksPanel.add(progressView);
+        return tasksPanel;
     }
 
     private String createCounterText(int count) {
@@ -62,15 +84,30 @@ public class FeFooter extends JPanel {
 
     private void handleChangeNumberOfElements(Integer numberOfElements) {
         LOGGER.debug("Handle change number of elements: {}", numberOfElements);
-        contentPane.removeAll();
-        if (numberOfElements != null) {
-            addCounterComponent();
+        String text = numberOfElements != null ? createCounterText(numberOfElements) : "";
+        counterView.setText(text);
+    }
+
+    private void handleChangeTasks(List<String> tasks) {
+        LOGGER.debug("Handle change tasks: {}", tasks);
+        String text;
+        if (tasks.isEmpty()) {
+            text = "";
+            progressView.setVisible(false);
+        } else {
+            text = tasks.get(0);
+            progressView.setVisible(true);
         }
-        contentPane.revalidate();
-        contentPane.repaint();
+        tasksView.setText(text);
     }
 
     private class ModelListener implements FeFooterModelListener {
+
+        @Override
+        public void changeTasks(FeFooterModelEvent event) {
+            List<String> tasks = event.getTasks();
+            handleChangeTasks(tasks);
+        }
 
         @Override
         public void changeNumberOfElements(FeFooterModelEvent event) {

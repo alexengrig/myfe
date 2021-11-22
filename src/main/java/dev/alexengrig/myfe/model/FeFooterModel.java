@@ -23,9 +23,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.invoke.MethodHandles;
+import java.util.ArrayList;
+import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Supplier;
 
 /**
  * Model of file explorer footer.
@@ -38,10 +41,22 @@ public class FeFooterModel {
 
     private final List<FeFooterModelListener> listeners = new LinkedList<>();
 
+    private final Deque<String> tasks = new LinkedList<>();
+
     private Integer numberOfElements;
 
     public FeFooterModel(Integer numberOfElements) {
         this.numberOfElements = numberOfElements;
+    }
+
+    public void addTask(Supplier<String> descriptionSupplier) {
+        tasks.add(descriptionSupplier.get());
+        fireChangeTasks(FeFooterModelEvent.tasks(new ArrayList<>(tasks)));
+    }
+
+    public void removeTask(Supplier<String> descriptionSupplier) {
+        tasks.removeFirstOccurrence(descriptionSupplier.get());
+        fireChangeTasks(FeFooterModelEvent.tasks(new ArrayList<>(tasks)));
     }
 
     public Integer getNumberOfElements() {
@@ -51,7 +66,7 @@ public class FeFooterModel {
     public void setNumberOfElements(Integer numberOfElements) {
         if (!Objects.equals(this.numberOfElements, numberOfElements)) {
             this.numberOfElements = numberOfElements;
-            fireChangeNumberOfElements(new FeFooterModelEvent(numberOfElements));
+            fireChangeNumberOfElements(FeFooterModelEvent.numberOfElements(numberOfElements));
         }
     }
 
@@ -67,6 +82,13 @@ public class FeFooterModel {
         LOGGER.debug("Fire change number of elements: {}", event);
         for (FeFooterModelListener listener : listeners) {
             listener.changeNumberOfElements(event);
+        }
+    }
+
+    private void fireChangeTasks(FeFooterModelEvent event) {
+        LOGGER.debug("Fire change tasks: {}", event);
+        for (FeFooterModelListener listener : listeners) {
+            listener.changeTasks(event);
         }
     }
 
