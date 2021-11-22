@@ -29,7 +29,7 @@ import dev.alexengrig.myfe.util.logging.LazyLogger;
 import dev.alexengrig.myfe.util.logging.LazyLoggerFactory;
 
 import javax.swing.*;
-import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.lang.invoke.MethodHandles;
 
 /**
@@ -40,28 +40,31 @@ public class FePathPreview extends JPanel {
     private static final LazyLogger LOGGER = LazyLoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private final FeSelectedPathModel model;
-    private final ContentPreviewBackgroundService backgroundService;
+    private final ContentPreviewBackgroundService previewService;
 
     private final MyTextDocument textModel;
     private final FeFileImageModel imageModel;
 
     private final MyText textView;
+    private final JButton loadButton;
     private final MyImage imageView;
 
-    public FePathPreview(FeSelectedPathModel model, ContentPreviewBackgroundService backgroundService) {
-        super(new GridBagLayout());
+    private Runnable loadAction;
+
+    public FePathPreview(FeSelectedPathModel model, ContentPreviewBackgroundService previewService) {
         this.model = model;
-        this.backgroundService = backgroundService;
+        this.previewService = previewService;
         this.textModel = new MyTextDocument();
         this.imageModel = new FeFileImageModel();
         this.textView = new MyText(textModel);
         this.imageView = new MyImage(imageModel);
+        this.loadButton = new JButton();
         init();
     }
 
     private void init() {
         initListeners();
-        addComponents();
+        initComponents();
         handleChangePath(model.getPath());
     }
 
@@ -69,13 +72,17 @@ public class FePathPreview extends JPanel {
         model.addSelectedFePathModelListener(new ModelListener());
     }
 
-    private void addComponents() {
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.weightx = gbc.weighty = 1.0;
-        add(textView, gbc);
+    private void initComponents() {
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+        add(textView);
+        loadButton.setAction(new LoadAction());
+        loadButton.setText("Load preview");
+        loadButton.setAlignmentX(CENTER_ALIGNMENT);
+        loadButton.setVisible(false);
+        add(loadButton);
         imageView.setVisible(false);
-        add(imageView, gbc);
+        add(imageView);
     }
 
     private void handleChangePath(FePath path) {
@@ -99,31 +106,66 @@ public class FePathPreview extends JPanel {
 
     private void setNotSelectedFilePreviewText() {
         imageView.setVisible(false);
+        loadButton.setVisible(false);
         textModel.setText("Select an element to preview");
         textView.setVisible(true);
     }
 
     private void setFileImage(FeFile file) {
-        backgroundService.loadImageData(file, imageData -> {
+        loadAction = () -> previewService.loadImageData(file, imageData -> {
+            LOGGER.debug("Got image data for: {}", file);
             textView.setVisible(false);
+            loadButton.setVisible(false);
             imageModel.setFileData(file, imageData);
             imageView.setVisible(true);
         });
+        if (previewService.isLazy()) {
+            textView.setVisible(false);
+            imageView.setVisible(false);
+            loadButton.setEnabled(true);
+            loadButton.setText("Load image: " + file.getName());
+            loadButton.setVisible(true);
+        } else {
+            loadAction.run();
+        }
     }
 
     private void setFilePreviewText(FeFile file) {
-        backgroundService.loadTextPreview(file, text -> {
+        loadAction = () -> previewService.loadTextPreview(file, text -> {
             LOGGER.debug("Got preview text for: {}", file);
+            loadButton.setVisible(false);
             imageView.setVisible(false);
             textModel.setText(text);
             textView.setVisible(true);
         });
+        if (previewService.isLazy()) {
+            textView.setVisible(false);
+            imageView.setVisible(false);
+            loadButton.setEnabled(true);
+            loadButton.setText("Load text: " + file.getName());
+            loadButton.setVisible(true);
+        } else {
+            loadAction.run();
+        }
     }
 
     private void setAvailablePreviewText() {
         imageView.setVisible(false);
+        loadButton.setVisible(false);
         textModel.setText("No preview available");
         textView.setVisible(true);
+    }
+
+    private class LoadAction extends AbstractAction {
+
+        @Override
+        public void actionPerformed(ActionEvent ignore) {
+            loadButton.setEnabled(false);
+            if (loadAction != null) {
+                loadAction.run();
+            }
+        }
+
     }
 
     /**

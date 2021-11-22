@@ -435,6 +435,11 @@ public class FeTab extends JPanel {
         private BackgroundTask previousTask;
 
         @Override
+        public boolean isLazy() {
+            return service.isRemote();
+        }
+
+        @Override
         public void loadTextPreview(FeFile file, Consumer<String> handler) {
             LOGGER.debug("Start loading text preview for: {}", file);
             cancelPreviousTaskIfNeed();

@@ -28,7 +28,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-public class SimplePathService implements FePathService {
+abstract class BasePathService implements FePathService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -40,7 +40,7 @@ public class SimplePathService implements FePathService {
     private final String rootName;
     private final FePathRepository repository;
 
-    public SimplePathService(String rootName, FePathRepository repository) {
+    public BasePathService(String rootName, FePathRepository repository) {
         this.rootName = rootName;
         this.repository = repository;
     }

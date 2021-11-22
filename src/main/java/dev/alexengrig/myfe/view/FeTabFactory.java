@@ -28,8 +28,8 @@ import dev.alexengrig.myfe.repository.ArchiveFileSystemPathRepository;
 import dev.alexengrig.myfe.repository.FePathRepository;
 import dev.alexengrig.myfe.repository.FtpFileSystemPathRepository;
 import dev.alexengrig.myfe.repository.LocalFileSystemPathRepository;
-import dev.alexengrig.myfe.service.FePathService;
-import dev.alexengrig.myfe.service.SimplePathService;
+import dev.alexengrig.myfe.service.LocalPathService;
+import dev.alexengrig.myfe.service.RemotePathService;
 import dev.alexengrig.myfe.util.FePathUtil;
 
 import java.nio.file.Path;
@@ -40,21 +40,20 @@ public class FeTabFactory {
     private final Converter<Path, FeFile> fileConverter = new Path2FeFileConverter();
     private final Converter<Path, FePath> pathConverter = new Path2FePathConverter(directoryConverter, fileConverter);
 
-    private FeTab createTab(String title, String tip, String name, FePathRepository repository) {
-        FePathService service = new SimplePathService(name, repository);
-        return new FeTab(title, tip, service);
-    }
-
     public FeTab createDefaultTab() {
+        String title = "This computer";
+        String tip = "Your computer";
         FePathRepository repository = new LocalFileSystemPathRepository(directoryConverter, pathConverter);
-        return createTab("This computer", "Your computer", "This computer", repository);
+        LocalPathService service = new LocalPathService(title, repository);
+        return new FeTab(title, tip, service);
     }
 
     public FeTab createArchiveTab(String path) {
         String title = getArchiveTabTitle(path);
         String name = FePathUtil.getNameByPath(path);
         FePathRepository repository = new ArchiveFileSystemPathRepository(path, directoryConverter, pathConverter);
-        return createTab(title, path, name, repository);
+        LocalPathService service = new LocalPathService(name, repository);
+        return new FeTab(title, path, service);
     }
 
     public String getArchiveTabTitle(String path) {
@@ -65,7 +64,8 @@ public class FeTabFactory {
     public FeTab createFtpTab(FtpConnectionConfig config) {
         String title = getFtpTabTitle(config);
         FePathRepository repository = new FtpFileSystemPathRepository(config, directoryConverter, pathConverter);
-        return createTab(title, config.getInfo(), config.getHostAndPort(), repository);
+        RemotePathService service = new RemotePathService(config.getHostAndPort(), repository);
+        return new FeTab(title, config.getInfo(), service);
     }
 
     private String getFtpTabTitle(FtpConnectionConfig config) {

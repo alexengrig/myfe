@@ -16,34 +16,17 @@
 
 package dev.alexengrig.myfe.service;
 
-import dev.alexengrig.myfe.model.FeDirectory;
-import dev.alexengrig.myfe.model.FeFile;
-import dev.alexengrig.myfe.model.FePath;
+import dev.alexengrig.myfe.repository.FePathRepository;
 
-import java.util.List;
-import java.util.stream.Stream;
+public class RemotePathService extends BasePathService {
 
-/**
- * Service of {@link FePath}.
- */
-public interface FePathService {
+    public RemotePathService(String rootName, FePathRepository repository) {
+        super(rootName, repository);
+    }
 
-    void destroy();
-
-    boolean isRemote();
-
-    String getRootName();
-
-    List<FeDirectory> getRootDirectories();
-
-    List<FeDirectory> getSubdirectories(FeDirectory directory);
-
-    List<FePath> getDirectoryContent(FeDirectory directory);
-
-    String getFileContentPreview(FeFile file);
-
-    Stream<String> readFileContent(FeFile file);
-
-    byte[] getFileData(FeFile file);
+    @Override
+    public boolean isRemote() {
+        return true;
+    }
 
 }
