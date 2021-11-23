@@ -146,7 +146,7 @@ public class BackgroundWorker<T, V, X extends Throwable> extends SwingWorker<T, 
      * @see BackgroundWorker#requireValidGenericTypeOfException()
      */
     protected Class<X> getExpectedExceptionType() {
-        return ReflectionUtil.getGenericType(getClass(), INDEX_OF_EXCEPTION_GENERIC_TYPE);
+        return ReflectionUtil.getGenericTypeFromSuperclass(getClass(), INDEX_OF_EXCEPTION_GENERIC_TYPE);
     }
 
     protected static class WithExceptionType<T, V, X extends Throwable>

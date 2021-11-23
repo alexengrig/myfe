@@ -29,12 +29,12 @@ public final class ReflectionUtil {
         throw new IllegalAccessException("This is utility class");
     }
 
-    public static <T> Class<T> getGenericType(Class<?> type) {
-        return getGenericType(type, 0);
+    public static <T> Class<T> getGenericTypeFromSuperclass(Class<?> type) {
+        return getGenericTypeFromSuperclass(type, 0);
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> Class<T> getGenericType(Class<?> type, int index) {
+    public static <T> Class<T> getGenericTypeFromSuperclass(Class<?> type, int index) {
         ParameterizedType genericSupertype = (ParameterizedType) type.getGenericSuperclass();
         Type[] genericTypes = genericSupertype.getActualTypeArguments();
         return (Class<T>) genericTypes[index];
