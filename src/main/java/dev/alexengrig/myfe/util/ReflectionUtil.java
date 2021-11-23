@@ -16,7 +16,6 @@
 
 package dev.alexengrig.myfe.util;
 
-import java.lang.reflect.Array;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 
@@ -29,20 +28,37 @@ public final class ReflectionUtil {
         throw new IllegalAccessException("This is utility class");
     }
 
+    /**
+     * Returns the first generic class from the superclass of the given class.
+     *
+     * @param type child class
+     * @param <T>  the type of the generic class
+     * @return the generic class
+     * @see ReflectionUtil#getGenericTypeFromSuperclass(java.lang.Class, int)
+     */
     public static <T> Class<T> getGenericTypeFromSuperclass(Class<?> type) {
         return getGenericTypeFromSuperclass(type, 0);
     }
 
+    /**
+     * Returns the generic class from the superclass of the given class by index.
+     *
+     * <pre>{@code
+     * // 0 - String
+     * // 1 - Long
+     * class Child extends Parent<String, Long> {}
+     * }</pre>
+     *
+     * @param type  child class
+     * @param index index of the generic class
+     * @param <T>   the type of the generic class
+     * @return the generic class
+     */
     @SuppressWarnings("unchecked")
     public static <T> Class<T> getGenericTypeFromSuperclass(Class<?> type, int index) {
         ParameterizedType genericSupertype = (ParameterizedType) type.getGenericSuperclass();
         Type[] genericTypes = genericSupertype.getActualTypeArguments();
         return (Class<T>) genericTypes[index];
-    }
-
-    @SuppressWarnings("unchecked")
-    public static <T> T[] newArray(Class<T> type, int length) {
-        return (T[]) Array.newInstance(type, length);
     }
 
 }
