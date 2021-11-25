@@ -35,6 +35,12 @@ public final class PathUtil {
         throw new IllegalAccessException("This is utility class");
     }
 
+    /**
+     * Get the path name.
+     *
+     * @param path path
+     * @return the path name
+     */
     public static String getName(Path path) {
         if (requireNonNullPath(path).getNameCount() == 0) {
             return path.toString();
@@ -42,10 +48,22 @@ public final class PathUtil {
         return path.getFileName().toString();
     }
 
+    /**
+     * Get the absolute path.
+     *
+     * @param path path
+     * @return the absolute path
+     */
     public static String getAbsolutePath(Path path) {
         return requireNonNullPath(path).toAbsolutePath().toString();
     }
 
+    /**
+     * Check if path is directory.
+     *
+     * @param path path
+     * @return true - if paths is directory
+     */
     public static boolean isDirectory(Path path) {
         return doIsDirectory(requireNonNullPath(path));
     }
@@ -54,6 +72,12 @@ public final class PathUtil {
         return Files.isDirectory(path);
     }
 
+    /**
+     * Check if path isn't directory.
+     *
+     * @param path path
+     * @return true - if path isn't directory
+     */
     public static boolean nonDirectory(Path path) {
         return doNonDirectory(requireNonNullPath(path));
     }
@@ -62,6 +86,12 @@ public final class PathUtil {
         return !doIsDirectory(path);
     }
 
+    /**
+     * Get subdirectories of path.
+     *
+     * @param path path
+     * @return subdirectories of path
+     */
     public static List<Path> getSubdirectories(Path path) {
         try (Stream<Path> stream = Files.list(requireDirectory(path))) {
             return stream.filter(PathUtil::doIsDirectory).collect(Collectors.toList());
@@ -70,6 +100,12 @@ public final class PathUtil {
         }
     }
 
+    /**
+     * Get children of path.
+     *
+     * @param path path
+     * @return children of path
+     */
     public static List<Path> getChildren(Path path) {
         try (Stream<Path> stream = Files.list(requireDirectory(path))) {
             return stream.collect(Collectors.toList());
