@@ -29,6 +29,17 @@ import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+/**
+ * {@link SwingWorker}-based background executor.
+ * <ul>
+ * <li>{@code after hook} - runs on the Event Dispatch Thread;
+ * <li>{@code background task} - runs on a background thread;
+ * <li>{@code result handler} - runs on the Event Dispatch Thread;
+ * <li>{@code error handler} - runs on the Event Dispatch Thread;
+ * <li>{@code before hook} - runs on the Event Dispatch Thread.
+ *
+ * @param <T> the type of result
+ */
 public class BackgroundExecutor<T> extends SwingWorker<T, T> {
 
     private static final LazyLogger LOGGER = LazyLoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -41,7 +52,7 @@ public class BackgroundExecutor<T> extends SwingWorker<T, T> {
     private final Consumer<Throwable> errorHandler;
     private final Runnable finishHook;
 
-    protected BackgroundExecutor(
+    private BackgroundExecutor(
             Supplier<String> descriptionSupplier,
             Callable<T> backgroundTask,
             Consumer<T> resultHandler,
@@ -53,6 +64,13 @@ public class BackgroundExecutor<T> extends SwingWorker<T, T> {
         this.finishHook = finishHook;
     }
 
+    /**
+     * Task builder.
+     *
+     * @param task background task
+     * @param <T>  the type of result
+     * @return task builder
+     */
     public static <T> Builder<T> builder(Callable<T> task) {
         return new Builder<>(task);
     }
@@ -72,33 +90,7 @@ public class BackgroundExecutor<T> extends SwingWorker<T, T> {
         LOGGER.debug(m -> m.log("Start waiting result - {}",
                 descriptionSupplier.get()));
         try {
-            T result;
-            try {
-                result = get();
-            } catch (InterruptedException e) {
-                LOGGER.warn(m -> m.log("Interrupted exception of waiting result - {}",
-                        descriptionSupplier.get(), e));
-                throw new InterruptedBackgroundTaskException("Interrupted exception of waiting result - " +
-                        descriptionSupplier.get(),
-                        e);
-            } catch (ExecutionException e) {
-                LOGGER.warn(m -> m.log("Execution exception of waiting result - {}",
-                        descriptionSupplier.get(), e));
-                if (errorHandler != null && e.getCause() != null) {
-                    errorHandler.accept(e.getCause());
-                    return;
-                }
-                throw new ExecutionBackgroundTaskException(e.getCause());
-            } catch (CancellationException ignore) {
-                LOGGER.debug(m -> m.log("Cancellation exception of waiting result - {}",
-                        descriptionSupplier.get()));
-                return;
-            }
-            LOGGER.debug(m -> m.log("Finished waiting result - {}",
-                    descriptionSupplier.get()));
-            if (resultHandler != null) {
-                resultHandler.accept(result); // don't catch handler's exceptions
-            }
+            doDone();
         } finally {
             if (finishHook != null) {
                 finishHook.run();
@@ -106,6 +98,41 @@ public class BackgroundExecutor<T> extends SwingWorker<T, T> {
         }
     }
 
+    private void doDone() {
+        T result;
+        try {
+            result = get();
+        } catch (InterruptedException e) {
+            LOGGER.warn(m -> m.log("Interrupted exception of waiting result - {}",
+                    descriptionSupplier.get(), e));
+            throw new InterruptedBackgroundTaskException("Interrupted exception of waiting result - " +
+                    descriptionSupplier.get(),
+                    e);
+        } catch (ExecutionException e) {
+            LOGGER.warn(m -> m.log("Execution exception of waiting result - {}",
+                    descriptionSupplier.get(), e));
+            if (errorHandler != null && e.getCause() != null) {
+                errorHandler.accept(e.getCause());
+                return;
+            }
+            throw new ExecutionBackgroundTaskException(e.getCause());
+        } catch (CancellationException ignore) {
+            LOGGER.debug(m -> m.log("Cancellation exception of waiting result - {}",
+                    descriptionSupplier.get()));
+            return;
+        }
+        LOGGER.debug(m -> m.log("Finished waiting result - {}",
+                descriptionSupplier.get()));
+        if (resultHandler != null) {
+            resultHandler.accept(result); // don't catch handler's exceptions
+        }
+    }
+
+    /**
+     * Task builder.
+     *
+     * @param <T> the type of result
+     */
     public static final class Builder<T> {
 
         private final Callable<T> backgroundTask;
@@ -120,40 +147,81 @@ public class BackgroundExecutor<T> extends SwingWorker<T, T> {
             this.backgroundTask = backgroundTask;
         }
 
+        /**
+         * Set the task description.
+         *
+         * @param description the task description
+         * @return this builder
+         */
         public Builder<T> withDescription(String description) {
             return withDescription(() -> description);
         }
 
+        /**
+         * Set the supplier of task description.
+         *
+         * @param descriptionSupplier the supplier of task description
+         * @return this builder
+         */
         public Builder<T> withDescription(Supplier<String> descriptionSupplier) {
             this.descriptionSupplier = descriptionSupplier;
             return this;
         }
 
+        /**
+         * Set the before hook.
+         *
+         * @param hook the before hook
+         * @return this builder
+         */
         public Builder<T> withBeforeHook(Runnable hook) {
             this.beforeHook = hook;
             return this;
         }
 
+        /**
+         * Set the result handler.
+         *
+         * @param handler the result handler
+         * @return this builder
+         */
         public Builder<T> withResultHandler(Consumer<T> handler) {
             this.resultHandler = handler;
             return this;
         }
 
+        /**
+         * Set the error handler.
+         *
+         * @param handler the error handler
+         * @return this builder
+         */
         public Builder<T> withErrorHandler(Consumer<Throwable> handler) {
             this.errorHandler = handler;
             return this;
         }
 
+        /**
+         * Set the after hook.
+         *
+         * @param hook the after hook
+         * @return this builder
+         */
         public Builder<T> withAfterHook(Runnable hook) {
             this.afterHook = hook;
             return this;
         }
 
+        /**
+         * Execute and get background task.
+         *
+         * @return background task
+         */
         public BackgroundTask execute() {
             BackgroundExecutor<T> worker = new BackgroundExecutor<>(
                     descriptionSupplier, backgroundTask, resultHandler, errorHandler, afterHook);
             if (beforeHook != null) {
-                beforeHook.run();
+                SwingUtilities.invokeLater(beforeHook);
             }
             worker.execute();
             return BackgroundTask.of(worker);
