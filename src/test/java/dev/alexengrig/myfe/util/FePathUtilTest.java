@@ -16,7 +16,10 @@
 
 package dev.alexengrig.myfe.util;
 
+import dev.alexengrig.myfe.config.KnownExtensions;
 import dev.alexengrig.myfe.model.FeDirectory;
+import dev.alexengrig.myfe.model.FeFile;
+import dev.alexengrig.myfe.model.FePath;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -30,6 +33,22 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FePathUtilTest {
+
+    static Stream<Arguments> provide_path_expectedType() {
+        return Stream.of(
+                Arguments.of(new FeDirectory("C:\\", "C:\\"), "File folder"),
+                Arguments.of(new FeFile("C:\\file", "file"), "File"),
+                Arguments.of(new FeFile("C:\\file.this", "file.this"), "THIS file")
+        );
+    }
+
+    static Stream<Arguments> provide_file_expectedExtension() {
+        return Stream.of(
+                Arguments.of(new FeFile("C:\\file", "file"), null),
+                Arguments.of(new FeFile("C:\\file.this", "file.this"), "THIS"),
+                Arguments.of(new FeFile("C:\\file.exe", "file.exe"), "EXE")
+        );
+    }
 
     static Stream<Arguments> provide_childDirectory_expectedDirectory() {
         return Stream.of(
@@ -111,6 +130,33 @@ class FePathUtilTest {
         );
     }
 
+    static Stream<Arguments> provide_file_isImage() {
+        String pathPrefix = "/file.";
+        String namePrefix = "file.";
+        return Stream.concat(
+                Stream.of(Arguments.of(
+                        new FeFile("/file.this", "file.this"),
+                        false)),
+                KnownExtensions.IMAGE_FILE_EXTENSIONS.stream()
+                        .map(extension -> Arguments.of(
+                                new FeFile(pathPrefix.concat(extension), namePrefix.concat(extension)),
+                                true)));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provide_path_expectedType")
+    void should_return_type(FePath path, String expectedType) {
+        assertEquals(expectedType, FePathUtil.getType(path), () ->
+                "Type for: " + path);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provide_file_expectedExtension")
+    void should_return_type(FeFile file, String expectedExtension) {
+        assertEquals(expectedExtension, FePathUtil.getFileExtension(file).orElse(null), () ->
+                "Extension for: " + file);
+    }
+
     @ParameterizedTest
     @MethodSource("provide_childDirectory_expectedDirectory")
     void should_return_parent(FeDirectory childDirectory, FeDirectory expectedDirectory) {
@@ -155,6 +201,13 @@ class FePathUtilTest {
     void should_return_nameByPath(String path, String expectedName) {
         assertEquals(expectedName, FePathUtil.getNameByPath(path), () ->
                 "Child name for: " + path);
+    }
+
+    @ParameterizedTest
+    @MethodSource("provide_file_isImage")
+    void should_return_nameByPath(FeFile file, boolean isImage) {
+        assertEquals(isImage, FePathUtil.isImage(file), () ->
+                "Check for: " + file);
     }
 
 }
