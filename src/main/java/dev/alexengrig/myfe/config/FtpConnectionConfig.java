@@ -24,8 +24,9 @@ import java.util.Objects;
 public class FtpConnectionConfig {
 
     public static final int DEFAULT_PORT = 21;
-    public static final char[] DEFAULT_PASSWORD = new char[]{};
     public static final String ANONYMOUS_USERNAME = "anonymous";
+
+    private static final char[] DEFAULT_PASSWORD = new char[]{};
 
     private final String host;
     private final int port;
@@ -80,6 +81,11 @@ public class FtpConnectionConfig {
         return password;
     }
 
+    /**
+     * Get info: {@code host:port by username}.
+     *
+     * @return {@code host:port by username}
+     */
     public String getInfo() {
         if (info == null) {
             info = host + ":" + port + " by " + username;
@@ -87,6 +93,11 @@ public class FtpConnectionConfig {
         return info;
     }
 
+    /**
+     * Get host and port: {@code host:port}.
+     *
+     * @return {@code host:port}
+     */
     public String getHostAndPort() {
         return host + ":" + port;
     }
