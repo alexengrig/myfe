@@ -16,22 +16,27 @@
 
 package dev.alexengrig.myfe.repository;
 
-import dev.alexengrig.myfe.converter.Converter;
-import dev.alexengrig.myfe.model.FeDirectory;
-import dev.alexengrig.myfe.model.FePath;
-
-import java.nio.file.FileSystems;
+import java.io.Closeable;
+import java.io.IOException;
+import java.nio.channels.SeekableByteChannel;
 import java.nio.file.Path;
+import java.util.List;
 
 /**
- * {@link FileSystems#getDefault()}-based implementation.
+ * Helper of file system.
  */
-public class LocalFileSystemPathRepository extends AidFileSystemPathRepository {
+public interface FileSystemHelper extends Closeable {
 
-    public LocalFileSystemPathRepository(
-            Converter<Path, FeDirectory> directoryConverter,
-            Converter<Path, FePath> pathConverter) {
-        super(FileSystems.getDefault(), directoryConverter, pathConverter);
-    }
+    Path getPath(String path);
+
+    Iterable<Path> getRootDirectories();
+
+    List<Path> getChildren(Path directory);
+
+    List<Path> getSubdirectories(Path directory);
+
+    SeekableByteChannel newByteChannel(Path path) throws IOException;
+
+    byte[] readAllBytes(Path path) throws IOException;
 
 }

@@ -20,7 +20,6 @@ import dev.alexengrig.myfe.converter.Converter;
 import dev.alexengrig.myfe.model.FeDirectory;
 import dev.alexengrig.myfe.model.FePath;
 import dev.alexengrig.myfe.util.CloseOnTerminalOperationStreams;
-import dev.alexengrig.myfe.util.PathUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,7 +31,6 @@ import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.SeekableByteChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Iterator;
 import java.util.List;
@@ -54,29 +52,29 @@ public class FileSystemPathRepository implements FePathRepository {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final FileSystem fileSystem;
+    private final FileSystemHelper fs;
     private final Converter<Path, FeDirectory> directoryConverter;
     private final Converter<Path, FePath> pathConverter;
 
     public FileSystemPathRepository(
-            FileSystem fileSystem,
+            FileSystemHelper fileSystem,
             Converter<Path, FeDirectory> directoryConverter,
             Converter<Path, FePath> pathConverter) {
-        this.fileSystem = fileSystem;
+        this.fs = fileSystem;
         this.directoryConverter = directoryConverter;
         this.pathConverter = pathConverter;
     }
 
     @Override
     public void close() throws Exception {
-        fileSystem.close();
+        fs.close();
         LOGGER.debug("Closed file system");
     }
 
     @Override
     public List<FeDirectory> getRootDirectories() {
         LOGGER.debug("Getting root directories");
-        Iterable<Path> directories = fileSystem.getRootDirectories();
+        Iterable<Path> directories = fs.getRootDirectories();
         return StreamSupport.stream(directories.spliterator(), false)
                 .map(directoryConverter::convert)
                 .collect(Collectors.toList());
@@ -85,8 +83,8 @@ public class FileSystemPathRepository implements FePathRepository {
     @Override
     public List<FePath> getChildren(String directoryPath) {
         LOGGER.debug("Getting children: {}", directoryPath);
-        Path directory = fileSystem.getPath(requireNonNullPath(directoryPath));
-        List<Path> children = PathUtil.getChildren(directory);
+        Path directory = fs.getPath(requireNonNullPath(directoryPath));
+        List<Path> children = fs.getChildren(directory);
         return children.stream()
                 .map(pathConverter::convert)
                 .collect(Collectors.toList());
@@ -95,8 +93,8 @@ public class FileSystemPathRepository implements FePathRepository {
     @Override
     public List<FeDirectory> getSubdirectories(String directoryPath) {
         LOGGER.debug("Getting subdirectories: {}", directoryPath);
-        Path directory = fileSystem.getPath(requireNonNullPath(directoryPath));
-        final List<Path> subdirectories = PathUtil.getSubdirectories(directory);
+        Path directory = fs.getPath(requireNonNullPath(directoryPath));
+        final List<Path> subdirectories = fs.getSubdirectories(directory);
         return subdirectories.stream()
                 .map(directoryConverter::convert)
                 .collect(Collectors.toList());
@@ -105,8 +103,8 @@ public class FileSystemPathRepository implements FePathRepository {
     @Override
     public String readBatch(String filePath, int batchSize) {
         LOGGER.debug("Start reading a batch: {} - {} bytes", filePath, batchSize);
-        Path path = fileSystem.getPath(requireNonNullPath(filePath));
-        try (SeekableByteChannel channel = Files.newByteChannel(path)) {
+        Path path = fs.getPath(requireNonNullPath(filePath));
+        try (SeekableByteChannel channel = fs.newByteChannel(path)) {
             if (batchSize > channel.size()) {
                 batchSize = (int) channel.size();
             }
@@ -127,8 +125,8 @@ public class FileSystemPathRepository implements FePathRepository {
     public Stream<String> readInBatches(String filePath, int batchSize, int numberOfBatches) {
         try {
             LOGGER.debug("Start reading in batches: {}", filePath);
-            Path path = fileSystem.getPath(requireNonNullPath(filePath));
-            SeekableByteChannel channel = Files.newByteChannel(path);
+            Path path = fs.getPath(requireNonNullPath(filePath));
+            SeekableByteChannel channel = fs.newByteChannel(path);
             if (batchSize > channel.size()) {
                 batchSize = (int) channel.size();
             }
@@ -156,8 +154,8 @@ public class FileSystemPathRepository implements FePathRepository {
     public byte[] readAllBytes(String filePath) {
         LOGGER.debug("Start reading all bytes: {}", filePath);
         try {
-            Path path = fileSystem.getPath(requireNonNullPath(filePath));
-            byte[] result = Files.readAllBytes(path);
+            Path path = fs.getPath(requireNonNullPath(filePath));
+            byte[] result = fs.readAllBytes(path);
             LOGGER.debug("Finished reading all bytes: {} - {} bytes", filePath, result.length);
             return result;
         } catch (IOException e) {
