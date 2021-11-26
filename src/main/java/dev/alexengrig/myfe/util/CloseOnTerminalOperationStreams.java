@@ -68,7 +68,7 @@ import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 /**
- * {@link Stream}-factory where {@link Stream} closes itself on terminal operations.
+ * {@link Stream}-wrapper where {@link Stream} closes itself on terminal operations.
  *
  * <p>Before:
  *
