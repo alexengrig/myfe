@@ -30,9 +30,4 @@
         <appender-ref ref="ASYNC-STDOUT"/>
     </root>
 
-    <logger name="dev.alexengrig.myfe.model" level="debug"/>
-    <logger name="dev.alexengrig.myfe.view" level="debug"/>
-    <logger name="dev.alexengrig.myfe.service" level="debug"/>
-    <logger name="dev.alexengrig.myfe.repository" level="debug"/>
-
 </configuration>
