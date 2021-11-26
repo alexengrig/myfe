@@ -42,6 +42,18 @@ public final class FePathUtil {
         throw new IllegalAccessException("This is utility class");
     }
 
+    /**
+     * Get type of path.
+     *
+     * <pre>{@code
+     * directory              -> 'File folder'
+     * file without extension -> 'File'
+     * file with extension    -> 'EXTENSION file'
+     * }</pre>
+     *
+     * @param path the path
+     * @return type of {@code path}
+     */
     public static String getType(FePath path) {
         if (requireNonNullPath(path).isDirectory()) {
             return "File folder";
@@ -53,6 +65,12 @@ public final class FePathUtil {
         }
     }
 
+    /**
+     * Get extension of file.
+     *
+     * @param file the file
+     * @return extension of {@code file}
+     */
     public static Optional<String> getFileExtension(FeFile file) {
         return doGetFileExtension(requireNonNullFile(file));
     }
@@ -67,11 +85,22 @@ public final class FePathUtil {
         }
     }
 
+    /**
+     * Get parent of directory.
+     *
+     * <pre>{@code
+     * /directory/subdirectory -> /directory
+     * /                       -> {empty}
+     * }</pre>
+     *
+     * @param directory the directory
+     * @return parent of {@code directory}
+     */
     public static Optional<FeDirectory> getParent(FeDirectory directory) {
         if (isRoot(directory)) {
             return Optional.empty();
         }
-        String path = requireNonNullPath(directory).getPath();
+        String path = requireNonNullDirectory(directory).getPath();
         int lastIndexOfSeparator = lastIndexOfSeparator(path);
         if (lastIndexOfSeparator < 0) {
             throw new IllegalArgumentException("No path separator: " + path);
@@ -89,6 +118,18 @@ public final class FePathUtil {
         return Optional.of(new FeDirectory(parentPath, parentName));
     }
 
+    /**
+     * Get the number of directory levels.
+     *
+     * <pre>{@code
+     * /         -> 0
+     * /pub      -> 1
+     * /pub/path -> 2
+     * }</pre>
+     *
+     * @param directory the directory
+     * @return the number of {@code directory} levels
+     */
     public static int getLevelCount(FeDirectory directory) {
         if (isRoot(directory)) {
             return 0;
@@ -105,6 +146,23 @@ public final class FePathUtil {
         return count;
     }
 
+    /**
+     * Get a directory name from the directory by the level.
+     *
+     * <pre>{@code
+     * /path/to/directory:
+     *   0 - /
+     *   1 - path
+     *   2 - to
+     *   3 - directory
+     * }</pre>
+     *
+     * @param directory the directory
+     * @param level     the level
+     * @return directory name from {@code directory} by {@code level}
+     * @throws IndexOutOfBoundsException if {@code level} out of range
+     * @see FePathUtil#getLevelCount(FeDirectory)
+     */
     public static String getNameByLevel(FeDirectory directory, int level) {
         requireNonNullDirectory(directory);
         requirePositiveLevel(level);
@@ -121,6 +179,9 @@ public final class FePathUtil {
         while (count < level && matcher.find()) {
             count++;
         }
+        if (count != level) {
+            throw new IndexOutOfBoundsException("Level out of range: " + level);
+        }
         int begin = matcher.end();
         if (matcher.find()) {
             int end = matcher.start();
@@ -130,6 +191,16 @@ public final class FePathUtil {
         }
     }
 
+    /**
+     * Split the directory by names.
+     *
+     * <pre>{@code
+     * /path/to/directory -> [/, path, directory]
+     * }</pre>
+     *
+     * @param directory the directory
+     * @return names from {@code directory}
+     */
     public static String[] splitByNames(FeDirectory directory) {
         String path = requireNonNullDirectory(directory).getPath();
         Matcher matcher = SEPARATOR_PATTERN.matcher(path);
@@ -147,6 +218,17 @@ public final class FePathUtil {
         return names.toArray(String[]::new);
     }
 
+    /**
+     * Get a name by the path.
+     *
+     * <pre>{@code
+     * /path/to/directory -> directory
+     * /path/to/file.this -> file.this
+     * }</pre>
+     *
+     * @param path the path
+     * @return name by {@code path}
+     */
     public static String getNameByPath(String path) {
         int lastIndexOfSeparator = lastIndexOfSeparator(path);
         if (lastIndexOfSeparator < 0) {
@@ -158,6 +240,12 @@ public final class FePathUtil {
         return path.substring(lastIndexOfSeparator + 1);
     }
 
+    /**
+     * Check that the file is an image.
+     *
+     * @param file the file
+     * @return true - if {@code file} is an image
+     */
     public static boolean isImage(FeFile file) {
         Optional<String> fileExtension = getFileExtension(file);
         return fileExtension
@@ -165,6 +253,12 @@ public final class FePathUtil {
                 .isPresent();
     }
 
+    /**
+     * Check that the file is text.
+     *
+     * @param file the file
+     * @return true - if {@code file} is text
+     */
     public static boolean isText(FeFile file) {
         Optional<String> fileExtension = getFileExtension(file);
         return fileExtension
@@ -172,6 +266,12 @@ public final class FePathUtil {
                 .isPresent();
     }
 
+    /**
+     * Check that the file is an archive.
+     *
+     * @param file the file
+     * @return true - if {@code file} is an archive
+     */
     public static boolean isArchive(FeFile file) {
         Optional<String> fileExtension = getFileExtension(file);
         return fileExtension
