@@ -65,6 +65,7 @@ public class FeFooter extends JPanel {
         tasksPanel.setLayout(new BoxLayout(tasksPanel, BoxLayout.X_AXIS));
         progressView.setIndeterminate(true);
         tasksPanel.add(tasksView);
+        //TODO: Show other tasks
         tasksPanel.add(Box.createHorizontalStrut(4));
         Dimension barSize = progressView.getPreferredSize();
         barSize.width = 50;
