@@ -27,6 +27,11 @@ public class DelayedSingleTaskExecutor extends Timer {
 
     private transient TaskAction previousTaskAction;
 
+    /**
+     * Construct executor.
+     *
+     * @param delay milliseconds for delay
+     */
     public DelayedSingleTaskExecutor(int delay) {
         super(delay, null);
         setRepeats(false);
