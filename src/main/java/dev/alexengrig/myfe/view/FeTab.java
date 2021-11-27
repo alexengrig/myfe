@@ -16,14 +16,14 @@
 
 package dev.alexengrig.myfe.view;
 
+import dev.alexengrig.myfe.domain.FeDirectory;
+import dev.alexengrig.myfe.domain.FeFile;
+import dev.alexengrig.myfe.domain.FePath;
 import dev.alexengrig.myfe.model.FeContentFilterModel;
 import dev.alexengrig.myfe.model.FeContentTableModel;
 import dev.alexengrig.myfe.model.FeCurrentDirectoryModel;
-import dev.alexengrig.myfe.model.FeDirectory;
 import dev.alexengrig.myfe.model.FeDirectoryTreeModel;
-import dev.alexengrig.myfe.model.FeFile;
 import dev.alexengrig.myfe.model.FeFooterModel;
-import dev.alexengrig.myfe.model.FePath;
 import dev.alexengrig.myfe.model.FeSelectedPathModel;
 import dev.alexengrig.myfe.service.BackgroundExecutorService;
 import dev.alexengrig.myfe.service.ContentPreviewBackgroundService;

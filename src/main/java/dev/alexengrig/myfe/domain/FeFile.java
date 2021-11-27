@@ -14,23 +14,20 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.model;
+package dev.alexengrig.myfe.domain;
 
 /**
- * Path of file explorer.
+ * File of file explorer.
  */
-public abstract class FePath extends AbstractPath {
+public class FeFile extends FePath {
 
-    protected FePath(String path, String name) {
+    public FeFile(String path, String name) {
         super(path, name);
     }
 
-    public FeDirectory asDirectory() {
-        return (FeDirectory) this;
-    }
-
-    public FeFile asFile() {
-        return (FeFile) this;
+    @Override
+    public boolean isDirectory() {
+        return false;
     }
 
 }

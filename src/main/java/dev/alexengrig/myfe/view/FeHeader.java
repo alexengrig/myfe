@@ -16,8 +16,8 @@
 
 package dev.alexengrig.myfe.view;
 
+import dev.alexengrig.myfe.domain.FeDirectory;
 import dev.alexengrig.myfe.model.FeCurrentDirectoryModel;
-import dev.alexengrig.myfe.model.FeDirectory;
 import dev.alexengrig.myfe.model.event.FeCurrentDirectoryModelEvent;
 import dev.alexengrig.myfe.model.event.FeCurrentDirectoryModelListener;
 import dev.alexengrig.myfe.view.event.FeHeaderEvent;

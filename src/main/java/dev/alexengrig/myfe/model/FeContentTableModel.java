@@ -16,6 +16,7 @@
 
 package dev.alexengrig.myfe.model;
 
+import dev.alexengrig.myfe.domain.FePath;
 import dev.alexengrig.myfe.util.FePathUtil;
 import dev.alexengrig.myfe.view.FeContentTable;
 

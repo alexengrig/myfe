@@ -16,7 +16,7 @@
 
 package dev.alexengrig.myfe.service;
 
-import dev.alexengrig.myfe.model.FeFile;
+import dev.alexengrig.myfe.domain.FeFile;
 
 import java.util.function.Consumer;
 

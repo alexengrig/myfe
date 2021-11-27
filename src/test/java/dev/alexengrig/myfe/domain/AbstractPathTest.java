@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.model;
+package dev.alexengrig.myfe.domain;
 
 import org.junit.jupiter.api.Test;
 

@@ -16,9 +16,9 @@
 
 package dev.alexengrig.myfe.view;
 
-import dev.alexengrig.myfe.model.FeFile;
+import dev.alexengrig.myfe.domain.FeFile;
+import dev.alexengrig.myfe.domain.FePath;
 import dev.alexengrig.myfe.model.FeFileImageModel;
-import dev.alexengrig.myfe.model.FePath;
 import dev.alexengrig.myfe.model.FeSelectedPathModel;
 import dev.alexengrig.myfe.model.MyTextDocument;
 import dev.alexengrig.myfe.model.event.FeSelectedPathModelEvent;

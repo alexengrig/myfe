@@ -16,8 +16,8 @@
 
 package dev.alexengrig.myfe.view;
 
+import dev.alexengrig.myfe.domain.FePath;
 import dev.alexengrig.myfe.model.FeContentTableModel;
-import dev.alexengrig.myfe.model.FePath;
 import dev.alexengrig.myfe.util.swing.DelayedSingleTaskExecutor;
 import dev.alexengrig.myfe.view.event.DoNothingKeyListener;
 import dev.alexengrig.myfe.view.event.DoNothingMouseListener;

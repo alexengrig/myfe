@@ -16,6 +16,7 @@
 
 package dev.alexengrig.myfe.model;
 
+import dev.alexengrig.myfe.domain.FeDirectory;
 import dev.alexengrig.myfe.model.event.FeCurrentDirectoryModelEvent;
 import dev.alexengrig.myfe.model.event.FeCurrentDirectoryModelListener;
 import dev.alexengrig.myfe.util.FePathUtil;

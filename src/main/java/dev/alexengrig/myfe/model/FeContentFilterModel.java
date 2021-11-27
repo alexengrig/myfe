@@ -16,6 +16,7 @@
 
 package dev.alexengrig.myfe.model;
 
+import dev.alexengrig.myfe.domain.FePath;
 import dev.alexengrig.myfe.model.event.FeContentFilterModelEvent;
 import dev.alexengrig.myfe.model.event.FeContentFilterModelListener;
 import dev.alexengrig.myfe.util.FePathUtil;

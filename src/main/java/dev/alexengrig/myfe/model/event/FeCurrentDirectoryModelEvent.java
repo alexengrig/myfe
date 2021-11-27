@@ -16,7 +16,7 @@
 
 package dev.alexengrig.myfe.model.event;
 
-import dev.alexengrig.myfe.model.FeDirectory;
+import dev.alexengrig.myfe.domain.FeDirectory;
 
 public class FeCurrentDirectoryModelEvent {
 

@@ -16,7 +16,7 @@
 
 package dev.alexengrig.myfe.view;
 
-import dev.alexengrig.myfe.model.FeDirectory;
+import dev.alexengrig.myfe.domain.FeDirectory;
 import dev.alexengrig.myfe.model.FeDirectoryTreeModel;
 import dev.alexengrig.myfe.model.FeDirectoryTreeNode;
 import dev.alexengrig.myfe.model.RootTreeNode;

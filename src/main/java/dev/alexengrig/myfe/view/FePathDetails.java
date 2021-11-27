@@ -16,7 +16,7 @@
 
 package dev.alexengrig.myfe.view;
 
-import dev.alexengrig.myfe.model.FePath;
+import dev.alexengrig.myfe.domain.FePath;
 import dev.alexengrig.myfe.model.FeSelectedPathModel;
 import dev.alexengrig.myfe.util.FePathUtil;
 

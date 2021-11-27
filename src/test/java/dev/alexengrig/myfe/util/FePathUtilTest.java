@@ -17,9 +17,9 @@
 package dev.alexengrig.myfe.util;
 
 import dev.alexengrig.myfe.config.KnownExtensions;
-import dev.alexengrig.myfe.model.FeDirectory;
-import dev.alexengrig.myfe.model.FeFile;
-import dev.alexengrig.myfe.model.FePath;
+import dev.alexengrig.myfe.domain.FeDirectory;
+import dev.alexengrig.myfe.domain.FeFile;
+import dev.alexengrig.myfe.domain.FePath;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;

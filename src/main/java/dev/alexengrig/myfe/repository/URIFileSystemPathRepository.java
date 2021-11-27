@@ -17,8 +17,8 @@
 package dev.alexengrig.myfe.repository;
 
 import dev.alexengrig.myfe.converter.Converter;
-import dev.alexengrig.myfe.model.FeDirectory;
-import dev.alexengrig.myfe.model.FePath;
+import dev.alexengrig.myfe.domain.FeDirectory;
+import dev.alexengrig.myfe.domain.FePath;
 
 import java.io.IOException;
 import java.io.UncheckedIOException;

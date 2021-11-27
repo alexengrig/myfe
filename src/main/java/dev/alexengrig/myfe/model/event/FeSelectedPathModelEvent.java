@@ -16,7 +16,7 @@
 
 package dev.alexengrig.myfe.model.event;
 
-import dev.alexengrig.myfe.model.FePath;
+import dev.alexengrig.myfe.domain.FePath;
 
 /**
  * Event of {@link FeSelectedPathModelListener}.

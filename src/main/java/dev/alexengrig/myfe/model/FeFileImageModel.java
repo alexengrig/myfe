@@ -16,6 +16,7 @@
 
 package dev.alexengrig.myfe.model;
 
+import dev.alexengrig.myfe.domain.FeFile;
 import dev.alexengrig.myfe.model.event.FeFileImageModelEvent;
 import dev.alexengrig.myfe.model.event.FeFileImageModelListener;
 

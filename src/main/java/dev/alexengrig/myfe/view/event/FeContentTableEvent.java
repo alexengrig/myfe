@@ -16,7 +16,7 @@
 
 package dev.alexengrig.myfe.view.event;
 
-import dev.alexengrig.myfe.model.FePath;
+import dev.alexengrig.myfe.domain.FePath;
 
 public class FeContentTableEvent {
 

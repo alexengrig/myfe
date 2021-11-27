@@ -16,7 +16,7 @@
 
 package dev.alexengrig.myfe.view.event;
 
-import dev.alexengrig.myfe.model.FeFile;
+import dev.alexengrig.myfe.domain.FeFile;
 
 public class FeTabEvent {
 

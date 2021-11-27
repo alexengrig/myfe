@@ -16,6 +16,7 @@
 
 package dev.alexengrig.myfe.model;
 
+import dev.alexengrig.myfe.domain.FePath;
 import dev.alexengrig.myfe.model.event.FeSelectedPathModelEvent;
 import dev.alexengrig.myfe.model.event.FeSelectedPathModelListener;
 import org.slf4j.Logger;

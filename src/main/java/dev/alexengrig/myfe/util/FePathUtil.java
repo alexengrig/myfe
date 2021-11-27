@@ -17,9 +17,9 @@
 package dev.alexengrig.myfe.util;
 
 import dev.alexengrig.myfe.config.KnownExtensions;
-import dev.alexengrig.myfe.model.FeDirectory;
-import dev.alexengrig.myfe.model.FeFile;
-import dev.alexengrig.myfe.model.FePath;
+import dev.alexengrig.myfe.domain.FeDirectory;
+import dev.alexengrig.myfe.domain.FeFile;
+import dev.alexengrig.myfe.domain.FePath;
 
 import java.util.LinkedList;
 import java.util.List;

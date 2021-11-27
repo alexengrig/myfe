@@ -14,12 +14,12 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.model;
+package dev.alexengrig.myfe.domain;
 
 import java.util.Objects;
 
 /**
- * Abstraction of file/directory in data store (file system/ftp server etc.).
+ * An abstraction of file/directory in a data store (e.g. file system/ftp server).
  */
 public abstract class AbstractPath {
 

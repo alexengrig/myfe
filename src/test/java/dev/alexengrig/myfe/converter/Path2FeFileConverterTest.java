@@ -16,7 +16,7 @@
 
 package dev.alexengrig.myfe.converter;
 
-import dev.alexengrig.myfe.model.FeFile;
+import dev.alexengrig.myfe.domain.FeFile;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Path;

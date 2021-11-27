@@ -16,6 +16,7 @@
 
 package dev.alexengrig.myfe.model;
 
+import dev.alexengrig.myfe.domain.FeDirectory;
 import dev.alexengrig.myfe.util.FePathUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

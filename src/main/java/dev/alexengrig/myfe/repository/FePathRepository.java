@@ -16,8 +16,8 @@
 
 package dev.alexengrig.myfe.repository;
 
-import dev.alexengrig.myfe.model.FeDirectory;
-import dev.alexengrig.myfe.model.FePath;
+import dev.alexengrig.myfe.domain.FeDirectory;
+import dev.alexengrig.myfe.domain.FePath;
 
 import java.util.List;
 import java.util.stream.Stream;

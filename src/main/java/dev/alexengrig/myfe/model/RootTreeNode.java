@@ -16,6 +16,8 @@
 
 package dev.alexengrig.myfe.model;
 
+import dev.alexengrig.myfe.domain.FeDirectory;
+
 import javax.swing.tree.TreeNode;
 import java.util.Collections;
 import java.util.Enumeration;

@@ -16,9 +16,9 @@
 
 package dev.alexengrig.myfe.converter;
 
-import dev.alexengrig.myfe.model.FeDirectory;
-import dev.alexengrig.myfe.model.FeFile;
-import dev.alexengrig.myfe.model.FePath;
+import dev.alexengrig.myfe.domain.FeDirectory;
+import dev.alexengrig.myfe.domain.FeFile;
+import dev.alexengrig.myfe.domain.FePath;
 import dev.alexengrig.myfe.util.PathUtil;
 
 import java.nio.file.Path;

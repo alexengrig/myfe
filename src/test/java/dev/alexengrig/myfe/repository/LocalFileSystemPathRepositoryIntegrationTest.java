@@ -18,8 +18,8 @@ package dev.alexengrig.myfe.repository;
 
 import dev.alexengrig.myfe.converter.Path2FeDirectoryConverter;
 import dev.alexengrig.myfe.converter.Path2FePathConverter;
-import dev.alexengrig.myfe.model.FeDirectory;
-import dev.alexengrig.myfe.model.FePath;
+import dev.alexengrig.myfe.domain.FeDirectory;
+import dev.alexengrig.myfe.domain.FePath;
 import dev.alexengrig.myfe.util.PathUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
