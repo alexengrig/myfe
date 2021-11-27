@@ -42,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -59,6 +60,14 @@ class FileSystemPathRepositoryTest {
     @BeforeEach
     void beforeEach() {
         repository = new FileSystemPathRepository(fs, directoryConverter, pathConverter);
+    }
+
+    @Test
+    void should_close_fileSystem() throws Exception {
+        // run
+        repository.close();
+        // check
+        verify(fs).close();
     }
 
     @Test
@@ -118,6 +127,7 @@ class FileSystemPathRepositoryTest {
         String expectedBatch = "So few";
         when(channel.read(any(ByteBuffer.class))).then(invocation -> {
             ByteBuffer buffer = invocation.getArgument(0, ByteBuffer.class);
+            buffer.clear();
             byte[] bytes = expectedBatch.getBytes(StandardCharsets.UTF_8);
             buffer.put(bytes);
             return bytes.length;
