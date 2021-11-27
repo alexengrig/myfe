@@ -178,8 +178,8 @@ public class FileSystemPathRepository implements FePathRepository {
         private final ByteBuffer buffer;
         private final int maxNumberOfBatches;
 
-        int numberOfBatches = 0;
-        String nextBatch = null;
+        private int numberOfBatches = 0;
+        private String nextBatch = null;
 
         public ChannelIterator(ReadableByteChannel channel, ByteBuffer buffer, int maxNumberOfBatches) {
             this.channel = channel;
@@ -189,7 +189,7 @@ public class FileSystemPathRepository implements FePathRepository {
 
         private String readBatch() {
             try {
-                int count = channel.read(buffer);
+                int count = channel.read(buffer.clear());
                 if (count != -1 && numberOfBatches++ < maxNumberOfBatches) {
                     return StandardCharsets.UTF_8.decode(buffer.flip()).toString();
                 }
