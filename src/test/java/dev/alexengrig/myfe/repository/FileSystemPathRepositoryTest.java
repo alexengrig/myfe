@@ -127,7 +127,6 @@ class FileSystemPathRepositoryTest {
         String expectedBatch = "So few";
         when(channel.read(any(ByteBuffer.class))).then(invocation -> {
             ByteBuffer buffer = invocation.getArgument(0, ByteBuffer.class);
-            buffer.clear();
             byte[] bytes = expectedBatch.getBytes(StandardCharsets.UTF_8);
             buffer.put(bytes);
             return bytes.length;
@@ -150,7 +149,6 @@ class FileSystemPathRepositoryTest {
         String batch = "on-repeat";
         when(channel.read(any(ByteBuffer.class))).then(invocation -> {
             ByteBuffer buffer = invocation.getArgument(0, ByteBuffer.class);
-            buffer.clear();
             byte[] bytes = batch.getBytes(StandardCharsets.UTF_8);
             buffer.put(bytes);
             return bytes.length;
