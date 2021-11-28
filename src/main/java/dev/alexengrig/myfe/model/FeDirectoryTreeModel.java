@@ -17,6 +17,8 @@
 package dev.alexengrig.myfe.model;
 
 import dev.alexengrig.myfe.domain.FeDirectory;
+import dev.alexengrig.myfe.domain.FeDirectoryTreeNode;
+import dev.alexengrig.myfe.domain.RootTreeNode;
 import dev.alexengrig.myfe.model.event.FeDirectoryTreeModelEvent;
 import dev.alexengrig.myfe.model.event.FeDirectoryTreeModelListener;
 import dev.alexengrig.myfe.util.FePathUtil;

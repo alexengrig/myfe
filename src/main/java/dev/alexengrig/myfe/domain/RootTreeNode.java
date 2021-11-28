@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.model;
-
-import dev.alexengrig.myfe.domain.FeDirectory;
+package dev.alexengrig.myfe.domain;
 
 import javax.swing.tree.TreeNode;
 import java.util.Collections;

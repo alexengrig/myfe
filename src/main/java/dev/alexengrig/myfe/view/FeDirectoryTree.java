@@ -17,9 +17,9 @@
 package dev.alexengrig.myfe.view;
 
 import dev.alexengrig.myfe.domain.FeDirectory;
+import dev.alexengrig.myfe.domain.FeDirectoryTreeNode;
+import dev.alexengrig.myfe.domain.RootTreeNode;
 import dev.alexengrig.myfe.model.FeDirectoryTreeModel;
-import dev.alexengrig.myfe.model.FeDirectoryTreeNode;
-import dev.alexengrig.myfe.model.RootTreeNode;
 import dev.alexengrig.myfe.service.DirectoryTreeBackgroundService;
 import dev.alexengrig.myfe.view.event.DoNothingKeyListener;
 import dev.alexengrig.myfe.view.event.DoNothingMouseListener;

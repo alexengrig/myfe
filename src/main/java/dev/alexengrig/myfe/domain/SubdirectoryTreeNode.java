@@ -14,24 +14,22 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.model;
-
-import dev.alexengrig.myfe.domain.FeDirectory;
+package dev.alexengrig.myfe.domain;
 
 import javax.swing.tree.TreeNode;
 import java.util.function.Function;
 
-public class RootDirectoryTreeNode extends FeDirectoryTreeNode {
+public class SubdirectoryTreeNode extends FeDirectoryTreeNode {
 
-    private final RootTreeNode parent;
+    private final FeDirectoryTreeNode parent;
 
-    public RootDirectoryTreeNode(RootTreeNode parent, FeDirectory directory) {
+    public SubdirectoryTreeNode(FeDirectoryTreeNode parent, FeDirectory directory) {
         super(directory);
         this.parent = parent;
     }
 
-    public static Function<FeDirectory, RootDirectoryTreeNode> factory(RootTreeNode parent) {
-        return directory -> new RootDirectoryTreeNode(parent, directory);
+    public static Function<FeDirectory, SubdirectoryTreeNode> factory(FeDirectoryTreeNode parent) {
+        return directory -> new SubdirectoryTreeNode(parent, directory);
     }
 
     @Override
