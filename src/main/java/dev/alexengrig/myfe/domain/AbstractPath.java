@@ -21,7 +21,7 @@ import java.util.Objects;
 /**
  * An abstraction of file/directory in a data store (e.g. file system/ftp server).
  */
-public abstract class AbstractPath {
+abstract class AbstractPath {
 
     private final String path;
     private final String name;
