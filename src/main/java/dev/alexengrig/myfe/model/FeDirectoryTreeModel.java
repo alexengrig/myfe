@@ -17,16 +17,15 @@
 package dev.alexengrig.myfe.model;
 
 import dev.alexengrig.myfe.domain.FeDirectory;
+import dev.alexengrig.myfe.model.event.FeDirectoryTreeModelEvent;
+import dev.alexengrig.myfe.model.event.FeDirectoryTreeModelListener;
 import dev.alexengrig.myfe.util.FePathUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import dev.alexengrig.myfe.util.event.EventListenerGroup;
 
-import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
-import java.lang.invoke.MethodHandles;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.List;
@@ -37,9 +36,7 @@ import java.util.Optional;
  */
 public class FeDirectoryTreeModel implements TreeModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
-    private final List<TreeModelListener> listeners = new LinkedList<>();
+    private final EventListenerGroup<FeDirectoryTreeModelListener, FeDirectoryTreeModelEvent> listenerGroup = new EventListenerGroup<>();
 
     private final RootTreeNode root;
 
@@ -63,12 +60,12 @@ public class FeDirectoryTreeModel implements TreeModel {
 
     public void setRootDirectories(List<FeDirectory> rootDirectories) {
         root.setChildren(rootDirectories);
-        fireTreeStructureChanged(new TreeModelEvent(this, getPath(root)));
+        listenerGroup.fire(FeDirectoryTreeModelEvent.structureChanged(this, getPath(root)));
     }
 
     public void setSubdirectories(FeDirectoryTreeNode parent, List<FeDirectory> subdirectories) {
         parent.setChildren(subdirectories);
-        fireTreeStructureChanged(new TreeModelEvent(this, getPath(parent), null, null));
+        listenerGroup.fire(FeDirectoryTreeModelEvent.structureChanged(this, getPath(parent)));
     }
 
     public void setSubdirectories(FeDirectory directory, List<FeDirectory> subdirectories) {
@@ -149,19 +146,12 @@ public class FeDirectoryTreeModel implements TreeModel {
 
     @Override
     public void addTreeModelListener(TreeModelListener l) {
-        listeners.add(l);
+        listenerGroup.add(FeDirectoryTreeModelListener.wrap(l));
     }
 
     @Override
     public void removeTreeModelListener(TreeModelListener l) {
-        listeners.remove(l);
-    }
-
-    private void fireTreeStructureChanged(TreeModelEvent event) {
-        LOGGER.debug("Fire tree structure changed: {}", event);
-        for (TreeModelListener listener : listeners) {
-            listener.treeStructureChanged(event);
-        }
+        listenerGroup.remove(FeDirectoryTreeModelListener.wrap(l));
     }
 
 }

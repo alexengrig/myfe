@@ -16,14 +16,29 @@
 
 package dev.alexengrig.myfe.model.event;
 
-public class LookAndFeelModelEvent {
+import dev.alexengrig.myfe.util.event.Event;
 
+/**
+ * Event of {@link LookAndFeelModelListener}.
+ */
+public class LookAndFeelModelEvent implements Event {
+
+    private final Type type;
     private final String name;
     private final String className;
 
-    public LookAndFeelModelEvent(String name, String className) {
+    private LookAndFeelModelEvent(Type type, String name, String className) {
+        this.type = type;
         this.name = name;
         this.className = className;
+    }
+
+    public static LookAndFeelModelEvent change(String name, String className) {
+        return new LookAndFeelModelEvent(Type.CHANGE, name, className);
+    }
+
+    protected Type getType() {
+        return type;
     }
 
     public String getName() {
@@ -32,6 +47,19 @@ public class LookAndFeelModelEvent {
 
     public String getClassName() {
         return className;
+    }
+
+    @Override
+    public String toString() {
+        return "LookAndFeelModelEvent{" +
+                "type=" + type +
+                ", name='" + name + '\'' +
+                ", className='" + className + '\'' +
+                '}';
+    }
+
+    protected enum Type {
+        CHANGE
     }
 
 }

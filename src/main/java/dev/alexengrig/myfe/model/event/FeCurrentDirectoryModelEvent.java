@@ -17,25 +17,35 @@
 package dev.alexengrig.myfe.model.event;
 
 import dev.alexengrig.myfe.domain.FeDirectory;
+import dev.alexengrig.myfe.util.event.Event;
 
-public class FeCurrentDirectoryModelEvent {
+/**
+ * Event of {@link FeCurrentDirectoryModelListener}.
+ */
+public class FeCurrentDirectoryModelEvent implements Event {
 
+    private final Type type;
     private final FeDirectory directory;
 
-    private FeCurrentDirectoryModelEvent(FeDirectory directory) {
+    private FeCurrentDirectoryModelEvent(Type type, FeDirectory directory) {
+        this.type = type;
         this.directory = directory;
     }
 
     public static FeCurrentDirectoryModelEvent root() {
-        return new FeCurrentDirectoryModelEvent(null);
+        return new FeCurrentDirectoryModelEvent(Type.GO_TO_ROOT, null);
     }
 
     public static FeCurrentDirectoryModelEvent directory(FeDirectory directory) {
-        return new FeCurrentDirectoryModelEvent(directory);
+        return new FeCurrentDirectoryModelEvent(Type.GO_TO_DIRECTORY, directory);
     }
 
     public static FeCurrentDirectoryModelEvent refreshing() {
-        return new FeCurrentDirectoryModelEvent(null);
+        return new FeCurrentDirectoryModelEvent(Type.REFRESH, null);
+    }
+
+    protected Type getType() {
+        return type;
     }
 
     public FeDirectory getDirectory() {
@@ -45,8 +55,15 @@ public class FeCurrentDirectoryModelEvent {
     @Override
     public String toString() {
         return "FeCurrentDirectoryModelEvent{" +
-                "directory=" + directory +
+                "type=" + type +
+                ", directory=" + directory +
                 '}';
+    }
+
+    protected enum Type {
+        GO_TO_ROOT,
+        GO_TO_DIRECTORY,
+        REFRESH
     }
 
 }

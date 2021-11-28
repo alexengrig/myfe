@@ -17,15 +17,31 @@
 package dev.alexengrig.myfe.model.event;
 
 import dev.alexengrig.myfe.domain.FeFile;
+import dev.alexengrig.myfe.util.event.Event;
 
-public class FeFileImageModelEvent {
+import java.util.Arrays;
 
+/**
+ * Event of {@link FeFileImageModelListener}.
+ */
+public class FeFileImageModelEvent implements Event {
+
+    private final Type type;
     private final FeFile file;
     private final byte[] data;
 
-    public FeFileImageModelEvent(FeFile file, byte[] data) {
+    private FeFileImageModelEvent(Type type, FeFile file, byte[] data) {
+        this.type = type;
         this.file = file;
         this.data = data;
+    }
+
+    public static FeFileImageModelEvent changeFile(FeFile file, byte[] data) {
+        return new FeFileImageModelEvent(Type.CHANGE_FILE, file, data);
+    }
+
+    protected Type getType() {
+        return type;
     }
 
     public FeFile getFile() {
@@ -34,6 +50,19 @@ public class FeFileImageModelEvent {
 
     public byte[] getData() {
         return data;
+    }
+
+    @Override
+    public String toString() {
+        return "FeFileImageModelEvent{" +
+                "type=" + type +
+                ", file=" + file +
+                ", data=" + Arrays.toString(data) +
+                '}';
+    }
+
+    protected enum Type {
+        CHANGE_FILE
     }
 
 }

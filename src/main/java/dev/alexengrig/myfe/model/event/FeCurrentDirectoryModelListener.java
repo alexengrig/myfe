@@ -16,9 +16,31 @@
 
 package dev.alexengrig.myfe.model.event;
 
-import java.util.EventListener;
 
-public interface FeCurrentDirectoryModelListener extends EventListener {
+import dev.alexengrig.myfe.util.event.EventListener;
+import dev.alexengrig.myfe.util.event.UnknownEventException;
+
+/**
+ * Event listener of {@link FeCurrentDirectoryModelEvent}.
+ */
+public interface FeCurrentDirectoryModelListener extends EventListener<FeCurrentDirectoryModelEvent> {
+
+    @Override
+    default void notify(FeCurrentDirectoryModelEvent event) {
+        switch (event.getType()) {
+            case GO_TO_ROOT:
+                goToRoot(event);
+                break;
+            case GO_TO_DIRECTORY:
+                goToDirectory(event);
+                break;
+            case REFRESH:
+                refresh(event);
+                break;
+            default:
+                throw new UnknownEventException(event);
+        }
+    }
 
     void goToRoot(FeCurrentDirectoryModelEvent event);
 

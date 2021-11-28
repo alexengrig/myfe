@@ -16,27 +16,35 @@
 
 package dev.alexengrig.myfe.model.event;
 
+import dev.alexengrig.myfe.util.event.Event;
+
 import java.util.List;
 
 /**
  * Event of {@link FeFooterModelListener}.
  */
-public class FeFooterModelEvent {
+public class FeFooterModelEvent implements Event {
 
+    private final Type type;
     private final Integer numberOfElements;
     private final List<String> tasks;
 
-    public FeFooterModelEvent(Integer numberOfElements, List<String> tasks) {
+    public FeFooterModelEvent(Type type, Integer numberOfElements, List<String> tasks) {
+        this.type = type;
         this.numberOfElements = numberOfElements;
         this.tasks = tasks;
     }
 
-    public static FeFooterModelEvent numberOfElements(int numberOfElements) {
-        return new FeFooterModelEvent(numberOfElements, null);
+    public static FeFooterModelEvent changeNumberOfElements(int numberOfElements) {
+        return new FeFooterModelEvent(Type.CHANGE_NUMBER_OF_ELEMENTS, numberOfElements, null);
     }
 
-    public static FeFooterModelEvent tasks(List<String> tasks) {
-        return new FeFooterModelEvent(null, tasks);
+    public static FeFooterModelEvent changeTasks(List<String> tasks) {
+        return new FeFooterModelEvent(Type.CHANGE_TASKS, null, tasks);
+    }
+
+    protected Type getType() {
+        return type;
     }
 
     public Integer getNumberOfElements() {
@@ -50,9 +58,15 @@ public class FeFooterModelEvent {
     @Override
     public String toString() {
         return "FeFooterModelEvent{" +
-                "numberOfElements=" + numberOfElements +
+                "type=" + type +
+                ", numberOfElements=" + numberOfElements +
                 ", tasks=" + tasks +
                 '}';
+    }
+
+    protected enum Type {
+        CHANGE_NUMBER_OF_ELEMENTS,
+        CHANGE_TASKS
     }
 
 }

@@ -20,20 +20,15 @@ import dev.alexengrig.myfe.domain.FeDirectory;
 import dev.alexengrig.myfe.model.event.FeCurrentDirectoryModelEvent;
 import dev.alexengrig.myfe.model.event.FeCurrentDirectoryModelListener;
 import dev.alexengrig.myfe.util.FePathUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import dev.alexengrig.myfe.util.event.EventListenerGroup;
 
-import java.lang.invoke.MethodHandles;
 import java.util.Deque;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
 
 public class FeCurrentDirectoryModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
-    private final List<FeCurrentDirectoryModelListener> listeners = new LinkedList<>();
+    private final EventListenerGroup<FeCurrentDirectoryModelListener, FeCurrentDirectoryModelEvent> listenerGroup = new EventListenerGroup<>();
 
     /**
      * Current directory on the top; {@code null} - the root.
@@ -73,7 +68,7 @@ public class FeCurrentDirectoryModel {
             if (!forwardStack.isEmpty()) {
                 forwardStack.clear();
             }
-            fireGoToDirectory(FeCurrentDirectoryModelEvent.directory(directory));
+            listenerGroup.fire(FeCurrentDirectoryModelEvent.directory(directory));
         }
     }
 
@@ -83,7 +78,7 @@ public class FeCurrentDirectoryModel {
             if (!forwardStack.isEmpty()) {
                 forwardStack.clear();
             }
-            fireGoToRoot(FeCurrentDirectoryModelEvent.root());
+            listenerGroup.fire(FeCurrentDirectoryModelEvent.root());
         }
     }
 
@@ -95,9 +90,9 @@ public class FeCurrentDirectoryModel {
         forwardStack.push(currentDirectory);
         FeDirectory previousDirectory = getCurrentDirectory();
         if (previousDirectory == null) {
-            fireGoToRoot(FeCurrentDirectoryModelEvent.root());
+            listenerGroup.fire(FeCurrentDirectoryModelEvent.root());
         } else {
-            fireGoToDirectory(FeCurrentDirectoryModelEvent.directory(previousDirectory));
+            listenerGroup.fire(FeCurrentDirectoryModelEvent.directory(previousDirectory));
         }
     }
 
@@ -108,9 +103,9 @@ public class FeCurrentDirectoryModel {
         FeDirectory nextDirectory = forwardStack.poll();
         backStack.push(nextDirectory);
         if (nextDirectory == null) {
-            fireGoToRoot(FeCurrentDirectoryModelEvent.root());
+            listenerGroup.fire(FeCurrentDirectoryModelEvent.root());
         } else {
-            fireGoToDirectory(FeCurrentDirectoryModelEvent.directory(nextDirectory));
+            listenerGroup.fire(FeCurrentDirectoryModelEvent.directory(nextDirectory));
         }
     }
 
@@ -125,43 +120,22 @@ public class FeCurrentDirectoryModel {
             forwardStack.clear();
         }
         if (parentDirectory == null) {
-            fireGoToRoot(FeCurrentDirectoryModelEvent.root());
+            listenerGroup.fire(FeCurrentDirectoryModelEvent.root());
         } else {
-            fireGoToDirectory(FeCurrentDirectoryModelEvent.directory(parentDirectory));
+            listenerGroup.fire(FeCurrentDirectoryModelEvent.directory(parentDirectory));
         }
     }
 
     public void update() {
-        fireRefresh(FeCurrentDirectoryModelEvent.refreshing());
+        listenerGroup.fire(FeCurrentDirectoryModelEvent.refreshing());
     }
 
     public void addFeCurrentDirectoryModelListener(FeCurrentDirectoryModelListener listener) {
-        listeners.add(listener);
+        listenerGroup.add(listener);
     }
 
     public void removeFeCurrentDirectoryModelListener(FeCurrentDirectoryModelListener listener) {
-        listeners.remove(listener);
-    }
-
-    private void fireGoToRoot(FeCurrentDirectoryModelEvent event) {
-        LOGGER.debug("Fire go to root: {}", event);
-        for (FeCurrentDirectoryModelListener listener : listeners) {
-            listener.goToRoot(event);
-        }
-    }
-
-    private void fireGoToDirectory(FeCurrentDirectoryModelEvent event) {
-        LOGGER.debug("Fire go to directory: {}", event);
-        for (FeCurrentDirectoryModelListener listener : listeners) {
-            listener.goToDirectory(event);
-        }
-    }
-
-    private void fireRefresh(FeCurrentDirectoryModelEvent event) {
-        LOGGER.debug("Fire refresh: {}", event);
-        for (FeCurrentDirectoryModelListener listener : listeners) {
-            listener.refresh(event);
-        }
+        listenerGroup.remove(listener);
     }
 
 }

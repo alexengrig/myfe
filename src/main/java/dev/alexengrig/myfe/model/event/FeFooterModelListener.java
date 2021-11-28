@@ -16,12 +16,27 @@
 
 package dev.alexengrig.myfe.model.event;
 
-import java.util.EventListener;
+import dev.alexengrig.myfe.util.event.EventListener;
+import dev.alexengrig.myfe.util.event.UnknownEventException;
 
 /**
  * Event listener of {@link dev.alexengrig.myfe.model.FeFooterModel}.
  */
-public interface FeFooterModelListener extends EventListener {
+public interface FeFooterModelListener extends EventListener<FeFooterModelEvent> {
+
+    @Override
+    default void notify(FeFooterModelEvent event) {
+        switch (event.getType()) {
+            case CHANGE_TASKS:
+                changeTasks(event);
+                break;
+            case CHANGE_NUMBER_OF_ELEMENTS:
+                changeNumberOfElements(event);
+                break;
+            default:
+                throw new UnknownEventException(event);
+        }
+    }
 
     void changeTasks(FeFooterModelEvent event);
 

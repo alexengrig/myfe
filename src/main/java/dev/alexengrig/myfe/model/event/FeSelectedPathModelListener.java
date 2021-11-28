@@ -17,13 +17,22 @@
 package dev.alexengrig.myfe.model.event;
 
 import dev.alexengrig.myfe.model.FeSelectedPathModel;
-
-import java.util.EventListener;
+import dev.alexengrig.myfe.util.event.EventListener;
+import dev.alexengrig.myfe.util.event.UnknownEventException;
 
 /**
  * Event listener of {@link FeSelectedPathModel}.
  */
-public interface FeSelectedPathModelListener extends EventListener {
+public interface FeSelectedPathModelListener extends EventListener<FeSelectedPathModelEvent> {
+
+    @Override
+    default void notify(FeSelectedPathModelEvent event) {
+        if (event.getType() == FeSelectedPathModelEvent.Type.CHANGE_PATH) {
+            changePath(event);
+        } else {
+            throw new UnknownEventException(event);
+        }
+    }
 
     void changePath(FeSelectedPathModelEvent event);
 

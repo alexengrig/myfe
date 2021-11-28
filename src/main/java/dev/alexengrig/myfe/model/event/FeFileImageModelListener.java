@@ -16,9 +16,22 @@
 
 package dev.alexengrig.myfe.model.event;
 
-import java.util.EventListener;
+import dev.alexengrig.myfe.util.event.EventListener;
+import dev.alexengrig.myfe.util.event.UnknownEventException;
 
-public interface FeFileImageModelListener extends EventListener {
+/**
+ * Event listener of {@link FeFileImageModelEvent}.
+ */
+public interface FeFileImageModelListener extends EventListener<FeFileImageModelEvent> {
+
+    @Override
+    default void notify(FeFileImageModelEvent event) {
+        if (event.getType() == FeFileImageModelEvent.Type.CHANGE_FILE) {
+            changeFile(event);
+        } else {
+            throw new UnknownEventException(event);
+        }
+    }
 
     void changeFile(FeFileImageModelEvent event);
 

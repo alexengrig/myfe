@@ -20,12 +20,9 @@ import dev.alexengrig.myfe.domain.FePath;
 import dev.alexengrig.myfe.model.event.FeContentFilterModelEvent;
 import dev.alexengrig.myfe.model.event.FeContentFilterModelListener;
 import dev.alexengrig.myfe.util.FePathUtil;
+import dev.alexengrig.myfe.util.event.EventListenerGroup;
 import dev.alexengrig.myfe.view.FeContentFilter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.lang.invoke.MethodHandles;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,9 +33,7 @@ import java.util.stream.Collectors;
  */
 public class FeContentFilterModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
-    private final List<FeContentFilterModelListener> listeners = new LinkedList<>();
+    private final EventListenerGroup<FeContentFilterModelListener, FeContentFilterModelEvent> listenerGroup = new EventListenerGroup<>();
 
     private List<String> types;
 
@@ -65,22 +60,15 @@ public class FeContentFilterModel {
 
     public void setTypes(List<String> types) {
         this.types = types;
-        fireChangeTypes(new FeContentFilterModelEvent(types));
+        listenerGroup.fire(FeContentFilterModelEvent.changeTypes(types));
     }
 
     public void addFeContentFilterModelListener(FeContentFilterModelListener listener) {
-        listeners.add(listener);
+        listenerGroup.add(listener);
     }
 
     public void removeFeContentFilterModelListener(FeContentFilterModelListener listener) {
-        listeners.remove(listener);
-    }
-
-    private void fireChangeTypes(FeContentFilterModelEvent event) {
-        LOGGER.debug("Fire change types: {}", event);
-        for (FeContentFilterModelListener listener : listeners) {
-            listener.changeTypes(event);
-        }
+        listenerGroup.remove(listener);
     }
 
 }

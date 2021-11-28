@@ -21,11 +21,10 @@ import com.formdev.flatlaf.intellijthemes.FlatDraculaIJTheme;
 import com.formdev.flatlaf.intellijthemes.FlatLightFlatIJTheme;
 import dev.alexengrig.myfe.model.event.LookAndFeelModelEvent;
 import dev.alexengrig.myfe.model.event.LookAndFeelModelListener;
+import dev.alexengrig.myfe.util.event.EventListenerGroup;
 
 import javax.swing.*;
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.SortedSet;
@@ -45,7 +44,7 @@ public class LookAndFeelModel {
         LAF_CLASS_NAME_BY_NAME = new TreeMap<>(laf);
     }
 
-    private final List<LookAndFeelModelListener> listeners = new LinkedList<>();
+    private final EventListenerGroup<LookAndFeelModelListener, LookAndFeelModelEvent> listenerGroup = new EventListenerGroup<>();
 
     private String currentClassName;
     private String currentName;
@@ -79,22 +78,16 @@ public class LookAndFeelModel {
         if (!Objects.equals(currentName, name)) {
             currentName = name;
             currentClassName = LAF_CLASS_NAME_BY_NAME.get(name);
-            fireChange(new LookAndFeelModelEvent(currentName, currentClassName));
+            listenerGroup.fire(LookAndFeelModelEvent.change(currentName, currentClassName));
         }
     }
 
     public void addLookAndFeelModelListener(LookAndFeelModelListener listener) {
-        listeners.add(listener);
+        listenerGroup.add(listener);
     }
 
     public void removeLookAndFeelModelListener(LookAndFeelModelListener listener) {
-        listeners.remove(listener);
-    }
-
-    private void fireChange(LookAndFeelModelEvent event) {
-        for (LookAndFeelModelListener listener : listeners) {
-            listener.change(event);
-        }
+        listenerGroup.remove(listener);
     }
 
 }

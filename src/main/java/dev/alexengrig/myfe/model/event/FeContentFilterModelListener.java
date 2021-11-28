@@ -16,12 +16,22 @@
 
 package dev.alexengrig.myfe.model.event;
 
-import java.util.EventListener;
+import dev.alexengrig.myfe.util.event.EventListener;
+import dev.alexengrig.myfe.util.event.UnknownEventException;
 
 /**
  * Event listener of {@link dev.alexengrig.myfe.model.FeContentFilterModel}.
  */
-public interface FeContentFilterModelListener extends EventListener {
+public interface FeContentFilterModelListener extends EventListener<FeContentFilterModelEvent> {
+
+    @Override
+    default void notify(FeContentFilterModelEvent event) {
+        if (event.getType() == FeContentFilterModelEvent.Type.CHANGE_TYPES) {
+            changeTypes(event);
+        } else {
+            throw new UnknownEventException(event);
+        }
+    }
 
     void changeTypes(FeContentFilterModelEvent event);
 

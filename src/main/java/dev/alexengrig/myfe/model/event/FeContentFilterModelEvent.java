@@ -16,17 +16,29 @@
 
 package dev.alexengrig.myfe.model.event;
 
+import dev.alexengrig.myfe.util.event.Event;
+
 import java.util.List;
 
 /**
  * Event of {@link FeContentFilterModelListener}.
  */
-public class FeContentFilterModelEvent {
+public class FeContentFilterModelEvent implements Event {
 
+    private final Type type;
     private final List<String> types;
 
-    public FeContentFilterModelEvent(List<String> types) {
+    private FeContentFilterModelEvent(Type type, List<String> types) {
+        this.type = type;
         this.types = types;
+    }
+
+    public static FeContentFilterModelEvent changeTypes(List<String> types) {
+        return new FeContentFilterModelEvent(Type.CHANGE_TYPES, types);
+    }
+
+    protected Type getType() {
+        return type;
     }
 
     public List<String> getTypes() {
@@ -35,9 +47,14 @@ public class FeContentFilterModelEvent {
 
     @Override
     public String toString() {
-        return "MyPathFilterModelEvent{" +
-                "types=" + types +
+        return "FeContentFilterModelEvent{" +
+                "type=" + type +
+                ", types=" + types +
                 '}';
+    }
+
+    protected enum Type {
+        CHANGE_TYPES
     }
 
 }

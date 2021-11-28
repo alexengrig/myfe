@@ -16,9 +16,22 @@
 
 package dev.alexengrig.myfe.model.event;
 
-import java.util.EventListener;
+import dev.alexengrig.myfe.util.event.EventListener;
+import dev.alexengrig.myfe.util.event.UnknownEventException;
 
-public interface LookAndFeelModelListener extends EventListener {
+/**
+ * Event listener of {@link LookAndFeelModelEvent}.
+ */
+public interface LookAndFeelModelListener extends EventListener<LookAndFeelModelEvent> {
+
+    @Override
+    default void notify(LookAndFeelModelEvent event) {
+        if (event.getType() == LookAndFeelModelEvent.Type.CHANGE) {
+            change(event);
+        } else {
+            throw new UnknownEventException(event);
+        }
+    }
 
     void change(LookAndFeelModelEvent event);
 

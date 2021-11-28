@@ -16,44 +16,48 @@
 
 package dev.alexengrig.myfe.model.event;
 
-import dev.alexengrig.myfe.domain.FePath;
 import dev.alexengrig.myfe.util.event.Event;
 
+import javax.swing.event.TreeModelEvent;
+import javax.swing.tree.TreePath;
+import java.util.Arrays;
+
 /**
- * Event of {@link FeSelectedPathModelListener}.
+ * Event of {@link FeDirectoryTreeModelListener}.
  */
-public class FeSelectedPathModelEvent implements Event {
+public class FeDirectoryTreeModelEvent extends TreeModelEvent implements Event {
 
     private final Type type;
-    private final FePath path;
 
-    private FeSelectedPathModelEvent(Type type, FePath path) {
+    private FeDirectoryTreeModelEvent(Type type, Object source, TreePath path) {
+        super(source, path, null, null);
         this.type = type;
-        this.path = path;
     }
 
-    public static FeSelectedPathModelEvent changePath(FePath path) {
-        return new FeSelectedPathModelEvent(Type.CHANGE_PATH, path);
+    public static FeDirectoryTreeModelEvent structureChanged(Object source, TreePath path) {
+        return new FeDirectoryTreeModelEvent(Type.STRUCTURE_CHANGED, source, path);
     }
 
     protected Type getType() {
         return type;
     }
 
-    public FePath getPath() {
-        return path;
-    }
-
     @Override
     public String toString() {
-        return "FeSelectedPathModelEvent{" +
+        return "FeDirectoryTreeModelEvent{" +
                 "type=" + type +
                 ", path=" + path +
+                ", childIndices=" + Arrays.toString(childIndices) +
+                ", children=" + Arrays.toString(children) +
+                ", source=" + source +
                 '}';
     }
 
     protected enum Type {
-        CHANGE_PATH
+        NODES_CHANGED,
+        NODES_INSERTED,
+        NODES_REMOVED,
+        STRUCTURE_CHANGED
     }
 
 }

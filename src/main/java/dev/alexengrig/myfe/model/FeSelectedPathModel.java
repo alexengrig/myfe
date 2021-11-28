@@ -19,12 +19,8 @@ package dev.alexengrig.myfe.model;
 import dev.alexengrig.myfe.domain.FePath;
 import dev.alexengrig.myfe.model.event.FeSelectedPathModelEvent;
 import dev.alexengrig.myfe.model.event.FeSelectedPathModelListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import dev.alexengrig.myfe.util.event.EventListenerGroup;
 
-import java.lang.invoke.MethodHandles;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -32,9 +28,7 @@ import java.util.Objects;
  */
 public class FeSelectedPathModel {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
-    private final List<FeSelectedPathModelListener> listeners = new LinkedList<>();
+    private final EventListenerGroup<FeSelectedPathModelListener, FeSelectedPathModelEvent> listenerGroup = new EventListenerGroup<>();
 
     private FePath path;
 
@@ -49,30 +43,16 @@ public class FeSelectedPathModel {
     public void setPath(FePath path) {
         if (!Objects.equals(this.path, path)) {
             this.path = path;
-            fireChangePath(new FeSelectedPathModelEvent(path));
+            listenerGroup.fire(FeSelectedPathModelEvent.changePath(path));
         }
     }
 
     public void addSelectedFePathModelListener(FeSelectedPathModelListener listener) {
-        listeners.add(listener);
+        listenerGroup.add(listener);
     }
 
     public void removeSelectedFePathModelListener(FeSelectedPathModelListener listener) {
-        listeners.remove(listener);
-    }
-
-    private void fireChangePath(FeSelectedPathModelEvent event) {
-        LOGGER.debug("Fire change path: {}", event);
-        for (FeSelectedPathModelListener listener : listeners) {
-            listener.changePath(event);
-        }
-    }
-
-    @Override
-    public String toString() {
-        return "SelectedFePathModel{" +
-                "path=" + path +
-                '}';
+        listenerGroup.remove(listener);
     }
 
 }

@@ -19,36 +19,29 @@ package dev.alexengrig.myfe.model;
 import dev.alexengrig.myfe.domain.FeFile;
 import dev.alexengrig.myfe.model.event.FeFileImageModelEvent;
 import dev.alexengrig.myfe.model.event.FeFileImageModelListener;
+import dev.alexengrig.myfe.util.event.EventListenerGroup;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
 
 public class FeFileImageModel {
 
-    private final List<FeFileImageModelListener> listeners = new LinkedList<>();
+    private final EventListenerGroup<FeFileImageModelListener, FeFileImageModelEvent> listenerGroup = new EventListenerGroup<>();
 
     private FeFile file;
 
     public void setFileData(FeFile file, byte[] data) {
         if (!Objects.equals(this.file, file)) {
             this.file = file;
-            fireChangeFile(new FeFileImageModelEvent(file, data));
+            listenerGroup.fire(FeFileImageModelEvent.changeFile(file, data));
         }
     }
 
     public void addFeFileImageModelListener(FeFileImageModelListener listener) {
-        listeners.add(listener);
+        listenerGroup.add(listener);
     }
 
     public void removeFeFileImageModelListener(FeFileImageModelListener listener) {
-        listeners.remove(listener);
-    }
-
-    private void fireChangeFile(FeFileImageModelEvent event) {
-        for (FeFileImageModelListener listener : listeners) {
-            listener.changeFile(event);
-        }
+        listenerGroup.remove(listener);
     }
 
 }
