@@ -78,7 +78,7 @@ public class FeDirectoryTreeModel implements TreeModel {
     /**
      * Find the node with given directory. Stop on not loaded node.
      */
-    //TODO: Improve it
+    //TODO: Improve it - Map: name -> node
     private Optional<FeDirectoryTreeNode> findLoadedDirectoryNode(FeDirectory directory) {
         String[] names = FePathUtil.splitByNames(directory);
         if (names.length == 0) {
