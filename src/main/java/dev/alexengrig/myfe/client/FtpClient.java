@@ -16,71 +16,31 @@
 
 package dev.alexengrig.myfe.client;
 
-import dev.alexengrig.myfe.converter.ContextFTPFile2FtpDirectoryConverter;
-import dev.alexengrig.myfe.converter.ContextFTPFile2FtpFileConverter;
-import dev.alexengrig.myfe.converter.ContextFTPFile2FtpPathConverter;
-import dev.alexengrig.myfe.converter.Converter;
-import dev.alexengrig.myfe.domain.ContextFTPFile;
 import dev.alexengrig.myfe.domain.FtpDirectory;
-import dev.alexengrig.myfe.domain.FtpFile;
 import dev.alexengrig.myfe.domain.FtpPath;
-import org.apache.commons.net.ftp.FTPClient;
-import org.apache.commons.net.ftp.FTPFile;
 
 import java.io.IOException;
-import java.util.Arrays;
+import java.io.InputStream;
 import java.util.List;
-import java.util.stream.Collectors;
 
-public class FtpClient {
+public interface FtpClient extends AutoCloseable {
 
-    private final FTPClient client;
-    private final Converter<ContextFTPFile, FtpPath> pathConverter;
-    private final Converter<ContextFTPFile, FtpDirectory> directoryConverter;
-    private final Converter<ContextFTPFile, FtpFile> fileConverter;
+    void connect(String host, int port) throws IOException;
 
-    public FtpClient() {
-        this(//TODO: Get from context
-                new FTPClient(),
-                new ContextFTPFile2FtpPathConverter(),
-                new ContextFTPFile2FtpDirectoryConverter(),
-                new ContextFTPFile2FtpFileConverter());
-    }
+    boolean isConnected();
 
-    protected FtpClient(
-            FTPClient client,
-            Converter<ContextFTPFile, FtpPath> pathConverter,
-            Converter<ContextFTPFile, FtpDirectory> directoryConverter,
-            Converter<ContextFTPFile, FtpFile> fileConverter) {
-        this.client = client;
-        this.pathConverter = pathConverter;
-        this.directoryConverter = directoryConverter;
-        this.fileConverter = fileConverter;
-    }
+    void login(String username, char[] password) throws IOException;
 
-    public void connect(String host, int port) throws IOException {
-        client.connect(host, port);
-    }
+    void login(String username, String password) throws IOException;
 
-    public void login(String username, char[] password) throws IOException {
-        login(username, new String(password));
-    }
+    void disconnect() throws IOException;
 
-    public void login(String username, String password) throws IOException {
-        boolean isLogged = client.login(username, password);
-        if (!isLogged) {
-            int code = client.getReplyCode();
-            String message = client.getReplyString();
-            throw new IOException(code + " " + message);
-        }
-    }
+    List<FtpDirectory> listRootDirectories() throws IOException;
 
-    public List<FtpDirectory> listRootDirectories() throws IOException {
-        FTPFile[] files = client.listFiles("/");
-        return Arrays.stream(files)
-                .map(ContextFTPFile.factory("/", "/"))
-                .map(directoryConverter::convert)
-                .collect(Collectors.toList());
-    }
+    List<FtpDirectory> listSubdirectories(String path) throws IOException;
+
+    List<FtpPath> listChildren(String path) throws IOException;
+
+    InputStream retrieveFileStream(String path) throws IOException;
 
 }
