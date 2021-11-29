@@ -32,8 +32,19 @@ public class ContextFTPFile2FtpDirectoryConverter implements Converter<ContextFT
         Objects.requireNonNull(source, "The source must not be null");
         FTPFile file = source.getFile();
         String name = file.getName();
-        String path = source.getParentPath() + source.getSeparator() + name;
+        String path = getPath(source);
         return new FtpDirectory(path, name);
+    }
+
+    private String getPath(ContextFTPFile source) {
+        String parentPath = source.getParentPath();
+        String separator = source.getSeparator();
+        String name = source.getFile().getName();
+        if (parentPath.endsWith(separator)) {
+            return parentPath + name;
+        } else {
+            return parentPath + separator + name;
+        }
     }
 
 }
