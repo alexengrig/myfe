@@ -16,9 +16,10 @@
 
 package dev.alexengrig.myfe.client;
 
+import java.io.Closeable;
 import java.io.IOException;
 
-public interface FtpClientManager<T extends FtpClient> {
+public interface FtpClientManager<T extends FtpClient> extends Closeable {
 
     T getClient() throws IOException;
 

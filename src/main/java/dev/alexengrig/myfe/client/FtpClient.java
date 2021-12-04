@@ -43,4 +43,7 @@ public interface FtpClient extends AutoCloseable {
 
     InputStream retrieveFileStream(String path) throws IOException;
 
+    @Override
+    void close() throws IOException;
+
 }
