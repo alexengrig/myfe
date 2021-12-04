@@ -125,7 +125,7 @@ public class CommonsFtpClient implements FtpClient {
     }
 
     @Override
-    public void close() throws Exception {
+    public void close() throws IOException {
         disconnect();
     }
 
