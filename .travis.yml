@@ -1,0 +1,36 @@
+language: java
+
+jdk:
+  - openjdk11
+
+install:
+  - gradle -b wrapper.gradle wrapper
+
+jobs:
+  include:
+    - stage: build
+      script: ./gradlew build -x test
+    - stage: test
+      script: ./gradlew test -i
+    - stage: jcstress
+      script: ./gradlew jcstress
+    - stage: jmh
+      script: ./gradlew jmh
+
+stages:
+  - name: build
+  - name: test
+    if: commit_message !~ /#skip-test/
+  - name: jcstress
+    if: commit_message =~ /#run-jcstress/
+  - name: jmh
+    if: commit_message =~ /#run-jmh/
+
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
