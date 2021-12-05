@@ -37,17 +37,17 @@ public interface FeDirectoryTreeModelListener extends EventListener<FeDirectoryT
 
             @Override
             public void treeNodesInserted(TreeModelEvent e) {
-                listener.treeNodesChanged(e);
+                listener.treeNodesInserted(e);
             }
 
             @Override
             public void treeNodesRemoved(TreeModelEvent e) {
-                listener.treeNodesChanged(e);
+                listener.treeNodesRemoved(e);
             }
 
             @Override
             public void treeStructureChanged(TreeModelEvent e) {
-                listener.treeNodesChanged(e);
+                listener.treeStructureChanged(e);
             }
 
         };
