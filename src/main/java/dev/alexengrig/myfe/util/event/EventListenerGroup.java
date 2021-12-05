@@ -50,7 +50,7 @@ public final class EventListenerGroup<L extends EventListener<E>, E extends Even
 
     public void remove(L listener) {
         LOGGER.debug("Remove listener: {}", listener);
-        listeners.add(listener);
+        listeners.remove(listener);
     }
 
     public void fire(E event) {
