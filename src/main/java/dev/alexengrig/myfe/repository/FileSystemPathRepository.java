@@ -112,8 +112,9 @@ public class FileSystemPathRepository implements FePathRepository {
             int count = channel.read(buffer);
             if (count != -1) {
                 return StandardCharsets.UTF_8.decode(buffer.flip()).toString();
+            } else {
+                return "";
             }
-            return "";
         } catch (IOException e) {
             LOGGER.error("Exception of reading a batch: {} - {} bytes", filePath, batchSize, e);
             throw new UncheckedIOException("Exception of reading a batch: " +
