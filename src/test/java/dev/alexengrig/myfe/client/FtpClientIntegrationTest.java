@@ -43,10 +43,8 @@ class FtpClientIntegrationTest extends WithUnixFtpServer {
     void beforeEach() throws IOException {
         setup();
         client = new CommonsFtpClient();
-//        client.connect(host, port);
-        client.connect("demo.wftpserver.com", 21);
-//        client.login(username, password);
-        client.login("demo", "demo");
+        client.connect(host, port);
+        client.login(username, password);
     }
 
     @AfterEach
@@ -56,7 +54,7 @@ class FtpClientIntegrationTest extends WithUnixFtpServer {
     }
 
     @Test
-    void should_return_rootDirectories() throws IOException {
+    void should_return_rootDirectories() {
         // run
         List<FtpDirectory> rootDirectories = client.listRootDirectories();
         // check
