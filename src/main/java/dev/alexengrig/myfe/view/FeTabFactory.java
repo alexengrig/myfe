@@ -18,15 +18,21 @@ package dev.alexengrig.myfe.view;
 
 import dev.alexengrig.myfe.config.FtpConnectionConfig;
 import dev.alexengrig.myfe.converter.Converter;
+import dev.alexengrig.myfe.converter.FtpDirectory2FeDirectoryConverter;
+import dev.alexengrig.myfe.converter.FtpFile2FeFileConverter;
+import dev.alexengrig.myfe.converter.FtpPath2FePathConverter;
 import dev.alexengrig.myfe.converter.Path2FeDirectoryConverter;
 import dev.alexengrig.myfe.converter.Path2FeFileConverter;
 import dev.alexengrig.myfe.converter.Path2FePathConverter;
 import dev.alexengrig.myfe.domain.FeDirectory;
 import dev.alexengrig.myfe.domain.FeFile;
 import dev.alexengrig.myfe.domain.FePath;
+import dev.alexengrig.myfe.domain.FtpDirectory;
+import dev.alexengrig.myfe.domain.FtpFile;
+import dev.alexengrig.myfe.domain.FtpPath;
 import dev.alexengrig.myfe.repository.ArchiveFileSystemPathRepository;
 import dev.alexengrig.myfe.repository.FePathRepository;
-import dev.alexengrig.myfe.repository.FtpFileSystemPathRepository;
+import dev.alexengrig.myfe.repository.FtpClientPathRepository;
 import dev.alexengrig.myfe.repository.LocalFileSystemPathRepository;
 import dev.alexengrig.myfe.service.LocalPathService;
 import dev.alexengrig.myfe.service.RemotePathService;
@@ -39,6 +45,10 @@ public class FeTabFactory {
     private final Converter<Path, FeDirectory> directoryConverter = new Path2FeDirectoryConverter();
     private final Converter<Path, FeFile> fileConverter = new Path2FeFileConverter();
     private final Converter<Path, FePath> pathConverter = new Path2FePathConverter(directoryConverter, fileConverter);
+
+    private final Converter<FtpDirectory, FeDirectory> ftpDirectoryConverter = new FtpDirectory2FeDirectoryConverter();
+    private final Converter<FtpFile, FeFile> ftpFileConverter = new FtpFile2FeFileConverter();
+    private final Converter<FtpPath, FePath> ftpPathConverter = new FtpPath2FePathConverter(ftpDirectoryConverter, ftpFileConverter);
 
     public FeTab createDefaultTab() {
         String title = "This computer";
@@ -63,12 +73,12 @@ public class FeTabFactory {
 
     public FeTab createFtpTab(FtpConnectionConfig config) {
         String title = getFtpTabTitle(config);
-        FePathRepository repository = new FtpFileSystemPathRepository(config, directoryConverter, pathConverter);
+        FePathRepository repository = new FtpClientPathRepository(config, ftpDirectoryConverter, ftpPathConverter);
         RemotePathService service = new RemotePathService(config.getHostAndPort(), repository);
         return new FeTab(title, config.getInfo(), service);
     }
 
-    private String getFtpTabTitle(FtpConnectionConfig config) {
+    public String getFtpTabTitle(FtpConnectionConfig config) {
         return "FTP: " + config.getHostAndPort();
     }
 
