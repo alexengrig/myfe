@@ -23,6 +23,7 @@ import dev.alexengrig.myfe.util.FePathUtil;
 import dev.alexengrig.myfe.util.event.EventListenerGroup;
 import dev.alexengrig.myfe.view.FeContentFilter;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +37,10 @@ public class FeContentFilterModel {
     private final EventListenerGroup<FeContentFilterModelListener, FeContentFilterModelEvent> listenerGroup = new EventListenerGroup<>();
 
     private List<String> types;
+
+    public FeContentFilterModel() {
+        this(Collections.emptyList());
+    }
 
     public FeContentFilterModel(List<? extends FePath> paths) {
         this.types = createTypes(paths);
