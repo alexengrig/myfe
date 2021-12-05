@@ -17,6 +17,9 @@
 package dev.alexengrig.myfe;
 
 import dev.alexengrig.myfe.config.FtpConnectionConfig;
+import dev.alexengrig.myfe.service.BackgroundExecutorService;
+import dev.alexengrig.myfe.util.swing.BackgroundExecutor;
+import dev.alexengrig.myfe.util.swing.BackgroundTask;
 import dev.alexengrig.myfe.view.FeTab;
 import dev.alexengrig.myfe.view.FeTabFactory;
 import dev.alexengrig.myfe.view.FeTabbedPane;
@@ -27,10 +30,33 @@ import dev.alexengrig.myfe.view.event.FeTabListener;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.concurrent.Callable;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public final class MyfeApplication extends JFrame {
 
     private static final String TITLE = "myfe";
+
+    private final BackgroundExecutorService backgroundExecutor = new BackgroundExecutorService() {
+
+        @Override
+        public <T> BackgroundTask execute(
+                Supplier<String> descriptionSupplier,
+                Callable<T> backgroundTask,
+                Consumer<T> resultHandler) {
+            return BackgroundExecutor.builder(backgroundTask)
+                    .withDescription(descriptionSupplier)
+                    .withResultHandler(resultHandler)
+                    .withErrorHandler(error -> JOptionPane.showMessageDialog(
+                            null,
+                            error.getMessage(),
+                            descriptionSupplier.get(),
+                            JOptionPane.ERROR_MESSAGE))
+                    .execute();
+        }
+
+    };
 
     private final FeTabbedPane tabbedPane = new FeTabbedPane();
     private final FeTabFactory tabFactory = new FeTabFactory();
@@ -87,14 +113,23 @@ public final class MyfeApplication extends JFrame {
         if (tabbedPane.hasTab(tabTitle)) {
             tabbedPane.openTab(tabTitle);
         } else {
-            FeTab archiveTab = tabFactory.createArchiveTab(path);
-            tabbedPane.openTab(archiveTab);
+            backgroundExecutor.execute(
+                    () -> "Open archive: " + path,
+                    () -> tabFactory.createArchiveTab(path),
+                    tabbedPane::openTab);
         }
     }
 
     private void handleConnectToFTPServer(FtpConnectionConfig connectionConfig) {
-        FeTab ftpTab = tabFactory.createFtpTab(connectionConfig);
-        tabbedPane.openTab(ftpTab);
+        String tabTitle = tabFactory.getFtpTabTitle(connectionConfig);
+        if (tabbedPane.hasTab(tabTitle)) {
+            tabbedPane.openTab(tabTitle);
+        } else {
+            backgroundExecutor.execute(
+                    () -> "Connect to FTP server: " + connectionConfig.getHostAndPort(),
+                    () -> tabFactory.createFtpTab(connectionConfig),
+                    tabbedPane::openTab);
+        }
     }
 
     private class MenuBarListener implements FeMenuBarListener {
