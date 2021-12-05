@@ -25,6 +25,7 @@ import dev.alexengrig.myfe.util.event.EventListenerGroup;
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.Objects;
+import java.util.Optional;
 
 public class FeCurrentDirectoryModel {
 
@@ -46,8 +47,8 @@ public class FeCurrentDirectoryModel {
         return rootName;
     }
 
-    public FeDirectory getCurrentDirectory() {
-        return backStack.peek();
+    public Optional<FeDirectory> getCurrentDirectory() {
+        return Optional.ofNullable(backStack.peek());
     }
 
     public boolean canGoBack() {
@@ -59,11 +60,12 @@ public class FeCurrentDirectoryModel {
     }
 
     public boolean canGoUp() {
-        return getCurrentDirectory() != null;
+        return getCurrentDirectory().isPresent();
     }
 
     public void goToDirectory(FeDirectory directory) {
-        if (!Objects.equals(getCurrentDirectory(), directory)) {
+        Optional<FeDirectory> optionalDirectory = getCurrentDirectory();
+        if (optionalDirectory.isEmpty() || !Objects.equals(optionalDirectory.get(), directory)) {
             backStack.push(directory);
             if (!forwardStack.isEmpty()) {
                 forwardStack.clear();
@@ -73,7 +75,7 @@ public class FeCurrentDirectoryModel {
     }
 
     public void goToRoot() {
-        if (getCurrentDirectory() != null) {
+        if (getCurrentDirectory().isPresent()) {
             backStack.push(null);
             if (!forwardStack.isEmpty()) {
                 forwardStack.clear();
@@ -86,13 +88,13 @@ public class FeCurrentDirectoryModel {
         if (!canGoBack()) {
             return;
         }
-        FeDirectory currentDirectory = backStack.poll();
-        forwardStack.push(currentDirectory);
-        FeDirectory previousDirectory = getCurrentDirectory();
-        if (previousDirectory == null) {
+        FeDirectory previousDirectory = backStack.poll();
+        forwardStack.push(previousDirectory);
+        Optional<FeDirectory> optionalDirectory = getCurrentDirectory();
+        if (optionalDirectory.isEmpty()) {
             listenerGroup.fire(FeCurrentDirectoryModelEvent.root());
         } else {
-            listenerGroup.fire(FeCurrentDirectoryModelEvent.directory(previousDirectory));
+            listenerGroup.fire(FeCurrentDirectoryModelEvent.directory(optionalDirectory.get()));
         }
     }
 
@@ -110,10 +112,11 @@ public class FeCurrentDirectoryModel {
     }
 
     public void goUp() {
-        if (!canGoUp()) {
+        Optional<FeDirectory> optionalDirectory = getCurrentDirectory();
+        if (optionalDirectory.isEmpty()) {
             return;
         }
-        FeDirectory currentDirectory = getCurrentDirectory();
+        FeDirectory currentDirectory = optionalDirectory.get();
         FeDirectory parentDirectory = FePathUtil.getParent(currentDirectory).orElse(null);
         backStack.push(parentDirectory);
         if (!forwardStack.isEmpty()) {
