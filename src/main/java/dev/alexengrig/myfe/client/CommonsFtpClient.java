@@ -17,12 +17,10 @@
 package dev.alexengrig.myfe.client;
 
 import dev.alexengrig.myfe.converter.ContextFTPFile2FtpDirectoryConverter;
-import dev.alexengrig.myfe.converter.ContextFTPFile2FtpFileConverter;
 import dev.alexengrig.myfe.converter.ContextFTPFile2FtpPathConverter;
 import dev.alexengrig.myfe.converter.Converter;
 import dev.alexengrig.myfe.domain.ContextFTPFile;
 import dev.alexengrig.myfe.domain.FtpDirectory;
-import dev.alexengrig.myfe.domain.FtpFile;
 import dev.alexengrig.myfe.domain.FtpPath;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
@@ -30,36 +28,33 @@ import org.apache.commons.net.ftp.FTPFile;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public class CommonsFtpClient implements FtpClient {
 
-    private static final String ROOT_PATH = "/";
     private static final String SEPARATOR = "/";
+    private static final List<FtpDirectory> ROOT_DIRECTORIES = Collections.singletonList(new FtpDirectory("/", "/"));
 
     private final FTPClient client;
     private final Converter<ContextFTPFile, FtpPath> pathConverter;
     private final Converter<ContextFTPFile, FtpDirectory> directoryConverter;
-    private final Converter<ContextFTPFile, FtpFile> fileConverter;
 
     public CommonsFtpClient() {
         this(//TODO: Get from context
                 new FTPClient(),
                 new ContextFTPFile2FtpPathConverter(),
-                new ContextFTPFile2FtpDirectoryConverter(),
-                new ContextFTPFile2FtpFileConverter());
+                new ContextFTPFile2FtpDirectoryConverter());
     }
 
     protected CommonsFtpClient(
             FTPClient client,
             Converter<ContextFTPFile, FtpPath> pathConverter,
-            Converter<ContextFTPFile, FtpDirectory> directoryConverter,
-            Converter<ContextFTPFile, FtpFile> fileConverter) {
+            Converter<ContextFTPFile, FtpDirectory> directoryConverter) {
         this.client = client;
         this.pathConverter = pathConverter;
         this.directoryConverter = directoryConverter;
-        this.fileConverter = fileConverter;
     }
 
     @Override
@@ -93,12 +88,8 @@ public class CommonsFtpClient implements FtpClient {
     }
 
     @Override
-    public List<FtpDirectory> listRootDirectories() throws IOException {
-        FTPFile[] files = client.listFiles(ROOT_PATH);
-        return Arrays.stream(files)
-                .map(ContextFTPFile.factory(ROOT_PATH, SEPARATOR))
-                .map(directoryConverter::convert)
-                .collect(Collectors.toList());
+    public List<FtpDirectory> listRootDirectories() {
+        return ROOT_DIRECTORIES;
     }
 
     @Override
@@ -121,7 +112,13 @@ public class CommonsFtpClient implements FtpClient {
 
     @Override
     public InputStream retrieveFileStream(String path) throws IOException {
-        return client.retrieveFileStream(path);
+        InputStream inputStream = client.retrieveFileStream(path);
+        if (inputStream == null) {
+            int code = client.getReplyCode();
+            String message = client.getReplyString();
+            throw new IOException(code + " " + message);
+        }
+        return inputStream;
     }
 
     @Override
