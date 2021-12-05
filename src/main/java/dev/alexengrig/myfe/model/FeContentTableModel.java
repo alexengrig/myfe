@@ -21,6 +21,7 @@ import dev.alexengrig.myfe.util.FePathUtil;
 import dev.alexengrig.myfe.view.FeContentTable;
 
 import javax.swing.table.DefaultTableModel;
+import java.util.Collections;
 import java.util.List;
 import java.util.Vector;
 import java.util.stream.Collectors;
@@ -35,6 +36,10 @@ public class FeContentTableModel extends DefaultTableModel {
 
     private List<? extends FePath> paths;
     private String filteredType;
+
+    public FeContentTableModel() {
+        this(Collections.emptyList());
+    }
 
     public FeContentTableModel(List<? extends FePath> paths) {
         super(convertToVector(paths), convertToVector(new Object[]{"Name", "Type"}));
