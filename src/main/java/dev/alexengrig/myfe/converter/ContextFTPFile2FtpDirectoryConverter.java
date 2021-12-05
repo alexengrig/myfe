@@ -18,7 +18,6 @@ package dev.alexengrig.myfe.converter;
 
 import dev.alexengrig.myfe.domain.ContextFTPFile;
 import dev.alexengrig.myfe.domain.FtpDirectory;
-import org.apache.commons.net.ftp.FTPFile;
 
 import java.util.Objects;
 
@@ -30,8 +29,7 @@ public class ContextFTPFile2FtpDirectoryConverter implements Converter<ContextFT
     @Override
     public FtpDirectory convert(ContextFTPFile source) {
         Objects.requireNonNull(source, "The source must not be null");
-        FTPFile file = source.getFile();
-        String name = file.getName();
+        String name = source.getFile().getName();
         String path = getPath(source);
         return new FtpDirectory(path, name);
     }
