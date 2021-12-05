@@ -150,7 +150,7 @@ public class FeHeader extends JPanel {
     private void fireRefreshContent(FeHeaderEvent event) {
         LOGGER.debug("Fire refresh content");
         for (FeHeaderListener listener : listeners) {
-            listener.refreshContent(event);
+            listener.refresh(event);
         }
     }
 

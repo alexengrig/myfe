@@ -24,6 +24,6 @@ public interface FeHeaderListener extends EventListener {
 
     void moveToDirectory(FeHeaderEvent event);
 
-    void refreshContent(FeHeaderEvent event);
+    void refresh(FeHeaderEvent event);
 
 }

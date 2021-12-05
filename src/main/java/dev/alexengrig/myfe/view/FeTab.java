@@ -54,6 +54,7 @@ import java.io.IOException;
 import java.lang.invoke.MethodHandles;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -217,9 +218,10 @@ public class FeTab extends JPanel {
                 });
     }
 
-    private void handleRefreshDirectoryContent() {
-        FeDirectory directory = directoryModel.getCurrentDirectory();
-        if (directory == null) {
+    private void handleRefreshDirectory() {
+        LOGGER.debug("Handle refresh directory");
+        Optional<FeDirectory> optionalDirectory = directoryModel.getCurrentDirectory();
+        if (optionalDirectory.isEmpty()) {
             backgroundExecutor.execute(
                     "Getting root directories",
                     service::getRootDirectories,
@@ -229,6 +231,7 @@ public class FeTab extends JPanel {
                         treeModel.setRootDirectories(directories);
                     });
         } else {
+            FeDirectory directory = optionalDirectory.get();
             backgroundExecutor.execute(
                     () -> "Getting directory content: " + directory,
                     () -> service.getDirectoryContent(directory),
@@ -330,8 +333,8 @@ public class FeTab extends JPanel {
         }
 
         @Override
-        public void refreshContent(FeHeaderEvent event) {
-            handleRefreshDirectoryContent();
+        public void refresh(FeHeaderEvent event) {
+            handleRefreshDirectory();
         }
 
     }
