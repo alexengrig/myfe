@@ -20,7 +20,7 @@ import java.util.Set;
 
 public interface KnownExtensions {
 
-    Set<String> IMAGE_FILE_EXTENSIONS = Set.of("JPEG", "JPG", "GIF", "XBM");
+    Set<String> IMAGE_FILE_EXTENSIONS = Set.of("JPEG", "JPG", "PNG", "GIF", "XBM");
 
     //FIXME: Add other extensions
     Set<String> TEXT_FILE_EXTENSIONS = Set.of("TXT", "LOG");
