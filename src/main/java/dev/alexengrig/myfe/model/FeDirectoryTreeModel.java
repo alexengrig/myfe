@@ -117,7 +117,7 @@ public class FeDirectoryTreeModel implements TreeModel {
     }
 
     @Override
-    public Object getRoot() {
+    public RootTreeNode getRoot() {
         return root;
     }
 

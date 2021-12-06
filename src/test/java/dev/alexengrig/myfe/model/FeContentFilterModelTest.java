@@ -72,7 +72,7 @@ class FeContentFilterModelTest {
     }
 
     @Test
-    void should_set_paths() {
+    void should_set_types_by_paths() {
         // setup
         List<? extends FePath> paths = List.of(
                 new FeDirectory("/path/to/directory", "directory"),
@@ -80,7 +80,7 @@ class FeContentFilterModelTest {
                 new FeFile("/path/to/file.this", "file.this"));
         List<String> expectedTypes = List.of("File", "File folder", "THIS file");
         // run
-        model.setPaths(paths);
+        model.setTypesByPaths(paths);
         // check
         assertIterableEquals(expectedTypes, model.getTypes(), "Types from model");
         assertEquals(1, events.size(), "Number of events");

@@ -28,29 +28,7 @@ import javax.swing.event.TreeModelListener;
 public interface FeDirectoryTreeModelListener extends EventListener<FeDirectoryTreeModelEvent>, TreeModelListener {
 
     static FeDirectoryTreeModelListener wrap(TreeModelListener listener) {
-        return new FeDirectoryTreeModelListener() {
-
-            @Override
-            public void treeNodesChanged(TreeModelEvent e) {
-                listener.treeNodesChanged(e);
-            }
-
-            @Override
-            public void treeNodesInserted(TreeModelEvent e) {
-                listener.treeNodesInserted(e);
-            }
-
-            @Override
-            public void treeNodesRemoved(TreeModelEvent e) {
-                listener.treeNodesRemoved(e);
-            }
-
-            @Override
-            public void treeStructureChanged(TreeModelEvent e) {
-                listener.treeStructureChanged(e);
-            }
-
-        };
+        return new Delegate(listener);
     }
 
     @Override
@@ -71,6 +49,53 @@ public interface FeDirectoryTreeModelListener extends EventListener<FeDirectoryT
             default:
                 throw new UnknownEventException(event);
         }
+    }
+
+    class Delegate implements FeDirectoryTreeModelListener {
+
+        private final TreeModelListener listener;
+
+        public Delegate(TreeModelListener listener) {
+            this.listener = listener;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (!(obj instanceof TreeModelListener)) return false;
+            if (obj instanceof Delegate) {
+                Delegate that = (Delegate) obj;
+                return listener.equals(that.listener);
+            } else {
+                return listener.equals(obj);
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            return listener.hashCode();
+        }
+
+        @Override
+        public void treeNodesChanged(TreeModelEvent e) {
+            listener.treeNodesChanged(e);
+        }
+
+        @Override
+        public void treeNodesInserted(TreeModelEvent e) {
+            listener.treeNodesInserted(e);
+        }
+
+        @Override
+        public void treeNodesRemoved(TreeModelEvent e) {
+            listener.treeNodesRemoved(e);
+        }
+
+        @Override
+        public void treeStructureChanged(TreeModelEvent e) {
+            listener.treeStructureChanged(e);
+        }
+
     }
 
 }

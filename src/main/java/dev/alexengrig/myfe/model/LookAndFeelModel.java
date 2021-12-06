@@ -31,8 +31,12 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+/**
+ * Model of Look & Feel in file explorer.
+ */
 public class LookAndFeelModel {
 
+    //TODO: Move it
     private static final TreeMap<String, String> LAF_CLASS_NAME_BY_NAME;
 
     static {

@@ -23,6 +23,9 @@ import dev.alexengrig.myfe.util.event.EventListenerGroup;
 
 import java.util.Objects;
 
+/**
+ * Model of image file.
+ */
 public class FeFileImageModel {
 
     private final EventListenerGroup<FeFileImageModelListener, FeFileImageModelEvent> listenerGroup = new EventListenerGroup<>();

@@ -54,7 +54,7 @@ public class FeContentFilterModel {
                 .collect(Collectors.toList());
     }
 
-    public void setPaths(List<? extends FePath> paths) {
+    public void setTypesByPaths(List<? extends FePath> paths) {
         List<String> types = createTypes(paths);
         setTypes(types);
     }

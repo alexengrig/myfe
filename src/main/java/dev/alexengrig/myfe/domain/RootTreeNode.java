@@ -55,7 +55,7 @@ public class RootTreeNode implements TreeNode {
     }
 
     @Override
-    public TreeNode getChildAt(int childIndex) {
+    public RootDirectoryTreeNode getChildAt(int childIndex) {
         return children.get(childIndex);
     }
 

@@ -60,7 +60,7 @@ public abstract class FeDirectoryTreeNode implements TreeNode {
     }
 
     @Override
-    public TreeNode getChildAt(int childIndex) {
+    public FeDirectoryTreeNode getChildAt(int childIndex) {
         if (children == null) {
             throw new IllegalStateException("No children");
         }

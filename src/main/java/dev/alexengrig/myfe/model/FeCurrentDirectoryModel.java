@@ -27,6 +27,9 @@ import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * Model of current directory in file explorer.
+ */
 public class FeCurrentDirectoryModel {
 
     private final EventListenerGroup<FeCurrentDirectoryModelListener, FeCurrentDirectoryModelEvent> listenerGroup = new EventListenerGroup<>();

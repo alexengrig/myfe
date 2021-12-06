@@ -102,6 +102,7 @@ class FeCurrentDirectoryModelTest {
         assertTrue(optionalDirectory.isEmpty(), "It isn't root");
         FeDirectory directory = new FeDirectory("/", "/");
         goToDirectory(directory);
+        assertTrue(model.canGoBack(), "Can't go back");
         model.goBack();
         optionalDirectory = model.getCurrentDirectory();
         assertTrue(optionalDirectory.isEmpty(), "It isn't root");
@@ -113,6 +114,7 @@ class FeCurrentDirectoryModelTest {
         assertTrue(optionalDirectory.isEmpty(), "It isn't root");
         FeDirectory directory = new FeDirectory("/", "/");
         goToDirectory(directory);
+        assertTrue(model.canGoBack(), "Can't go back");
         model.goBack();
         optionalDirectory = model.getCurrentDirectory();
         assertTrue(optionalDirectory.isEmpty(), "It isn't root");
@@ -120,6 +122,7 @@ class FeCurrentDirectoryModelTest {
         assertEquals(1, eventsOfGoToRoot.size(), "Number of events of goToRoot");
         FeCurrentDirectoryModelEvent eventOfGoToRoot = eventsOfGoToRoot.get(0);
         assertNull(eventOfGoToRoot.getDirectory(), "Directory from event");
+        assertTrue(model.canGoForward(), "Can't go forward");
         model.goForward();
         optionalDirectory = model.getCurrentDirectory();
         assertTrue(optionalDirectory.isPresent(), "It isn't directory");
@@ -135,6 +138,7 @@ class FeCurrentDirectoryModelTest {
         Optional<FeDirectory> optionalDirectory = model.getCurrentDirectory();
         assertTrue(optionalDirectory.isEmpty(), "It isn't root");
         goToDirectory(new FeDirectory("/directory", "directory"));
+        assertTrue(model.canGoUp(), "Can't go up");
         model.goUp();
         optionalDirectory = model.getCurrentDirectory();
         assertTrue(optionalDirectory.isPresent(), "It isn't directory");

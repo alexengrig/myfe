@@ -21,6 +21,9 @@ import javax.swing.text.PlainDocument;
 import javax.swing.text.Segment;
 import java.util.Arrays;
 
+/**
+ * Document of text.
+ */
 public class MyTextDocument extends PlainDocument {
 
     public String getText() {
