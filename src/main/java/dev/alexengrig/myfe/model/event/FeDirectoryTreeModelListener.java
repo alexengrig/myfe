@@ -16,8 +16,8 @@
 
 package dev.alexengrig.myfe.model.event;
 
+import dev.alexengrig.myfe.exception.UnknownEventException;
 import dev.alexengrig.myfe.util.event.EventListener;
-import dev.alexengrig.myfe.util.event.UnknownEventException;
 
 import javax.swing.event.TreeModelEvent;
 import javax.swing.event.TreeModelListener;

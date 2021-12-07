@@ -17,8 +17,8 @@
 package dev.alexengrig.myfe.model.event;
 
 
+import dev.alexengrig.myfe.exception.UnknownEventException;
 import dev.alexengrig.myfe.util.event.EventListener;
-import dev.alexengrig.myfe.util.event.UnknownEventException;
 
 /**
  * Event listener of {@link FeCurrentDirectoryModelEvent}.

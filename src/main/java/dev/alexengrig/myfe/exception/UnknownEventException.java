@@ -14,10 +14,12 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.util.event;
+package dev.alexengrig.myfe.exception;
+
+import dev.alexengrig.myfe.util.event.Event;
 
 /**
- * Unknown {@link Event}.
+ * Exception of unknown {@link Event}.
  */
 public class UnknownEventException extends IllegalArgumentException {
 
