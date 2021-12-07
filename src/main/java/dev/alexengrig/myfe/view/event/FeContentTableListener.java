@@ -16,9 +16,30 @@
 
 package dev.alexengrig.myfe.view.event;
 
-import java.util.EventListener;
+import dev.alexengrig.myfe.exception.UnknownEventException;
+import dev.alexengrig.myfe.util.event.EventListener;
 
-public interface FeContentTableListener extends EventListener {
+/**
+ * Event listener of {@link FeContentTableEvent}.
+ */
+public interface FeContentTableListener extends EventListener<FeContentTableEvent> {
+
+    @Override
+    default void notify(FeContentTableEvent event) {
+        switch (event.getType()) {
+            case GO_TO_PATH:
+                goToPath(event);
+                break;
+            case SELECT_PATH:
+                selectPath(event);
+                break;
+            case CHANGE_ROW_COUNT:
+                changeRowCount(event);
+                break;
+            default:
+                throw new UnknownEventException(event);
+        }
+    }
 
     void selectPath(FeContentTableEvent event);
 

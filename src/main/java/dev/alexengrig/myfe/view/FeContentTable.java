@@ -18,13 +18,12 @@ package dev.alexengrig.myfe.view;
 
 import dev.alexengrig.myfe.domain.FePath;
 import dev.alexengrig.myfe.model.FeContentTableModel;
+import dev.alexengrig.myfe.util.event.EventListenerGroup;
 import dev.alexengrig.myfe.util.swing.DelayedSingleTaskExecutor;
 import dev.alexengrig.myfe.view.event.DoNothingKeyListener;
 import dev.alexengrig.myfe.view.event.DoNothingMouseListener;
 import dev.alexengrig.myfe.view.event.FeContentTableEvent;
 import dev.alexengrig.myfe.view.event.FeContentTableListener;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -34,16 +33,14 @@ import javax.swing.event.RowSorterListener;
 import javax.swing.table.TableRowSorter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
-import java.lang.invoke.MethodHandles;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Objects;
 
+/**
+ * View of file explorer content table.
+ */
 public class FeContentTable extends JTable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-
-    private final List<FeContentTableListener> listeners = new LinkedList<>();
+    private final EventListenerGroup<FeContentTableListener, FeContentTableEvent> listenerGroup = new EventListenerGroup<>();
 
     public FeContentTable(FeContentTableModel model) {
         super(model);
@@ -56,6 +53,7 @@ public class FeContentTable extends JTable {
         getInputMap(WHEN_ANCESTOR_OF_FOCUSED_COMPONENT)
                 .getParent()
                 .remove(KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, 0));
+        getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         initSorter();
         initListeners();
     }
@@ -63,15 +61,18 @@ public class FeContentTable extends JTable {
     private void initSorter() {
         TableRowSorter<FeContentTableModel> sorter = new TableRowSorter<>(getModel());
         sorter.setRowFilter(new RowFilter<>() {
+
             @Override
             public boolean include(Entry<? extends FeContentTableModel, ? extends Integer> entry) {
                 String filteredType = getModel().getFilteredType();
                 if (filteredType == null) {
                     return true;
                 }
+                //TODO: Fix magic number - column of type
                 String type = entry.getStringValue(1);
                 return filteredType.equals(type);
             }
+
         });
         setRowSorter(sorter);
     }
@@ -95,45 +96,35 @@ public class FeContentTable extends JTable {
         return getModel().getPathAt(pathIndex);
     }
 
+    private void handleSelectPath(FePath path) {
+        listenerGroup.fire(FeContentTableEvent.selectPath(path));
+    }
+
+    private void handleGoToPath(FePath path) {
+        listenerGroup.fire(FeContentTableEvent.goToPath(path));
+    }
+
+    private void handleChangeRowCount(int rowCount) {
+        listenerGroup.fire(FeContentTableEvent.changeRowCount(rowCount));
+    }
+
     public void addFeContentTableListener(FeContentTableListener listener) {
-        listeners.add(listener);
+        listenerGroup.add(listener);
     }
 
     public void removeFeContentTableListener(FeContentTableListener listener) {
-        listeners.remove(listener);
-    }
-
-    private void fireSelectPath(FeContentTableEvent event) {
-        LOGGER.debug("Fire select path: {}", event);
-        for (FeContentTableListener listener : listeners) {
-            listener.selectPath(event);
-        }
-    }
-
-    private void fireGoToPath(FeContentTableEvent event) {
-        LOGGER.debug("Fire go to path: {}", event);
-        for (FeContentTableListener listener : listeners) {
-            listener.goToPath(event);
-        }
-    }
-
-    private void fireChangeRowCount(FeContentTableEvent event) {
-        LOGGER.debug("Fire change row count: {}", event);
-        for (FeContentTableListener listener : listeners) {
-            listener.changeRowCount(event);
-        }
+        listenerGroup.remove(listener);
     }
 
     /**
      * On select a single row.
-     *
-     * @see FeContentTable#fireSelectPath(FeContentTableEvent)
      */
     private class SelectPathListener implements ListSelectionListener {
 
+        //TODO: Move delay
         private final DelayedSingleTaskExecutor timer = new DelayedSingleTaskExecutor(400);
 
-        private transient FePath previousPath;
+        private FePath previousPath;
 
         @Override
         public void valueChanged(ListSelectionEvent ignore) {
@@ -145,7 +136,7 @@ public class FeContentTable extends JTable {
                 FePath path = getSelectedPath();
                 if (!Objects.equals(previousPath, path)) {
                     previousPath = path;
-                    fireSelectPath(new FeContentTableEvent(path));
+                    handleSelectPath(path);
                 }
             }
         }
@@ -154,8 +145,6 @@ public class FeContentTable extends JTable {
 
     /**
      * On double-click the left mouse button and press the Enter key on a row.
-     *
-     * @see FeContentTable#fireGoToPath(FeContentTableEvent)
      */
     private class GoToPathListener implements DoNothingMouseListener, DoNothingKeyListener {
 
@@ -163,7 +152,7 @@ public class FeContentTable extends JTable {
         public void mouseClicked(MouseEvent e) {
             if (e.getButton() == MouseEvent.BUTTON1 && e.getClickCount() > 1 && getSelectedRowCount() == 1) {
                 FePath path = getSelectedPath();
-                fireGoToPath(new FeContentTableEvent(path));
+                handleGoToPath(path);
             }
         }
 
@@ -171,7 +160,7 @@ public class FeContentTable extends JTable {
         public void keyPressed(KeyEvent e) {
             if (e.getKeyCode() == KeyEvent.VK_ENTER && getSelectedRowCount() == 1) {
                 FePath path = getSelectedPath();
-                fireGoToPath(new FeContentTableEvent(path));
+                handleGoToPath(path);
             }
         }
 
@@ -179,8 +168,6 @@ public class FeContentTable extends JTable {
 
     /**
      * On change number of rows.
-     *
-     * @see FeContentTable#fireChangeRowCount(FeContentTableEvent)
      */
     private class RowCountListener implements RowSorterListener {
 
@@ -188,7 +175,7 @@ public class FeContentTable extends JTable {
         public void sorterChanged(RowSorterEvent e) {
             int currentCount = getRowSorter().getViewRowCount();
             if (currentCount == 0 || currentCount != e.getPreviousRowCount()) {
-                fireChangeRowCount(new FeContentTableEvent(currentCount));
+                handleChangeRowCount(currentCount);
             }
         }
 

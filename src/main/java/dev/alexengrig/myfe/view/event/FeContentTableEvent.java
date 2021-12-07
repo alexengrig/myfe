@@ -17,27 +17,37 @@
 package dev.alexengrig.myfe.view.event;
 
 import dev.alexengrig.myfe.domain.FePath;
+import dev.alexengrig.myfe.util.event.Event;
 
-public class FeContentTableEvent {
+/**
+ * Event of {@link FeContentTableListener}.
+ */
+public class FeContentTableEvent implements Event {
 
+    private final Type type;
     private final FePath path;
     private final Integer rowCount;
 
-    public FeContentTableEvent(FePath path, Integer rowCount) {
+    private FeContentTableEvent(Type type, FePath path, Integer rowCount) {
+        this.type = type;
         this.path = path;
         this.rowCount = rowCount;
     }
 
-    public FeContentTableEvent() {
-        this(null, null);
+    public static FeContentTableEvent selectPath(FePath path) {
+        return new FeContentTableEvent(Type.SELECT_PATH, path, null);
     }
 
-    public FeContentTableEvent(FePath path) {
-        this(path, null);
+    public static FeContentTableEvent goToPath(FePath path) {
+        return new FeContentTableEvent(Type.GO_TO_PATH, path, null);
     }
 
-    public FeContentTableEvent(Integer rowCount) {
-        this(null, rowCount);
+    public static FeContentTableEvent changeRowCount(Integer rowCount) {
+        return new FeContentTableEvent(Type.CHANGE_ROW_COUNT, null, rowCount);
+    }
+
+    protected Type getType() {
+        return type;
     }
 
     public FePath getPath() {
@@ -50,10 +60,17 @@ public class FeContentTableEvent {
 
     @Override
     public String toString() {
-        return "MyPathTableEvent{" +
-                "path=" + path +
+        return "FeContentTableEvent{" +
+                "type=" + type +
+                ", path=" + path +
                 ", rowCount=" + rowCount +
                 '}';
+    }
+
+    protected enum Type {
+        SELECT_PATH,
+        GO_TO_PATH,
+        CHANGE_ROW_COUNT
     }
 
 }
