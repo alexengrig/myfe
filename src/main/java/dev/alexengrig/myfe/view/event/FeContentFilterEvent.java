@@ -16,16 +16,27 @@
 
 package dev.alexengrig.myfe.view.event;
 
-public class FeContentFilterEvent {
+import dev.alexengrig.myfe.util.event.Event;
 
+/**
+ * Event of {@link FeContentFilterListener}.
+ */
+public class FeContentFilterEvent implements Event {
+
+    private final Type eventType;
     private final String type;
 
-    private FeContentFilterEvent(String type) {
+    private FeContentFilterEvent(Type eventType, String type) {
+        this.eventType = eventType;
         this.type = type;
     }
 
     public static FeContentFilterEvent type(String type) {
-        return new FeContentFilterEvent(type);
+        return new FeContentFilterEvent(Type.CHANGE_TYPE, type);
+    }
+
+    protected Type getEventType() {
+        return eventType;
     }
 
     public String getType() {
@@ -34,9 +45,14 @@ public class FeContentFilterEvent {
 
     @Override
     public String toString() {
-        return "MyPathFilterEvent{" +
-                "type='" + type + '\'' +
+        return "FeContentFilterEvent{" +
+                "eventType=" + eventType +
+                ", type='" + type + '\'' +
                 '}';
+    }
+
+    protected enum Type {
+        CHANGE_TYPE
     }
 
 }

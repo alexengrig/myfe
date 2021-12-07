@@ -16,9 +16,22 @@
 
 package dev.alexengrig.myfe.view.event;
 
-import java.util.EventListener;
+import dev.alexengrig.myfe.exception.UnknownEventException;
+import dev.alexengrig.myfe.util.event.EventListener;
 
-public interface FeContentFilterListener extends EventListener {
+/**
+ * Event listener of {@link FeContentFilterEvent}.
+ */
+public interface FeContentFilterListener extends EventListener<FeContentFilterEvent> {
+
+    @Override
+    default void notify(FeContentFilterEvent event) {
+        if (event.getEventType() == FeContentFilterEvent.Type.CHANGE_TYPE) {
+            changeType(event);
+        } else {
+            throw new UnknownEventException(event);
+        }
+    }
 
     void changeType(FeContentFilterEvent event);
 
