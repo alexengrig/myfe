@@ -31,6 +31,29 @@ repositories {
     mavenCentral()
 }
 
+sourceSets {
+    integrationTest {
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+
+configurations {
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom runtimeOnly
+}
+
+task integrationTest(type: Test) {
+    description = 'Runs integration tests.'
+    group = 'verification'
+
+    testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    classpath = sourceSets.integrationTest.runtimeClasspath
+    shouldRunAfter test
+}
+
+check.dependsOn integrationTest
+
 dependencies {
     implementation "commons-net:commons-net:${commonsNetVersion}"
 
@@ -48,6 +71,10 @@ dependencies {
 
     testImplementation "org.mockftpserver:MockFtpServer:${mockFtpServerVersion}"
 
+    integrationTestImplementation "org.testng:testng:${testNGVersion}"
+
+    integrationTestImplementation "org.assertj:assertj-swing-testng:${assertJSwingTestNGVersion}"
+
     testImplementation "org.openjdk.jcstress:jcstress-core:${jcstressVersion}"
 
     jmh "org.openjdk.jmh:jmh-core:${jmhVersion}"
@@ -56,4 +83,8 @@ dependencies {
 
 test {
     useJUnitPlatform()
+}
+
+integrationTest {
+    useTestNG()
 }
