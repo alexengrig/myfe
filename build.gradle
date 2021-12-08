@@ -32,7 +32,7 @@ repositories {
 }
 
 dependencies {
-    implementation "com.github.robtimus:ftp-fs:${ftpFsVersion}"
+    implementation "commons-net:commons-net:${commonsNetVersion}"
 
     implementation "com.formdev:flatlaf-intellij-themes:${flatlafVersion}"
 
