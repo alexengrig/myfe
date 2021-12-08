@@ -16,9 +16,27 @@
 
 package dev.alexengrig.myfe.view.event;
 
-import java.util.EventListener;
+import dev.alexengrig.myfe.exception.UnknownEventException;
+import dev.alexengrig.myfe.util.event.EventListener;
 
-public interface FeDirectoryTreeListener extends EventListener {
+/**
+ * Event listener of {@link FeDirectoryTreeEvent}.
+ */
+public interface FeDirectoryTreeListener extends EventListener<FeDirectoryTreeEvent> {
+
+    @Override
+    default void notify(FeDirectoryTreeEvent event) {
+        switch (event.getType()) {
+            case SELECT_ROOT:
+                selectRoot(event);
+                break;
+            case SELECT_DIRECTORY:
+                selectDirectory(event);
+                break;
+            default:
+                throw new UnknownEventException(event);
+        }
+    }
 
     void selectRoot(FeDirectoryTreeEvent event);
 

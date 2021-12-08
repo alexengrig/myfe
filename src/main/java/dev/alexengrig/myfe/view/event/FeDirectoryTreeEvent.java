@@ -17,23 +17,33 @@
 package dev.alexengrig.myfe.view.event;
 
 import dev.alexengrig.myfe.domain.FeDirectory;
+import dev.alexengrig.myfe.util.event.Event;
 
-public class FeDirectoryTreeEvent {
+/**
+ * Event of {@link FeDirectoryTreeListener}.
+ */
+public class FeDirectoryTreeEvent implements Event {
 
+    private final Type type;
     private final FeDirectory directory;
     private final String rootName;
 
-    public FeDirectoryTreeEvent(FeDirectory directory) {
-        this(directory, null);
-    }
-
-    public FeDirectoryTreeEvent(String rootName) {
-        this(null, rootName);
-    }
-
-    public FeDirectoryTreeEvent(FeDirectory directory, String rootName) {
+    private FeDirectoryTreeEvent(Type type, FeDirectory directory, String rootName) {
+        this.type = type;
         this.directory = directory;
         this.rootName = rootName;
+    }
+
+    public static FeDirectoryTreeEvent selectRoot(String rootName) {
+        return new FeDirectoryTreeEvent(Type.SELECT_ROOT, null, rootName);
+    }
+
+    public static FeDirectoryTreeEvent selectDirectory(FeDirectory directory) {
+        return new FeDirectoryTreeEvent(Type.SELECT_DIRECTORY, directory, null);
+    }
+
+    protected Type getType() {
+        return type;
     }
 
     public FeDirectory getDirectory() {
@@ -46,10 +56,16 @@ public class FeDirectoryTreeEvent {
 
     @Override
     public String toString() {
-        return "MyDirectoryTreeEvent{" +
-                "directory=" + directory +
+        return "FeDirectoryTreeEvent{" +
+                "type=" + type +
+                ", directory=" + directory +
                 ", rootName='" + rootName + '\'' +
                 '}';
+    }
+
+    protected enum Type {
+        SELECT_ROOT,
+        SELECT_DIRECTORY
     }
 
 }

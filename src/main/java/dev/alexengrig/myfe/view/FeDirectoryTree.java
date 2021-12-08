@@ -21,6 +21,7 @@ import dev.alexengrig.myfe.domain.FeDirectoryTreeNode;
 import dev.alexengrig.myfe.domain.RootTreeNode;
 import dev.alexengrig.myfe.model.FeDirectoryTreeModel;
 import dev.alexengrig.myfe.service.DirectoryTreeBackgroundService;
+import dev.alexengrig.myfe.util.event.EventListenerGroup;
 import dev.alexengrig.myfe.view.event.DoNothingKeyListener;
 import dev.alexengrig.myfe.view.event.DoNothingMouseListener;
 import dev.alexengrig.myfe.view.event.DoNothingTreeWillExpandListener;
@@ -35,8 +36,6 @@ import javax.swing.tree.TreePath;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseEvent;
 import java.lang.invoke.MethodHandles;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
@@ -44,27 +43,24 @@ public class FeDirectoryTree extends JTree {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-    private final DirectoryTreeBackgroundService backgroundService;
+    private final EventListenerGroup<FeDirectoryTreeListener, FeDirectoryTreeEvent> listenerGroup = new EventListenerGroup<>();
 
-    private final List<FeDirectoryTreeListener> listeners;
+    private final DirectoryTreeBackgroundService backgroundService;
 
     public FeDirectoryTree(
             FeDirectoryTreeModel model,
             DirectoryTreeBackgroundService backgroundService) {
         super(model);
         this.backgroundService = backgroundService;
-        this.listeners = new LinkedList<>();
         init();
     }
 
     private void init() {
-        LOGGER.debug("Start init");
-        LoadChildDirectoriesListener loadChildDirectoriesListener = new LoadChildDirectoriesListener();
-        addTreeWillExpandListener(loadChildDirectoriesListener);
+        LoadChildNodesListener loadChildNodesListener = new LoadChildNodesListener();
+        addTreeWillExpandListener(loadChildNodesListener);
         SelectNodeListener selectNodeListener = new SelectNodeListener();
         addMouseListener(selectNodeListener);
         addKeyListener(selectNodeListener);
-        LOGGER.debug("Finished init");
     }
 
     @Override
@@ -89,26 +85,20 @@ public class FeDirectoryTree extends JTree {
         }
     }
 
+    private void handleSelectRoot(String rootName) {
+        listenerGroup.fire(FeDirectoryTreeEvent.selectRoot(rootName));
+    }
+
+    private void handleSelectDirectory(FeDirectory directory) {
+        listenerGroup.fire(FeDirectoryTreeEvent.selectDirectory(directory));
+    }
+
     public void addFeDirectoryTreeListener(FeDirectoryTreeListener listener) {
-        listeners.add(listener);
+        listenerGroup.add(listener);
     }
 
     public void removeFeDirectoryTreeListener(FeDirectoryTreeListener listener) {
-        listeners.remove(listener);
-    }
-
-    private void fireSelectRoot(FeDirectoryTreeEvent event) {
-        LOGGER.debug("Fire select root: {}", event);
-        for (FeDirectoryTreeListener listener : listeners) {
-            listener.selectRoot(event);
-        }
-    }
-
-    private void fireSelectDirectory(FeDirectoryTreeEvent event) {
-        LOGGER.debug("Fire select directory: {}", event);
-        for (FeDirectoryTreeListener listener : listeners) {
-            listener.selectDirectory(event);
-        }
+        listenerGroup.remove(listener);
     }
 
     /**
@@ -116,7 +106,7 @@ public class FeDirectoryTree extends JTree {
      *
      * @see FeDirectoryTree#handleLoadChildDirectories(FeDirectoryTreeNode)
      */
-    private class LoadChildDirectoriesListener implements DoNothingTreeWillExpandListener {
+    private class LoadChildNodesListener implements DoNothingTreeWillExpandListener {
 
         @Override
         public void treeWillExpand(TreeExpansionEvent event) {
@@ -135,8 +125,8 @@ public class FeDirectoryTree extends JTree {
     /**
      * On click the left mouse button and press the Enter key on a node.
      *
-     * @see FeDirectoryTree#fireSelectRoot(FeDirectoryTreeEvent)
-     * @see FeDirectoryTree#fireSelectDirectory(FeDirectoryTreeEvent)
+     * @see FeDirectoryTree#handleSelectRoot(String)
+     * @see FeDirectoryTree#handleSelectDirectory(FeDirectory)
      */
     private class SelectNodeListener implements DoNothingMouseListener, DoNothingKeyListener {
 
@@ -144,18 +134,17 @@ public class FeDirectoryTree extends JTree {
         public void mouseClicked(MouseEvent event) {
             if (event.getButton() == MouseEvent.BUTTON1) {
                 TreePath path = getPathForLocation(event.getX(), event.getY());
-                //TODO: Add benchmark: vs Plain style
                 Optional.ofNullable(path)
                         .map(TreePath::getLastPathComponent)
                         .filter(FeDirectoryTreeNode.class::isInstance)
                         .map(FeDirectoryTreeNode.class::cast)
                         .ifPresentOrElse(
-                                node -> fireSelectDirectory(new FeDirectoryTreeEvent(node.getDirectory())),
+                                node -> handleSelectDirectory(node.getDirectory()),
                                 () -> Optional.ofNullable(path)
                                         .map(TreePath::getLastPathComponent)
                                         .filter(RootTreeNode.class::isInstance)
                                         .map(RootTreeNode.class::cast)
-                                        .ifPresent(root -> fireSelectRoot(new FeDirectoryTreeEvent(root.getName()))));
+                                        .ifPresent(root -> handleSelectRoot(root.getName())));
             }
         }
 
@@ -163,16 +152,15 @@ public class FeDirectoryTree extends JTree {
         public void keyPressed(KeyEvent event) {
             if (event.getKeyCode() == KeyEvent.VK_ENTER) {
                 Object lastNode = getLastSelectedPathComponent();
-                //TODO: Add benchmark: vs Plain style
                 Optional.ofNullable(lastNode)
                         .filter(FeDirectoryTreeNode.class::isInstance)
                         .map(FeDirectoryTreeNode.class::cast)
                         .ifPresentOrElse(
-                                node -> fireSelectDirectory(new FeDirectoryTreeEvent(node.getDirectory())),
+                                node -> handleSelectDirectory(node.getDirectory()),
                                 () -> Optional.ofNullable(lastNode)
                                         .filter(RootTreeNode.class::isInstance)
                                         .map(RootTreeNode.class::cast)
-                                        .ifPresent(root -> fireSelectRoot(new FeDirectoryTreeEvent(root.getName()))));
+                                        .ifPresent(root -> handleSelectRoot(root.getName())));
             }
         }
 
