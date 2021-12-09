@@ -69,7 +69,7 @@ dependencies {
     testImplementation "org.mockito:mockito-core:${mockitoVersion}"
     testImplementation "org.mockito:mockito-junit-jupiter:${mockitoVersion}"
 
-    testImplementation "org.mockftpserver:MockFtpServer:${mockFtpServerVersion}"
+    integrationTestImplementation "org.mockftpserver:MockFtpServer:${mockFtpServerVersion}"
 
     integrationTestImplementation "org.testng:testng:${testNGVersion}"
 
