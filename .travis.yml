@@ -9,9 +9,11 @@ install:
 jobs:
   include:
     - stage: build
-      script: ./gradlew build -x test
+      script: ./gradlew build -x test -x integrationTest
     - stage: test
       script: ./gradlew test -i
+    - stage: integrationTest
+      script: ./gradlew integrationTest -i
     - stage: jcstress
       script: ./gradlew jcstress
     - stage: jmh
@@ -21,6 +23,8 @@ stages:
   - name: build
   - name: test
     if: commit_message !~ /#skip-test/
+  - name: integrationTest
+    if: commit_message =~ /#run-it/
   - name: jcstress
     if: commit_message =~ /#run-jcstress/
   - name: jmh
