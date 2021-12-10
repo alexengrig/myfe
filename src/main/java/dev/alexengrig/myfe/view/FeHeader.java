@@ -67,6 +67,7 @@ public class FeHeader extends JPanel {
     private void addComponents() {
         ButtonActions actions = new ButtonActions();
         addNavigations(actions);
+        pathField.setName("path");
         pathField.setEnabled(false);
         pathField.setDisabledTextColor(Color.BLACK);
         pathField.setBackground(Color.WHITE);
@@ -80,12 +81,15 @@ public class FeHeader extends JPanel {
         toggleNavigations();
         JPanel actionPanel = new JPanel(new GridLayout(1, 3));
         actionPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 2));
+        backButton.setName("back");
         backButton.setText("<");
         backButton.addActionListener(actions::back);
         actionPanel.add(backButton);
+        forwardButton.setName("forward");
         forwardButton.setText(">");
         forwardButton.addActionListener(actions::forward);
         actionPanel.add(forwardButton);
+        upButton.setName("to-parent");
         upButton.setText("^");
         upButton.addActionListener(actions::up);
         actionPanel.add(upButton);
