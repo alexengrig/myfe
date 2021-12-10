@@ -55,6 +55,7 @@ public class FeFooter extends JPanel {
     }
 
     private void initComponents() {
+        counterView.setName("element-counter");
         add(counterView, BorderLayout.WEST);
         JPanel taskPanel = createTasksPanel();
         add(taskPanel, BorderLayout.EAST);
