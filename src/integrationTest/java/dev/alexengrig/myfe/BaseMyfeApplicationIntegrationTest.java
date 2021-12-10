@@ -16,11 +16,16 @@
 
 package dev.alexengrig.myfe;
 
+import org.assertj.swing.annotation.GUITest;
 import org.assertj.swing.edt.GuiActionRunner;
 import org.assertj.swing.edt.GuiQuery;
 import org.assertj.swing.fixture.FrameFixture;
+import org.assertj.swing.testng.listener.ScreenshotOnFailureListener;
 import org.assertj.swing.testng.testcase.AssertJSwingTestngTestCase;
+import org.testng.annotations.Listeners;
 
+@GUITest
+@Listeners(ScreenshotOnFailureListener.class)
 public abstract class BaseMyfeApplicationIntegrationTest extends AssertJSwingTestngTestCase {
 
     private FrameFixture window;
@@ -48,8 +53,9 @@ public abstract class BaseMyfeApplicationIntegrationTest extends AssertJSwingTes
     }
 
     @Override
-    protected void onTearDown() {
+    protected final void onTearDown() {
         super.onTearDown();
+        this.window.cleanUp();
         this.window = null;
     }
 
