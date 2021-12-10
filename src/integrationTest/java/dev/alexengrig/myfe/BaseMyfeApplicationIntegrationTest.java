@@ -20,6 +20,7 @@ import dev.alexengrig.myfe.view.FeContentFilter;
 import dev.alexengrig.myfe.view.FeContentTable;
 import dev.alexengrig.myfe.view.FeDirectoryTree;
 import dev.alexengrig.myfe.view.FeFooter;
+import dev.alexengrig.myfe.view.FeHeader;
 import org.assertj.swing.annotation.GUITest;
 import org.assertj.swing.edt.GuiActionRunner;
 import org.assertj.swing.edt.GuiQuery;
@@ -92,6 +93,13 @@ public abstract class BaseMyfeApplicationIntegrationTest extends AssertJSwingTes
      */
     protected JPanelFixture getFooter() {
         return window.panel(new InstanceTypeMatcher<>(FeFooter.class));
+    }
+
+    /**
+     * @return {@link FeHeader}
+     */
+    protected JPanelFixture getHeader() {
+        return window.panel(new InstanceTypeMatcher<>(FeHeader.class));
     }
 
 }
