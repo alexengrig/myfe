@@ -16,16 +16,19 @@
 
 package dev.alexengrig.myfe;
 
+import java.util.Objects;
+
 public final class OsUtil {
 
-    public static final String OS = System.getProperty("os.name");
+    private static final String OS = Objects.requireNonNull(System.getProperty("os.name"), "No property \"os.name\"").toLowerCase();
+    private static final boolean IS_WINDOWS = OS.startsWith("windows");
 
     private OsUtil() throws IllegalAccessException {
         throw new IllegalAccessException("This is utility class");
     }
 
     public static boolean isWindows() {
-        return OS.startsWith("Windows");
+        return IS_WINDOWS;
     }
 
 }
