@@ -17,14 +17,12 @@
 package dev.alexengrig.myfe.view;
 
 import dev.alexengrig.myfe.BaseMyfeApplicationIntegrationTest;
-import dev.alexengrig.myfe.InstanceTypeMatcher;
-import dev.alexengrig.myfe.OsUtil;
-import org.assertj.swing.fixture.FrameFixture;
+import dev.alexengrig.myfe.TestUtil;
 import org.assertj.swing.fixture.JTableCellFixture;
 import org.assertj.swing.fixture.JTableFixture;
 import org.assertj.swing.fixture.JTreeFixture;
 import org.assertj.swing.fixture.JTreePathFixture;
-import org.testng.SkipException;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -37,15 +35,17 @@ public class WindowsFeDirectoryTreeIntegrationTest extends BaseMyfeApplicationIn
 
     @BeforeClass
     public void skipOnNotWindows() {
-        if (!OsUtil.isWindows()) {
-            throw new SkipException("Skipping tests because OS isn't Windows");
-        }
+        TestUtil.skipOnNotWindows();
     }
 
     @BeforeMethod
     public void beforeMethod() {
-        FrameFixture window = window();
-        this.tree = window.tree(new InstanceTypeMatcher<>(FeDirectoryTree.class));
+        this.tree = getTree();
+    }
+
+    @AfterMethod
+    public void afterMethod() {
+        this.tree = null;
     }
 
     @Test
@@ -60,7 +60,7 @@ public class WindowsFeDirectoryTreeIntegrationTest extends BaseMyfeApplicationIn
     public void should_click_nodeOfdiskC_and_find_cellOfWindows() {
         JTreePathFixture diskCNode = tree.node("This computer/C:\\");
         diskCNode.click();
-        JTableFixture table = window().table(new InstanceTypeMatcher<>(FeContentTable.class));
+        JTableFixture table = getTable();
         JTableCellFixture windowsCell = table.cell("Windows");
         assertNotNull(windowsCell, "Cell of Windows");
     }
@@ -71,7 +71,7 @@ public class WindowsFeDirectoryTreeIntegrationTest extends BaseMyfeApplicationIn
         diskCNode.click();
         JTreePathFixture rootNode = tree.node("This computer");
         rootNode.click();
-        JTableFixture table = window().table(new InstanceTypeMatcher<>(FeContentTable.class));
+        JTableFixture table = getTable();
         JTableCellFixture diskCCell = table.cell("C:\\");
         assertNotNull(diskCCell, "Cell of C:\\");
     }
