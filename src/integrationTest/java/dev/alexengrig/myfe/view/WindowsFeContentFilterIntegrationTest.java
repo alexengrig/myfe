@@ -21,6 +21,7 @@ import org.assertj.swing.fixture.JComboBoxFixture;
 import org.assertj.swing.fixture.JPanelFixture;
 import org.assertj.swing.fixture.JTableCellFixture;
 import org.assertj.swing.fixture.JTableFixture;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
@@ -33,6 +34,11 @@ public class WindowsFeContentFilterIntegrationTest extends BaseWindowsMyfeApplic
     @BeforeMethod
     public void beforeMethod() {
         this.panel = getFilterPanel();
+    }
+
+    @AfterMethod
+    public void afterMethod() {
+        this.panel = null;
     }
 
     @Test
