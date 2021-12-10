@@ -16,27 +16,19 @@
 
 package dev.alexengrig.myfe.view;
 
-import dev.alexengrig.myfe.BaseMyfeApplicationIntegrationTest;
-import dev.alexengrig.myfe.TestUtil;
+import dev.alexengrig.myfe.BaseWindowsMyfeApplicationIntegrationTest;
 import org.assertj.swing.fixture.JComboBoxFixture;
 import org.assertj.swing.fixture.JPanelFixture;
 import org.assertj.swing.fixture.JTableCellFixture;
 import org.assertj.swing.fixture.JTableFixture;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertNotNull;
 
-public class WindowsFeContentFilterIntegrationTest extends BaseMyfeApplicationIntegrationTest {
+public class WindowsFeContentFilterIntegrationTest extends BaseWindowsMyfeApplicationIntegrationTest {
 
     private JPanelFixture panel;
-
-    @BeforeClass
-    public void skipOnNotWindows() {
-        TestUtil.skipOnNotWindows();
-    }
-
 
     @BeforeMethod
     public void beforeMethod() {
