@@ -22,6 +22,7 @@ import dev.alexengrig.myfe.view.FeDirectoryTree;
 import dev.alexengrig.myfe.view.FeFooter;
 import dev.alexengrig.myfe.view.FeHeader;
 import dev.alexengrig.myfe.view.FePathDetails;
+import dev.alexengrig.myfe.view.FePathPreview;
 import org.assertj.swing.annotation.GUITest;
 import org.assertj.swing.edt.GuiActionRunner;
 import org.assertj.swing.edt.GuiQuery;
@@ -108,6 +109,13 @@ public abstract class BaseMyfeApplicationIntegrationTest extends AssertJSwingTes
      */
     protected JPanelFixture getDetailsPanel() {
         return window.panel(new InstanceTypeMatcher<>(FePathDetails.class));
+    }
+
+    /**
+     * @return {@link FePathPreview}
+     */
+    protected JPanelFixture getPreviewPanel() {
+        return window.panel(new InstanceTypeMatcher<>(FePathPreview.class));
     }
 
 }
