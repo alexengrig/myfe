@@ -55,7 +55,9 @@ public class FeContentFilter extends JPanel {
         add(new JLabel("Filter type: "), BorderLayout.WEST);
         model.addFeContentFilterModelListener(new ModelListener());
         typeModel.addListDataListener(new TypeModelListener());
-        add(new JComboBox<>(typeModel));
+        JComboBox<String> comboBox = new JComboBox<>(typeModel);
+        comboBox.setName("filter-type");
+        add(comboBox);
     }
 
     private void handleSelectType(String type) {
