@@ -19,6 +19,7 @@ package dev.alexengrig.myfe;
 import dev.alexengrig.myfe.view.FeContentFilter;
 import dev.alexengrig.myfe.view.FeContentTable;
 import dev.alexengrig.myfe.view.FeDirectoryTree;
+import dev.alexengrig.myfe.view.FeFooter;
 import org.assertj.swing.annotation.GUITest;
 import org.assertj.swing.edt.GuiActionRunner;
 import org.assertj.swing.edt.GuiQuery;
@@ -76,7 +77,7 @@ public abstract class BaseMyfeApplicationIntegrationTest extends AssertJSwingTes
      * @return {@link FeContentTable}
      */
     protected JTableFixture getTable() {
-        return window().table(new InstanceTypeMatcher<>(FeContentTable.class));
+        return window.table(new InstanceTypeMatcher<>(FeContentTable.class));
     }
 
     /**
@@ -84,6 +85,13 @@ public abstract class BaseMyfeApplicationIntegrationTest extends AssertJSwingTes
      */
     protected JPanelFixture getFilterPanel() {
         return window.panel(new InstanceTypeMatcher<>(FeContentFilter.class));
+    }
+
+    /**
+     * @return {@link FeFooter}
+     */
+    protected JPanelFixture getFooter() {
+        return window.panel(new InstanceTypeMatcher<>(FeFooter.class));
     }
 
 }
