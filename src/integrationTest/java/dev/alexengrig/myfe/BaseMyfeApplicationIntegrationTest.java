@@ -16,10 +16,16 @@
 
 package dev.alexengrig.myfe;
 
+import dev.alexengrig.myfe.view.FeContentFilter;
+import dev.alexengrig.myfe.view.FeContentTable;
+import dev.alexengrig.myfe.view.FeDirectoryTree;
 import org.assertj.swing.annotation.GUITest;
 import org.assertj.swing.edt.GuiActionRunner;
 import org.assertj.swing.edt.GuiQuery;
 import org.assertj.swing.fixture.FrameFixture;
+import org.assertj.swing.fixture.JPanelFixture;
+import org.assertj.swing.fixture.JTableFixture;
+import org.assertj.swing.fixture.JTreeFixture;
 import org.assertj.swing.testng.listener.ScreenshotOnFailureListener;
 import org.assertj.swing.testng.testcase.AssertJSwingTestngTestCase;
 import org.testng.annotations.Listeners;
@@ -57,6 +63,27 @@ public abstract class BaseMyfeApplicationIntegrationTest extends AssertJSwingTes
         super.onTearDown();
         this.window.cleanUp();
         this.window = null;
+    }
+
+    /**
+     * @return {@link FeDirectoryTree}
+     */
+    protected JTreeFixture getTree() {
+        return window.tree(new InstanceTypeMatcher<>(FeDirectoryTree.class));
+    }
+
+    /**
+     * @return {@link FeContentTable}
+     */
+    protected JTableFixture getTable() {
+        return window().table(new InstanceTypeMatcher<>(FeContentTable.class));
+    }
+
+    /**
+     * @return {@link FeContentFilter}
+     */
+    protected JPanelFixture getFilterPanel() {
+        return window.panel(new InstanceTypeMatcher<>(FeContentFilter.class));
     }
 
 }
