@@ -75,6 +75,7 @@ public class FePathPreview extends JPanel {
     private void initComponents() {
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+        textView.setName("preview-text");
         add(textView);
         loadButton.setAction(new LoadAction());
         loadButton.setText("Load preview");
