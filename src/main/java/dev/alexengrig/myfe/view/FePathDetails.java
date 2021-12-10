@@ -18,57 +18,65 @@ package dev.alexengrig.myfe.view;
 
 import dev.alexengrig.myfe.domain.FePath;
 import dev.alexengrig.myfe.model.FeSelectedPathModel;
+import dev.alexengrig.myfe.model.event.FeSelectedPathModelEvent;
+import dev.alexengrig.myfe.model.event.FeSelectedPathModelListener;
 import dev.alexengrig.myfe.util.FePathUtil;
 
 import javax.swing.*;
-import java.awt.*;
-import java.util.List;
 
 public class FePathDetails extends JPanel {
 
     private final FeSelectedPathModel model;
-    private final JPanel contentPane;
+
+    private final JLabel noDetailsLabel = new JLabel();
+
+    private final JPanel detailsPanel = new JPanel();
+    private final JLabel nameLabel = new JLabel();
+    private final JLabel typeLabel = new JLabel();
 
     public FePathDetails(FeSelectedPathModel model) {
         this.model = model;
-        this.contentPane = new JPanel(new GridLayout(0, 1));
         init();
     }
 
     private void init() {
-        addDetailsComponents();
-        model.addSelectedFePathModelListener(event -> updateDetailsComponents());
-        add(contentPane);
+        model.addSelectedFePathModelListener(new ModelListener());
+        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
+        noDetailsLabel.setName("no-details");
+        noDetailsLabel.setText("Select an element to details");
+        add(noDetailsLabel);
+        detailsPanel.setName("details");
+        detailsPanel.setLayout(new BoxLayout(detailsPanel, BoxLayout.Y_AXIS));
+        detailsPanel.setVisible(false);
+        nameLabel.setName("name");
+        detailsPanel.add(nameLabel);
+        typeLabel.setName("type");
+        detailsPanel.add(typeLabel);
+        add(detailsPanel);
     }
 
-    private void addDetailsComponents() {
-        List<JComponent> components;
-        if (model.isEmpty()) {
-            components = createEmptyComponent();
+    private void handleChangePath(FePath path) {
+        if (path != null) {
+            nameLabel.setText("Name: " + path.getName());
+            typeLabel.setText("Type: " + FePathUtil.getType(path));
+            noDetailsLabel.setVisible(false);
+            detailsPanel.setVisible(true);
         } else {
-            components = createComponent();
+            detailsPanel.setVisible(false);
+            noDetailsLabel.setVisible(true);
+            nameLabel.setText("");
+            typeLabel.setText("");
         }
-        for (JComponent component : components) {
-            contentPane.add(component);
+    }
+
+    private class ModelListener implements FeSelectedPathModelListener {
+
+        @Override
+        public void changePath(FeSelectedPathModelEvent event) {
+            handleChangePath(event.getPath());
         }
-    }
 
-    private void updateDetailsComponents() {
-        contentPane.removeAll();
-        addDetailsComponents();
-        contentPane.revalidate();
-    }
-
-    private List<JComponent> createEmptyComponent() {
-        return List.of(new JLabel("Select an element to details"));
-    }
-
-    private List<JComponent> createComponent() {
-        FePath path = model.getPath();
-        return List.of(
-                new JLabel("Name: " + path.getName()),
-                new JLabel("Type: " + FePathUtil.getType(path))
-        );
     }
 
 }
