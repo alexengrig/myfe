@@ -34,6 +34,10 @@ import java.lang.invoke.MethodHandles;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Menu bar of {@link MyfeApplication}.
+ */
+//TODO: Decompose
 public class MyfeMenuBar extends JMenuBar {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -125,7 +129,7 @@ public class MyfeMenuBar extends JMenuBar {
                                 JOptionPane.ERROR_MESSAGE);
                         return;
                     }
-                    //FIXME: Add spinner
+                    //TODO: Add spinner
                     fireOpenArchive(FeMenuBarEvent.archivePath(file.getAbsolutePath()));
                 }
             });
