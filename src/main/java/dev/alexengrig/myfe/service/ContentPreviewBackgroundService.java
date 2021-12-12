@@ -25,6 +25,7 @@ import java.util.function.Consumer;
  */
 public interface ContentPreviewBackgroundService {
 
+    //TODO: Refactor
     boolean isLazy();
 
     void loadTextPreview(FeFile file, Consumer<String> handler);
