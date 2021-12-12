@@ -22,17 +22,27 @@ import dev.alexengrig.myfe.converter.Converter;
 import dev.alexengrig.myfe.domain.ContextFTPFile;
 import dev.alexengrig.myfe.domain.FtpDirectory;
 import dev.alexengrig.myfe.domain.FtpPath;
+import dev.alexengrig.myfe.exception.FTPClientIOException;
+import dev.alexengrig.myfe.util.logging.LazyLogger;
+import dev.alexengrig.myfe.util.logging.LazyLoggerFactory;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPFile;
+import org.apache.commons.net.ftp.FTPReply;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.invoke.MethodHandles;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * Wrapper of {@link FTPClient}.
+ */
 public class CommonsFtpClient implements FtpClient {
+
+    private static final LazyLogger LOGGER = LazyLoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
     private static final String SEPARATOR = "/";
     private static final List<FtpDirectory> ROOT_DIRECTORIES = Collections.singletonList(new FtpDirectory("/", "/"));
@@ -58,8 +68,18 @@ public class CommonsFtpClient implements FtpClient {
     }
 
     @Override
-    public void connect(String host, int port) throws IOException {
-        client.connect(host, port);
+    public void connect(String host, int port) throws FTPClientIOException {
+        LOGGER.trace("Start to connect to {}:{}", host, port);
+        try {
+            client.connect(host, port);
+            if (!FTPReply.isPositiveCompletion(client.getReplyCode())) {
+                FTPClientIOException exception = new FTPClientIOException(client);
+                client.disconnect();
+                throw exception;
+            }
+        } catch (IOException e) {
+            throw new FTPClientIOException(client, e);
+        }
     }
 
     @Override
@@ -74,16 +94,16 @@ public class CommonsFtpClient implements FtpClient {
 
     @Override
     public void login(String username, String password) throws IOException {
+        LOGGER.trace("Start to login");
         boolean isLogged = client.login(username, password);
         if (!isLogged) {
-            int code = client.getReplyCode();
-            String message = client.getReplyString();
-            throw new IOException(code + " " + message);
+            throw new FTPClientIOException(client);
         }
     }
 
     @Override
     public void disconnect() throws IOException {
+        LOGGER.trace("Start to disconnect");
         client.disconnect();
     }
 
@@ -94,6 +114,7 @@ public class CommonsFtpClient implements FtpClient {
 
     @Override
     public List<FtpDirectory> listSubdirectories(String path) throws IOException {
+        LOGGER.trace("Start to list subdirectories: {}", path);
         FTPFile[] files = client.listFiles(path, FTPFile::isDirectory);
         return Arrays.stream(files)
                 .map(ContextFTPFile.factory(path, SEPARATOR))
@@ -103,6 +124,7 @@ public class CommonsFtpClient implements FtpClient {
 
     @Override
     public List<FtpPath> listChildren(String path) throws IOException {
+        LOGGER.trace("Start to list children: {}", path);
         FTPFile[] files = client.listFiles(path);
         return Arrays.stream(files)
                 .map(ContextFTPFile.factory(path, SEPARATOR))
@@ -112,18 +134,20 @@ public class CommonsFtpClient implements FtpClient {
 
     @Override
     public InputStream retrieveFileStream(String path) throws IOException {
+        LOGGER.trace("Start to retrieve file stream: {}", path);
         InputStream inputStream = client.retrieveFileStream(path);
         if (inputStream == null) {
-            int code = client.getReplyCode();
-            String message = client.getReplyString();
-            throw new IOException(code + " " + message);
+            throw new FTPClientIOException(client);
         }
         return inputStream;
     }
 
     @Override
     public void close() throws IOException {
-        disconnect();
+        LOGGER.trace("Start to close");
+        if (client.isConnected()) {
+            disconnect();
+        }
     }
 
 }
