@@ -34,6 +34,9 @@ import java.util.concurrent.Callable;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+/**
+ * Main frame of file explorer.
+ */
 public final class MyfeApplication extends JFrame {
 
     private static final String TITLE = "myfe";
@@ -59,6 +62,7 @@ public final class MyfeApplication extends JFrame {
     };
 
     private final FeTabbedPane tabbedPane = new FeTabbedPane();
+    //TODO: DI
     private final FeTabFactory tabFactory = new FeTabFactory();
 
     public MyfeApplication() {
