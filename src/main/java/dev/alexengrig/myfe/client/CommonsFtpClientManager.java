@@ -38,10 +38,12 @@ public class CommonsFtpClientManager extends BaseFtpClientManager<CommonsFtpClie
         super(pool, config);
     }
 
+    @Override
     protected FtpClientFactory<CommonsFtpClient> createClientFactory() {
         return new ManagedClientFactory();
     }
 
+    @Override
     protected void prepareClient(CommonsFtpClient client, FtpConnectionConfig config) throws IOException {
         if (!client.isConnected()) {
             client.connect(config.getHost(), config.getPort());
@@ -49,11 +51,19 @@ public class CommonsFtpClientManager extends BaseFtpClientManager<CommonsFtpClie
         }
     }
 
+    @Override
+    protected void destroyClient(CommonsFtpClient client) throws IOException {
+        ((ManagedClient) client).doClose();
+    }
+
     private class ManagedClient extends CommonsFtpClient {
+
+        public void doClose() throws IOException {
+            super.close();
+        }
 
         @Override
         public void close() throws IOException {
-            super.close();
             returnToPool(this);
         }
 
