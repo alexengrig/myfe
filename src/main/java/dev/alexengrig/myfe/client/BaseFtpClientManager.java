@@ -40,7 +40,7 @@ public abstract class BaseFtpClientManager<T extends FtpClient> implements FtpCl
     private final FtpClientPool<T> pool;
     private final FtpConnectionConfig config;
 
-    public BaseFtpClientManager(FtpClientPool<T> pool, FtpConnectionConfig config) {
+    protected BaseFtpClientManager(FtpClientPool<T> pool, FtpConnectionConfig config) {
         FtpClientFactory<T> factory = createClientFactory();
         this.obtainingStrategyHolder = new AtomicReference<>(new UnfilledPoolObtainingStrategy(factory));
         this.comebackStrategyHolder = new AtomicReference<>(new Return2PoolComebackStrategy());
@@ -63,6 +63,8 @@ public abstract class BaseFtpClientManager<T extends FtpClient> implements FtpCl
     }
 
     protected abstract void prepareClient(T client, FtpConnectionConfig config) throws IOException;
+
+    protected abstract void destroyClient(T client) throws IOException;
 
     protected void returnToPool(T client) {
         ClientComebackStrategy<T> strategy = comebackStrategyHolder.get();
@@ -87,8 +89,8 @@ public abstract class BaseFtpClientManager<T extends FtpClient> implements FtpCl
         }
     }
 
-    private void replaceWithDoNothingComebackStrategy(ClientComebackStrategy<T> previousStrategy) {
-        DoNothingComebackStrategy newStrategy = new DoNothingComebackStrategy();
+    private void replaceWithDestroyComebackStrategy(ClientComebackStrategy<T> previousStrategy) {
+        DestroyComebackStrategy newStrategy = new DestroyComebackStrategy();
         if (comebackStrategyHolder.compareAndSet(previousStrategy, newStrategy)) {
             LOGGER.debug("Replaced comeback strategy of client {} with {}", previousStrategy, newStrategy);
         } else {
@@ -99,20 +101,27 @@ public abstract class BaseFtpClientManager<T extends FtpClient> implements FtpCl
     @Override
     public void close() throws IOException {
         replaceWithRejectionObtainingStrategy(obtainingStrategyHolder.get());
-        replaceWithDoNothingComebackStrategy(comebackStrategyHolder.get());
+        replaceWithDestroyComebackStrategy(comebackStrategyHolder.get());
+        destroyClients();
+    }
+
+    private void destroyClients() throws IOException {
         List<T> clients = pool.clear();
         LOGGER.debug("Destroy clients: {}", clients);
-        List<IOException> exceptions = new LinkedList<>();
+        List<IOException> exceptions = null;
         for (T client : clients) {
             try {
-                client.close();
+                destroyClient(client);
             } catch (IOException exception) {
+                if (exceptions == null) {
+                    exceptions = new LinkedList<>();
+                }
                 exceptions.add(exception);
             }
         }
-        if (!exceptions.isEmpty()) {
+        if (exceptions != null) {
             IOException exception = ThrowableUtil.compose(exceptions);
-            LOGGER.error("Exception of closing", exception);
+            LOGGER.error("Exception of destroying", exception);
             throw exception;
         }
     }
@@ -231,11 +240,16 @@ public abstract class BaseFtpClientManager<T extends FtpClient> implements FtpCl
 
     }
 
-    private class DoNothingComebackStrategy implements ClientComebackStrategy<T> {
+    private class DestroyComebackStrategy implements ClientComebackStrategy<T> {
 
         @Override
         public void comeBack(T client) {
-            LOGGER.debug("Do nothing with client: {}", client);
+            try {
+                destroyClient(client);
+                LOGGER.error("Destroyed client: {}", client);
+            } catch (IOException e) {
+                LOGGER.warn("Exception of destroying client: {}", client, e);
+            }
         }
 
     }
