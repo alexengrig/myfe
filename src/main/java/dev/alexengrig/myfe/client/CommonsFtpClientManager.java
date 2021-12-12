@@ -20,6 +20,9 @@ import dev.alexengrig.myfe.config.FtpConnectionConfig;
 
 import java.io.IOException;
 
+/**
+ * Manager of {@link CommonsFtpClient}.
+ */
 public class CommonsFtpClientManager extends BaseFtpClientManager<CommonsFtpClient> {
 
     private static final int DEFAULT_CAPACITY = 4;

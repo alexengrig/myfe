@@ -16,6 +16,11 @@
 
 package dev.alexengrig.myfe.client;
 
+/**
+ * Factory of {@link FtpClient}.
+ *
+ * @param <T> the type of FTP client
+ */
 public interface FtpClientFactory<T extends FtpClient> {
 
     T createClient();

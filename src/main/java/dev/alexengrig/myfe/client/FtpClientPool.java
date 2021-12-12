@@ -18,6 +18,11 @@ package dev.alexengrig.myfe.client;
 
 import java.util.List;
 
+/**
+ * Pool of {@link FtpClient}.
+ *
+ * @param <T> the type of FTP client
+ */
 public interface FtpClientPool<T extends FtpClient> {
 
     T take() throws InterruptedException;

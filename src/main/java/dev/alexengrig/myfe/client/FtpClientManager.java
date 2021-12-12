@@ -19,8 +19,27 @@ package dev.alexengrig.myfe.client;
 import java.io.Closeable;
 import java.io.IOException;
 
+/**
+ * Manager of {@link FtpClient}.
+ *
+ * @param <T> the type of FTP client
+ */
 public interface FtpClientManager<T extends FtpClient> extends Closeable {
 
+    /**
+     * Get FTP client.
+     *
+     * <pre>{@code
+     * try (FtpClient client = ftpClientManager.getClient()) {
+     *     // work with client
+     * } catch (IOException exception) {
+     *     // process exception
+     * }
+     * }</pre>
+     *
+     * @return FTP client
+     * @throws IOException while preparing FTP client
+     */
     T getClient() throws IOException;
 
 }

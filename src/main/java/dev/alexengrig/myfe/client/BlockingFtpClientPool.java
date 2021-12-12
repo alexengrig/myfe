@@ -22,6 +22,11 @@ import java.util.Objects;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 
+/**
+ * {@link FtpClientPool} implementation with using {@link BlockingQueue}.
+ *
+ * @param <T> the type of FTP client
+ */
 public class BlockingFtpClientPool<T extends FtpClient> implements FtpClientPool<T> {
 
     private final int capacity;

@@ -31,6 +31,11 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * Base implementation of {@link FtpClientManager}.
+ *
+ * @param <T>
+ */
 public abstract class BaseFtpClientManager<T extends FtpClient> implements FtpClientManager<T> {
 
     private static final LazyLogger LOGGER = LazyLoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

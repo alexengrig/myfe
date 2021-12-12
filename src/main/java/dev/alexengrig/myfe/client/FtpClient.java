@@ -23,6 +23,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+/**
+ * FTP client.
+ */
 public interface FtpClient extends AutoCloseable {
 
     void connect(String host, int port) throws IOException;
