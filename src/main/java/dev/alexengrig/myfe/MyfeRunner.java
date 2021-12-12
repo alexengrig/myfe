@@ -16,21 +16,32 @@
 
 package dev.alexengrig.myfe;
 
-import javax.swing.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.swing.*;
+import java.lang.invoke.MethodHandles;
+
+/**
+ * Runner of {@link MyfeApplication}.
+ */
 public class MyfeRunner {
 
-    static {
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+    public static void main(String[] args) {
+        setSystemLookAndFeel();
+        SwingUtilities.invokeLater(MyfeApplication::new);
+    }
+
+    //TODO: Move it
+    private static void setSystemLookAndFeel() {
         String className = UIManager.getSystemLookAndFeelClassName();
         try {
             UIManager.setLookAndFeel(className);
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | UnsupportedLookAndFeelException e) {
-            e.printStackTrace();
+            LOGGER.error("Exception of setting system Look & Feel", e);
         }
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(MyfeApplication::new);
     }
 
 }
