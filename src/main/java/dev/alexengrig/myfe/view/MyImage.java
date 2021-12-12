@@ -21,20 +21,34 @@ import dev.alexengrig.myfe.model.FeFileImageModel;
 import dev.alexengrig.myfe.model.event.FeFileImageModelEvent;
 import dev.alexengrig.myfe.model.event.FeFileImageModelListener;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 
-public class MyImage extends JLabel {
+/**
+ * Image component.
+ */
+public class MyImage extends JPanel {
 
     private final FeFileImageModel model;
 
+    private final ImageCanvas canvas = new ImageCanvas();
+
+    private BufferedImage image;
+
     public MyImage(FeFileImageModel model) {
-        super(null, null, CENTER);
         this.model = model;
         init();
     }
 
     private void init() {
         initListeners();
+        setLayout(new BorderLayout());
+        JScrollPane scrollPane = new JScrollPane(canvas);
+        add(scrollPane, BorderLayout.CENTER);
     }
 
     private void initListeners() {
@@ -42,7 +56,30 @@ public class MyImage extends JLabel {
     }
 
     private void handleChangeFile(FeFile file, byte[] data) {
-        setIcon(new ImageIcon(data, file.getName()));
+        try {
+            image = ImageIO.read(new ByteArrayInputStream(data));
+            canvas.setToolTipText(file.getName());
+            canvas.setPreferredSize(new Dimension(image.getWidth(), image.getHeight()));
+            canvas.revalidate();
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(
+                    null,
+                    e.getMessage(),
+                    "Image: " + file.getPath(),
+                    JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    private class ImageCanvas extends JPanel {
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            if (image != null) {
+                g.drawImage(image, 0, 0, null);
+            }
+        }
+
     }
 
     private class ModelListener implements FeFileImageModelListener {
