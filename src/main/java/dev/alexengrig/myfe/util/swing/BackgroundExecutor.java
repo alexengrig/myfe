@@ -105,6 +105,7 @@ public class BackgroundExecutor<T> extends SwingWorker<T, T> {
         } catch (InterruptedException e) {
             LOGGER.warn(m -> m.log("Interrupted exception of waiting result - {}",
                     descriptionSupplier.get(), e));
+            Thread.currentThread().interrupt();
             throw new InterruptedBackgroundTaskException("Interrupted exception of waiting result - " +
                     descriptionSupplier.get(),
                     e);
