@@ -208,6 +208,12 @@ public class BaseFtpClientManager_JCStressTest {
         protected void prepareClient(FtpClient client, FtpConnectionConfig config) {
             // do nothing
         }
+
+        @Override
+        protected void destroyClient(FtpClient client) throws IOException {
+            // do nothing
+        }
+
     }
 
     static class DoNothingFtpClient implements FtpClient {
