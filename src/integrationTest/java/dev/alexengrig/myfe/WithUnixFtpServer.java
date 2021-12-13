@@ -25,10 +25,10 @@ import org.mockftpserver.fake.filesystem.UnixFakeFileSystem;
 
 public class WithUnixFtpServer {
 
-    protected final String host = "localhost";
-    protected final int port = 21;
-    protected final String username = "user";
-    protected final String password = "pass";
+    public final String host = "localhost";
+    public final int port = 21;
+    public final String username = "user";
+    public final String password = "pass";
 
     protected FakeFtpServer ftpServer;
 
@@ -43,7 +43,7 @@ public class WithUnixFtpServer {
         instance.tearDown();
     }
 
-    FakeFtpServer createUnixFakeFtpServer() {
+    private FakeFtpServer createUnixFakeFtpServer() {
         FakeFtpServer fakeFtpServer = new FakeFtpServer();
         fakeFtpServer.setServerControlPort(port);
         fakeFtpServer.addUserAccount(new UserAccount(username, password, "/"));
@@ -53,26 +53,26 @@ public class WithUnixFtpServer {
         return fakeFtpServer;
     }
 
-    protected void setup() {
+    public void setup() {
         ftpServer = createUnixFakeFtpServer();
         ftpServer.start();
     }
 
-    protected void tearDown() {
+    public void tearDown() {
         ftpServer.stop();
     }
 
-    protected void addDirectory(String path) {
+    public void addDirectory(String path) {
         FileSystem fs = ftpServer.getFileSystem();
         fs.add(new DirectoryEntry(path));
     }
 
-    protected void addFile(String path) {
+    public void addFile(String path) {
         FileSystem fs = ftpServer.getFileSystem();
         fs.add(new FileEntry(path));
     }
 
-    protected void addFile(String path, String content) {
+    public void addFile(String path, String content) {
         FileSystem fs = ftpServer.getFileSystem();
         fs.add(new FileEntry(path, content));
     }
