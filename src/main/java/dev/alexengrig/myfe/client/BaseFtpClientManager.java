@@ -16,7 +16,7 @@
 
 package dev.alexengrig.myfe.client;
 
-import dev.alexengrig.myfe.config.FtpConnectionConfig;
+import dev.alexengrig.myfe.domain.FtpConnectionConfig;
 import dev.alexengrig.myfe.exception.UncheckedInterruptedException;
 import dev.alexengrig.myfe.util.ThrowableUtil;
 import dev.alexengrig.myfe.util.logging.LazyLogger;

@@ -19,10 +19,10 @@ package dev.alexengrig.myfe.repository;
 import dev.alexengrig.myfe.client.CommonsFtpClientManager;
 import dev.alexengrig.myfe.client.FtpClient;
 import dev.alexengrig.myfe.client.FtpClientManager;
-import dev.alexengrig.myfe.config.FtpConnectionConfig;
 import dev.alexengrig.myfe.converter.Converter;
 import dev.alexengrig.myfe.domain.FeDirectory;
 import dev.alexengrig.myfe.domain.FePath;
+import dev.alexengrig.myfe.domain.FtpConnectionConfig;
 import dev.alexengrig.myfe.domain.FtpDirectory;
 import dev.alexengrig.myfe.domain.FtpPath;
 import org.slf4j.Logger;
@@ -124,7 +124,7 @@ public class FtpClientPathRepository implements FePathRepository {
 
     @Override
     public Stream<String> readInBatches(String filePath, int batchSize, int numberOfBatches) {
-        return Stream.empty(); //FIXME: Implement
+        throw new UnsupportedOperationException(); //TODO: Implement?
     }
 
     @Override

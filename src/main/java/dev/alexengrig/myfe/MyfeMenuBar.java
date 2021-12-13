@@ -16,7 +16,8 @@
 
 package dev.alexengrig.myfe;
 
-import dev.alexengrig.myfe.config.FtpConnectionConfig;
+import dev.alexengrig.myfe.config.KnownExtensions;
+import dev.alexengrig.myfe.domain.FtpConnectionConfig;
 import dev.alexengrig.myfe.model.LookAndFeelModel;
 import dev.alexengrig.myfe.model.event.LookAndFeelModelEvent;
 import dev.alexengrig.myfe.model.event.LookAndFeelModelListener;
@@ -116,7 +117,7 @@ public class MyfeMenuBar extends JMenuBar {
                     chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
                     chooser.setAcceptAllFileFilterUsed(false);
                     chooser.setMultiSelectionEnabled(false);
-                    chooser.setFileFilter(new FileNameExtensionFilter("Archive", "JAR", "ZIP"));
+                    chooser.setFileFilter(new FileNameExtensionFilter("Archive", KnownExtensions.ARCHIVE_FILE_EXTENSIONS.toArray(String[]::new)));
                     int result = chooser.showOpenDialog(parentFrame);
                     if (result != JFileChooser.APPROVE_OPTION) {
                         return;

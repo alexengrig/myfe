@@ -149,7 +149,7 @@ class BackgroundWorkerTest {
         assertSame(exceptionFromHandler, exception, "Exception from handler");
     }
 
-    //FIXME: How do interrupt?
+    //TODO: How do interrupt?
     @Disabled
     @Test
     void should_throw_interruptedException() {

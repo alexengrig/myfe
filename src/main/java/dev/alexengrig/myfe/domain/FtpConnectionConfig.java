@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package dev.alexengrig.myfe.config;
+package dev.alexengrig.myfe.domain;
 
 import java.util.Objects;
 

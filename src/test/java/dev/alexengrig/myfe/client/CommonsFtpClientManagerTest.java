@@ -16,7 +16,7 @@
 
 package dev.alexengrig.myfe.client;
 
-import dev.alexengrig.myfe.config.FtpConnectionConfig;
+import dev.alexengrig.myfe.domain.FtpConnectionConfig;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;

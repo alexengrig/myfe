@@ -35,6 +35,7 @@ public interface FePathRepository extends AutoCloseable {
 
     String readBatch(String filePath, int batchSize);
 
+    @Deprecated
     Stream<String> readInBatches(String filePath, int batchSize, int numberOfBatches);
 
     byte[] readAllBytes(String filePath);

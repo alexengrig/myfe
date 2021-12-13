@@ -16,7 +16,7 @@
 
 package dev.alexengrig.myfe.view;
 
-import dev.alexengrig.myfe.config.FtpConnectionConfig;
+import dev.alexengrig.myfe.domain.FtpConnectionConfig;
 import dev.alexengrig.myfe.model.MyTextDocument;
 
 import javax.swing.*;

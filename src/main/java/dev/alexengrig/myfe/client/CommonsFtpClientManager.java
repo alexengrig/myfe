@@ -16,7 +16,7 @@
 
 package dev.alexengrig.myfe.client;
 
-import dev.alexengrig.myfe.config.FtpConnectionConfig;
+import dev.alexengrig.myfe.domain.FtpConnectionConfig;
 
 import java.io.IOException;
 

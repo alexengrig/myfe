@@ -172,7 +172,7 @@ public class FileSystemPathRepository implements FePathRepository {
     /**
      * {@link ReadableByteChannel} as {@link Iterator}.
      */
-    //FIXME: Move class
+    //TODO: Move class
     private static class ChannelIterator implements Iterator<String> {
 
         private final ReadableByteChannel channel;

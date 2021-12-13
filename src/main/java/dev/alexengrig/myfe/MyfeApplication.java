@@ -16,7 +16,7 @@
 
 package dev.alexengrig.myfe;
 
-import dev.alexengrig.myfe.config.FtpConnectionConfig;
+import dev.alexengrig.myfe.domain.FtpConnectionConfig;
 import dev.alexengrig.myfe.service.BackgroundExecutorService;
 import dev.alexengrig.myfe.util.swing.BackgroundExecutor;
 import dev.alexengrig.myfe.util.swing.BackgroundTask;

@@ -16,7 +16,7 @@
 
 package dev.alexengrig.myfe.view.event;
 
-import dev.alexengrig.myfe.config.FtpConnectionConfig;
+import dev.alexengrig.myfe.domain.FtpConnectionConfig;
 
 public class FeMenuBarEvent {
 

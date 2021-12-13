@@ -16,7 +16,6 @@
 
 package dev.alexengrig.myfe.view;
 
-import dev.alexengrig.myfe.config.FtpConnectionConfig;
 import dev.alexengrig.myfe.converter.Converter;
 import dev.alexengrig.myfe.converter.FtpDirectory2FeDirectoryConverter;
 import dev.alexengrig.myfe.converter.FtpFile2FeFileConverter;
@@ -27,6 +26,7 @@ import dev.alexengrig.myfe.converter.Path2FePathConverter;
 import dev.alexengrig.myfe.domain.FeDirectory;
 import dev.alexengrig.myfe.domain.FeFile;
 import dev.alexengrig.myfe.domain.FePath;
+import dev.alexengrig.myfe.domain.FtpConnectionConfig;
 import dev.alexengrig.myfe.domain.FtpDirectory;
 import dev.alexengrig.myfe.domain.FtpFile;
 import dev.alexengrig.myfe.domain.FtpPath;
