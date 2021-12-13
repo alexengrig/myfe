@@ -1,5 +1,7 @@
 # myfe
 
+[![Build Status](https://app.travis-ci.com/alexengrig/myfe.svg?token=gkPekbuqV4MisskP2zyz&branch=master)](https://app.travis-ci.com/alexengrig/myfe)
+
 MYFE (MYFE Youth File Explorer) is a file explorer application.
 
 ## Architecture
