@@ -18,14 +18,17 @@ package dev.alexengrig.myfe.config;
 
 import java.util.Set;
 
+/**
+ * Supported file extensions.
+ */
 public interface KnownExtensions {
 
     Set<String> IMAGE_FILE_EXTENSIONS = Set.of("JPEG", "JPG", "PNG", "GIF", "XBM");
 
     //FIXME: Add other extensions
-    Set<String> TEXT_FILE_EXTENSIONS = Set.of("TXT", "LOG");
+    Set<String> TEXT_FILE_EXTENSIONS = Set.of("TXT", "LOG", "XML", "JSON", "YAML", "YML", "PROPERTIES");
 
     //FIXME: Add other extensions
-    Set<String> ARCHIVE_FILE_EXTENSIONS = Set.of("JAR", "ZIP");
+    Set<String> ARCHIVE_FILE_EXTENSIONS = Set.of("JAR", "ZIP", "7Z");
 
 }
