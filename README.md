@@ -23,6 +23,16 @@ MYFE (MYFE Youth File Explorer) is a file explorer application.
           Data Store
 ```
 
+## UI
+
+### Window
+
+![Window](docs/window.png)
+
+### Tab
+
+![Tab](docs/tab.png)
+
 ## License
 
 This project is [licensed](LICENSE) under [Apache License, version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
