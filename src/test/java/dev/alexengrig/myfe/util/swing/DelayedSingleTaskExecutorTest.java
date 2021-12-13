@@ -26,39 +26,36 @@ class DelayedSingleTaskExecutorTest {
 
     @Test
     void should_not_repeat() throws InterruptedException {
-        int delay = 50;
-        DelayedSingleTaskExecutor executor = new DelayedSingleTaskExecutor(delay);
+        DelayedSingleTaskExecutor executor = new DelayedSingleTaskExecutor(50);
         AtomicInteger counter = new AtomicInteger();
         executor.execute(counter::incrementAndGet);
-        Thread.sleep(delay * 3);
+        Thread.sleep(400);
         assertEquals(1, counter.get(), "Counter");
     }
 
     @Test
     void should_execute_severalTimes() throws InterruptedException {
-        int delay = 1000;
-        DelayedSingleTaskExecutor executor = new DelayedSingleTaskExecutor(delay);
+        DelayedSingleTaskExecutor executor = new DelayedSingleTaskExecutor(50);
         AtomicInteger counter = new AtomicInteger();
         executor.execute(counter::incrementAndGet);
-        Thread.sleep(delay + delay / 2);
+        Thread.sleep(200);
         executor.execute(counter::incrementAndGet);
-        Thread.sleep(delay + delay / 2);
+        Thread.sleep(200);
         executor.execute(counter::incrementAndGet);
-        Thread.sleep(delay + 200);
+        Thread.sleep(200);
         assertEquals(3, counter.get(), "Counter");
     }
 
     @Test
     void should_execute_onlyTime() throws InterruptedException {
-        int delay = 1000;
-        DelayedSingleTaskExecutor executor = new DelayedSingleTaskExecutor(delay);
+        DelayedSingleTaskExecutor executor = new DelayedSingleTaskExecutor(800);
         AtomicInteger counter = new AtomicInteger();
         executor.execute(counter::incrementAndGet);
-        Thread.sleep(delay / 4);
+        Thread.sleep(100);
         executor.execute(counter::incrementAndGet);
-        Thread.sleep(delay / 4);
+        Thread.sleep(100);
         executor.execute(counter::incrementAndGet);
-        Thread.sleep(delay + 200);
+        Thread.sleep(1000);
         assertEquals(1, counter.get(), "Counter");
     }
 
