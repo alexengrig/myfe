@@ -17,9 +17,6 @@
 package dev.alexengrig.myfe;
 
 import dev.alexengrig.myfe.domain.FtpConnectionConfig;
-import dev.alexengrig.myfe.service.BackgroundExecutorService;
-import dev.alexengrig.myfe.util.swing.BackgroundExecutor;
-import dev.alexengrig.myfe.util.swing.BackgroundTask;
 import dev.alexengrig.myfe.view.FeTab;
 import dev.alexengrig.myfe.view.FeTabFactory;
 import dev.alexengrig.myfe.view.FeTabbedPane;
@@ -27,39 +24,23 @@ import dev.alexengrig.myfe.view.event.FeMenuBarEvent;
 import dev.alexengrig.myfe.view.event.FeMenuBarListener;
 import dev.alexengrig.myfe.view.event.FeTabEvent;
 import dev.alexengrig.myfe.view.event.FeTabListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.concurrent.Callable;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import java.lang.invoke.MethodHandles;
+import java.net.URL;
 
 /**
  * Main frame of file explorer.
  */
 public final class MyfeApplication extends JFrame {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
     private static final String TITLE = "myfe";
-
-    private final BackgroundExecutorService backgroundExecutor = new BackgroundExecutorService() {
-
-        @Override
-        public <T> BackgroundTask execute(
-                Supplier<String> descriptionSupplier,
-                Callable<T> backgroundTask,
-                Consumer<T> resultHandler) {
-            return BackgroundExecutor.builder(backgroundTask)
-                    .withDescription(descriptionSupplier)
-                    .withResultHandler(resultHandler)
-                    .withErrorHandler(error -> JOptionPane.showMessageDialog(
-                            null,
-                            error.getMessage(),
-                            descriptionSupplier.get(),
-                            JOptionPane.ERROR_MESSAGE))
-                    .execute();
-        }
-
-    };
+    private static final String ICON_FILENAME = "myfe.png";
 
     private final FeTabbedPane tabbedPane = new FeTabbedPane();
     //TODO: DI
@@ -76,7 +57,17 @@ public final class MyfeApplication extends JFrame {
     private void init() {
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setPreferredSize(createFramePreferredSize());
+        setIcon();
         componentsInit();
+    }
+
+    private void setIcon() {
+        URL resource = MyfeApplication.class.getClassLoader().getResource(ICON_FILENAME);
+        if (resource == null) {
+            throw new IllegalStateException("No " + ICON_FILENAME);
+        }
+        ImageIcon imageIcon = new ImageIcon(resource);
+        setIconImage(imageIcon.getImage());
     }
 
     private Dimension createFramePreferredSize() {
@@ -108,7 +99,7 @@ public final class MyfeApplication extends JFrame {
             SwingUtilities.updateComponentTreeUI(this);
             pack();
         } catch (ReflectiveOperationException | UnsupportedLookAndFeelException e) {
-            e.printStackTrace();
+            LOGGER.error("Exception of changing Look & Feel: {}", lafClassName, e);
         }
     }
 
@@ -117,8 +108,17 @@ public final class MyfeApplication extends JFrame {
         if (tabbedPane.hasTab(tabTitle)) {
             tabbedPane.openTab(tabTitle);
         } else {
-            FeTab tab = tabFactory.createArchiveTab(path);
-            tabbedPane.openNewTab(tab);
+            try {
+                FeTab tab = tabFactory.createArchiveTab(path);
+                tabbedPane.openNewTab(tab);
+            } catch (Exception e) {
+                LOGGER.error("Exception of open archive {}", path, e);
+                JOptionPane.showMessageDialog(
+                        this,
+                        e.getMessage(),
+                        "Open archive " + path,
+                        JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
@@ -127,8 +127,17 @@ public final class MyfeApplication extends JFrame {
         if (tabbedPane.hasTab(tabTitle)) {
             tabbedPane.openTab(tabTitle);
         } else {
-            FeTab tab = tabFactory.createFtpTab(connectionConfig);
-            tabbedPane.openNewTab(tab);
+            try {
+                FeTab tab = tabFactory.createFtpTab(connectionConfig);
+                tabbedPane.openNewTab(tab);
+            } catch (Exception e) {
+                LOGGER.error("Exception of connection to FTP server {}", connectionConfig.getInfo(), e);
+                JOptionPane.showMessageDialog(
+                        this,
+                        e.getMessage(),
+                        "Connect to FTP server " + connectionConfig.getInfo(),
+                        JOptionPane.ERROR_MESSAGE);
+            }
         }
     }
 
