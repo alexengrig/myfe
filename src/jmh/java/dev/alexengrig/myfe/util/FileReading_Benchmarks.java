@@ -47,7 +47,7 @@ import java.util.concurrent.TimeUnit;
 @State(Scope.Benchmark)
 @Fork(value = 1, jvmArgs = "-ea")
 @Warmup(iterations = 1, time = 1)
-@Measurement(iterations = 1)
+@Measurement(iterations = 5)
 @BenchmarkMode(Mode.AverageTime)
 @OutputTimeUnit(TimeUnit.MILLISECONDS)
 @CompilerControl(CompilerControl.Mode.DONT_INLINE)
