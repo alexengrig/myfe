@@ -6,6 +6,10 @@ MYFE (MYFE Youth File Explorer) is a file explorer application.
 
 ![Screenshot](docs/screenshot.png)
 
+- view the structure and contents of directories on the local disk, on FTP servers and inside ZIP archives;
+- show preview files and images;
+- filter files in a directory by a type.
+
 ## Build
 
 Required Gradle and JDK 11.
