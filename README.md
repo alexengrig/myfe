@@ -50,6 +50,13 @@ java -jar build/libs/myfe.jar
 
 ![Tab](docs/tab.png)
 
+## Dependencies
+
+- [Apache Commons Net](https://github.com/apache/commons-net)
+- [FlatLaf IntelliJ Themes Pack](https://github.com/JFormDesigner/FlatLaf/tree/main/flatlaf-intellij-themes)
+- [SLF4J](https://github.com/qos-ch/slf4j)
+- [Logback](https://github.com/qos-ch/logback)
+
 ## License
 
 This project is [licensed](LICENSE) under [Apache License, version 2.0](https://www.apache.org/licenses/LICENSE-2.0).
