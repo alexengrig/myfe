@@ -98,6 +98,7 @@ public class MyfeMenuBar extends JMenuBar {
 
         public FileMenu() {
             super("File");
+            setName("file");
             add(new OpenArchiveMenuItem());
             add(new ConnectToFtpServerMenuItem());
         }
@@ -142,6 +143,7 @@ public class MyfeMenuBar extends JMenuBar {
     private class ConnectToFtpServerMenuItem extends JMenuItem {
 
         public ConnectToFtpServerMenuItem() {
+            setName("connect-to-ftp-server");
             setAction(new ConnectToFtpServerAction());
             setMnemonic('C');
             setText("Connect to FTP server...");

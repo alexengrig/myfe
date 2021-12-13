@@ -154,14 +154,22 @@ public class FeTab extends JPanel {
     }
 
     private void initViews() {
-        LOGGER.debug("Start initializing views");
+        String rootName = service.getRootName();
+        LOGGER.debug("Start initializing views: {}", rootName);
         headerView = new FeHeader(directoryModel);
+        headerView.setName(rootName);
         treeView = new FeDirectoryTree(treeModel, new TreeService());
+        treeView.setName(rootName);
         tableView = new FeContentTable(tableModel);
+        tableView.setName(rootName);
         filterView = new FeContentFilter(filterModel);
+        filterView.setName(rootName);
         detailsView = new FePathDetails(pathModel);
+        detailsView.setName(rootName);
         previewView = new FePathPreview(pathModel, new PreviewService());
+        previewView.setName(rootName);
         footerView = new FeFooter(footerModel);
+        footerView.setName(rootName);
         LOGGER.debug("Finished initializing views");
     }
 

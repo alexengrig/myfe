@@ -29,7 +29,7 @@ public class FeTabbedPane extends JTabbedPane {
         insertTab(defaultTab.title(), null, defaultTab, defaultTab.tip(), 0);
     }
 
-    public void openTab(FeTab tab) {
+    public void openNewTab(FeTab tab) {
         super.addTab(tab.title(), null, tab, tab.tip());
         int index = super.getTabCount() - 1;
         super.setTabComponentAt(index, new MyTabComponent(tab));

@@ -45,6 +45,7 @@ public class FtpConnectDialog extends JDialog {
     public FtpConnectDialog(JFrame owner, String title, ConnectAction connectAction) {
         super(owner, title, true);
         this.connectAction = connectAction;
+        setName("ftp-connect");
         setLocationRelativeTo(owner);
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         init();
@@ -61,12 +62,16 @@ public class FtpConnectDialog extends JDialog {
         JPanel contentPanel = new JPanel();
         contentPanel.setLayout(new BoxLayout(contentPanel, BoxLayout.Y_AXIS));
         contentPanel.setBorder(BorderFactory.createEmptyBorder(12, 12, 12, 12));
+        hostField.setName("host");
         contentPanel.add(createLabeledTextField(hostLabel, hostField));
         contentPanel.add(Box.createVerticalStrut(12));
+        portField.setName("port");
         contentPanel.add(createLabeledTextField(portLabel, portField));
         contentPanel.add(Box.createVerticalStrut(12));
+        usernameField.setName("username");
         contentPanel.add(createLabeledTextField(usernameLabel, usernameField));
         contentPanel.add(Box.createVerticalStrut(12));
+        passwordField.setName("password");
         contentPanel.add(createLabeledTextField(passwordLabel, passwordField));
         contentPanel.add(Box.createVerticalStrut(16));
         contentPanel.add(createConnectButton());
@@ -98,6 +103,7 @@ public class FtpConnectDialog extends JDialog {
             }
         });
         connectButton.setText("Connect"); // Should be after setAction
+        connectButton.setName("connect");
         return connectButton;
     }
 

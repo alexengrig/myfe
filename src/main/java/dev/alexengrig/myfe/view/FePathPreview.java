@@ -77,6 +77,7 @@ public class FePathPreview extends JPanel {
         setBorder(BorderFactory.createEmptyBorder(4, 4, 4, 4));
         textView.setName("preview-text");
         add(textView);
+        loadButton.setName("load");
         loadButton.setAction(new LoadAction());
         loadButton.setText("Load preview");
         loadButton.setAlignmentX(CENTER_ALIGNMENT);
