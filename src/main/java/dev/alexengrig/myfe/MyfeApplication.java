@@ -117,10 +117,8 @@ public final class MyfeApplication extends JFrame {
         if (tabbedPane.hasTab(tabTitle)) {
             tabbedPane.openTab(tabTitle);
         } else {
-            backgroundExecutor.execute(
-                    () -> "Open archive: " + path,
-                    () -> tabFactory.createArchiveTab(path),
-                    tabbedPane::openTab);
+            FeTab tab = tabFactory.createArchiveTab(path);
+            tabbedPane.openNewTab(tab);
         }
     }
 
@@ -129,10 +127,8 @@ public final class MyfeApplication extends JFrame {
         if (tabbedPane.hasTab(tabTitle)) {
             tabbedPane.openTab(tabTitle);
         } else {
-            backgroundExecutor.execute(
-                    () -> "Connect to FTP server: " + connectionConfig.getHostAndPort(),
-                    () -> tabFactory.createFtpTab(connectionConfig),
-                    tabbedPane::openTab);
+            FeTab tab = tabFactory.createFtpTab(connectionConfig);
+            tabbedPane.openNewTab(tab);
         }
     }
 
