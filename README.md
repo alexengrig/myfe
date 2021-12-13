@@ -9,16 +9,11 @@ MYFE (MYFE Youth File Explorer) is a file explorer application.
 ```
         User
           \ action
-           v
-          VIEW
-          ^   \ event
- notify /      \ 
-    MODEL       )
-        ^      /
-  update \    v
-       CONTROLLER
-         ^    \
-          \    v
+           v             update
+        UI delegate -----------> MODEL
+      (VIEW + CONTROLLER) <-------
+          ^    \           notify
+           \    v
            SERVICE
             ^   / query
     result /   v
