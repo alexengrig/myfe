@@ -21,11 +21,9 @@ import dev.alexengrig.myfe.model.FeContentTableModel;
 import dev.alexengrig.myfe.view.event.FeContentTableEvent;
 import dev.alexengrig.myfe.view.event.FeContentTableListener;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import javax.swing.*;
-import java.awt.*;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -78,19 +76,6 @@ class FeContentTableTest {
         assertEquals(1, events.size(), "Number of events");
         FeContentTableEvent event = events.get(0);
         assertSame(file, event.getPath(), "Selected file");
-    }
-
-    @Disabled("Mouse click / Enter press")
-    @Test
-    void should_go_to_path() throws AWTException, InterruptedException {
-        FeFile file = new FeFile("/file.this", "file.this");
-        model.setPaths(Collections.singletonList(file));
-        events.clear();
-        //TODO: Click / press
-        Thread.sleep(500); // wait select timeout
-        assertEquals(1, events.size(), "Number of events");
-        FeContentTableEvent event = events.get(0);
-        assertSame(file, event.getPath(), "Go to file");
     }
 
     @Test
