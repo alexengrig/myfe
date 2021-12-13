@@ -6,6 +6,17 @@ MYFE (MYFE Youth File Explorer) is a file explorer application.
 
 ![Screenshot](docs/screenshot.png)
 
+## Build
+
+Required Gradle and JDK 11.
+
+```shell
+# build
+gradle shadowJar
+# run
+java -jar build/libs/myfe.jar
+```
+
 ## Architecture
 
 ```
