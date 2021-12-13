@@ -4,6 +4,8 @@
 
 MYFE (MYFE Youth File Explorer) is a file explorer application.
 
+![Screenshot](docs/screenshot.png)
+
 ## Architecture
 
 ```
