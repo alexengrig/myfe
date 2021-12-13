@@ -23,11 +23,13 @@ import dev.alexengrig.myfe.view.FeFooter;
 import dev.alexengrig.myfe.view.FeHeader;
 import dev.alexengrig.myfe.view.FePathDetails;
 import dev.alexengrig.myfe.view.FePathPreview;
+import dev.alexengrig.myfe.view.FeTabbedPane;
 import org.assertj.swing.annotation.GUITest;
 import org.assertj.swing.edt.GuiActionRunner;
 import org.assertj.swing.edt.GuiQuery;
 import org.assertj.swing.fixture.FrameFixture;
 import org.assertj.swing.fixture.JPanelFixture;
+import org.assertj.swing.fixture.JTabbedPaneFixture;
 import org.assertj.swing.fixture.JTableFixture;
 import org.assertj.swing.fixture.JTreeFixture;
 import org.assertj.swing.testng.listener.ScreenshotOnFailureListener;
@@ -84,6 +86,14 @@ public abstract class BaseMyfeApplicationIntegrationTest extends AssertJSwingTes
     }
 
     /**
+     * @param name component name
+     * @return {@link FeContentTable} by {@code name}
+     */
+    protected JTableFixture getTable(String name) {
+        return window.table(new NamedInstanceTypeMatcher<>(FeContentTable.class, name));
+    }
+
+    /**
      * @return {@link FeContentFilter}
      */
     protected JPanelFixture getFilterPanel() {
@@ -116,6 +126,21 @@ public abstract class BaseMyfeApplicationIntegrationTest extends AssertJSwingTes
      */
     protected JPanelFixture getPreviewPanel() {
         return window.panel(new InstanceTypeMatcher<>(FePathPreview.class));
+    }
+
+    /**
+     * @param name component name
+     * @return {@link FePathPreview} by {@code name}
+     */
+    protected JPanelFixture getPreviewPanel(String name) {
+        return window.panel(new NamedInstanceTypeMatcher<>(FePathPreview.class, name));
+    }
+
+    /**
+     * @return {@link FePathPreview}
+     */
+    protected JTabbedPaneFixture getTabbedPane() {
+        return window.tabbedPane(new InstanceTypeMatcher<>(FeTabbedPane.class));
     }
 
 }
