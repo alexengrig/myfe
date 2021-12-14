@@ -77,6 +77,7 @@ public class CommonsFtpClient implements FtpClient {
                 client.disconnect();
                 throw exception;
             }
+            client.enterLocalPassiveMode();
         } catch (IOException e) {
             throw new FTPClientIOException(client, e);
         }
